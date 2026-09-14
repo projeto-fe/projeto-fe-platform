@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { registrarAuditoria } from "@/lib/auditoria";
+import { enviarConviteNoEmail } from "@/lib/email";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
@@ -70,13 +71,49 @@ export async function convidarPessoa(
     sensivel: true,
   });
 
+  let nomeDaArea: string | undefined;
+  if (analise.data.area_id) {
+    const { data: area } = await supabase
+      .from("areas")
+      .select("nome")
+      .eq("id", analise.data.area_id)
+      .maybeSingle();
+    nomeDaArea = area?.nome;
+  }
+
+  const envio = await enviarConviteNoEmail({
+    para: analise.data.email,
+    link: `${enderecoDoPortal()}/convite/${token}`,
+    quemConvidou: pessoa.nome,
+    papel: analise.data.papel,
+    area: nomeDaArea,
+    expiraEm,
+  });
+
   revalidatePath("/pessoas");
 
-  // O envio do e-mail entra quando o domínio estiver verificado no Resend.
-  // Até lá o convite existe e aparece como pendente na tela.
-  return {
-    sucesso: `Convite criado para ${analise.data.email}. O envio por e-mail ainda não está ligado.`,
-  };
+  // Quando o e-mail não sai, dizer isso é melhor que deixar a pessoa
+  // esperando por uma mensagem que nunca chega. O convite continua válido e
+  // o link pode ser passado à mão.
+  if (!envio.enviado) {
+    return {
+      sucesso: `Convite criado para ${analise.data.email}, mas o e-mail não saiu (${envio.motivo}). O convite aparece como pendente abaixo.`,
+    };
+  }
+
+  return { sucesso: `Convite enviado para ${analise.data.email}.` };
+}
+
+/**
+ * Endereço público do portal, usado para montar o link do convite.
+ * Na Vercel vem pronto; em desenvolvimento cai para o servidor local.
+ */
+function enderecoDoPortal() {
+  if (process.env.NEXT_PUBLIC_URL_DO_PORTAL) return process.env.NEXT_PUBLIC_URL_DO_PORTAL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  return "http://localhost:3000";
 }
 
 export async function cancelarConvite(dados: FormData) {
