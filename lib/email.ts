@@ -88,6 +88,14 @@ function montarHtmlDoConvite({
   // variável CSS, então as cores da marca vêm de lib/brand.
   return `<!doctype html>
 <html lang="pt-BR">
+  <head>
+    <!-- Sem esta declaração, cliente de e-mail que não assume UTF-8 troca
+         cada acento por caractere estranho, e "PROJETO FÉ" vira "PROJETO FÃ‰". -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Seu acesso ao Portal Projeto Fé</title>
+  </head>
   <body style="margin:0;padding:0;background:${marcaNeutros.fundo};font-family:'Open Sans',Arial,sans-serif;color:${marca.azul};">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
       <tr>
