@@ -4,16 +4,40 @@
 -- ============================================================================
 \set ON_ERROR_STOP on
 
--- ---------------------------------------------------------------- massa
-insert into auth.users (id, email) values
-  ('11111111-1111-1111-1111-111111111111', 'admin@projetofe.org'),
-  ('22222222-2222-2222-2222-222222222222', 'coord@projetofe.org'),
-  ('33333333-3333-3333-3333-333333333333', 'volu@projetofe.org');
+-- helper de asserção
+create or replace function espera(condicao boolean, descricao text)
+returns void language plpgsql as $$
+begin
+  if condicao then
+    raise notice 'ok    %', descricao;
+  else
+    raise exception 'FALHOU: %', descricao;
+  end if;
+end;
+$$;
 
-insert into perfis (id, nome, email, is_admin) values
-  ('11111111-1111-1111-1111-111111111111', 'Admin Teste',   'admin@projetofe.org', true),
-  ('22222222-2222-2222-2222-222222222222', 'Coord Teste',   'coord@projetofe.org', false),
-  ('33333333-3333-3333-3333-333333333333', 'Volu Teste',    'volu@projetofe.org',  false);
+-- ---------------------------------------------------------------- massa
+-- Os perfis nascem pelo trigger em auth.users, como acontece de verdade.
+-- O primeiro usuário vira administrador pela regra de bootstrap.
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('11111111-1111-1111-1111-111111111111', 'admin@projetofe.org', '{"nome":"Admin Teste"}'),
+  ('22222222-2222-2222-2222-222222222222', 'coord@projetofe.org', '{"nome":"Coord Teste"}'),
+  ('33333333-3333-3333-3333-333333333333', 'volu@projetofe.org',  '{"nome":"Volu Teste"}');
+
+select espera(
+  (select is_admin from perfis where id = '11111111-1111-1111-1111-111111111111'),
+  'primeiro usuário virou administrador pelo bootstrap'
+);
+
+select espera(
+  (select count(*) from perfis where is_admin) = 1,
+  'apenas o primeiro usuário é administrador'
+);
+
+select espera(
+  (select nome from perfis where id = '22222222-2222-2222-2222-222222222222') = 'Coord Teste',
+  'nome do perfil veio dos metadados do usuário'
+);
 
 insert into areas (id, nome, tipo) values
   ('aaaaaaaa-0000-0000-0000-000000000001', 'Educacional', 'area');
@@ -34,18 +58,6 @@ insert into criancas_dados_sensiveis (crianca_id, logradouro, telefone_principal
 insert into motivos_pontuacao (id, rotulo, valor) values
   ('dddddddd-0000-0000-0000-000000000001', 'Ajudou um colega', 5),
   ('dddddddd-0000-0000-0000-000000000002', 'Linguagem inadequada', -3);
-
--- helper de asserção
-create or replace function espera(condicao boolean, descricao text)
-returns void language plpgsql as $$
-begin
-  if condicao then
-    raise notice 'ok    %', descricao;
-  else
-    raise exception 'FALHOU: %', descricao;
-  end if;
-end;
-$$;
 
 -- =============================================================== teste 1
 -- Voluntário não lê dado sensível. Testado no banco, não na interface.

@@ -17,9 +17,11 @@ $$;
 
 create schema if not exists auth;
 
+-- Mesmas colunas que o schema real do Supabase expõe e que usamos.
 create table auth.users (
   id uuid primary key default gen_random_uuid(),
-  email text unique
+  email text unique,
+  raw_user_meta_data jsonb not null default '{}'::jsonb
 );
 
 -- auth.uid() real lê o JWT. Aqui lê um GUC de sessão, que é como os testes
