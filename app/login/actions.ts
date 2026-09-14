@@ -45,9 +45,3 @@ export async function entrar(
 
   redirect(destino);
 }
-
-export async function sair() {
-  const supabase = await criarClienteDoServidor();
-  await supabase.auth.signOut();
-  redirect("/login");
-}

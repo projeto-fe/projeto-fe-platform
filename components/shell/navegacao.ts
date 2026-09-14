@@ -1,4 +1,12 @@
-import { Home, Star, Users, Network, ShieldCheck, type LucideIcon } from "lucide-react";
+import {
+  Home,
+  Star,
+  Users,
+  Network,
+  ShieldCheck,
+  UserCog,
+  type LucideIcon,
+} from "lucide-react";
 
 export type ItemDeNavegacao = {
   href: string;
@@ -9,8 +17,10 @@ export type ItemDeNavegacao = {
   grupo: "operacao" | "administracao";
   /** Só administrador enxerga. */
   somenteAdmin?: boolean;
-  /** Aparece na barra inferior do celular (cabem quatro). */
+  /** Aparece na barra inferior do celular (cabem cinco). */
   noCelular?: boolean;
+  /** Só na barra do celular: no desktop o item vive no menu da conta. */
+  somenteCelular?: boolean;
 };
 
 export const NAVEGACAO: ItemDeNavegacao[] = [
@@ -19,4 +29,6 @@ export const NAVEGACAO: ItemDeNavegacao[] = [
   { href: "/jogai", rotulo: "IDE JOGAI", rotuloCurto: "JOGAI", icone: Star, grupo: "operacao", noCelular: true },
   { href: "/estrutura", rotulo: "Estrutura", rotuloCurto: "Estrutura", icone: Network, grupo: "administracao", noCelular: true },
   { href: "/pessoas", rotulo: "Pessoas e acessos", rotuloCurto: "Pessoas", icone: ShieldCheck, grupo: "administracao", somenteAdmin: true },
+  // No desktop, conta e saída ficam no menu do rodapé da barra lateral.
+  { href: "/conta", rotulo: "Minha conta", rotuloCurto: "Conta", icone: UserCog, grupo: "administracao", noCelular: true, somenteCelular: true },
 ];

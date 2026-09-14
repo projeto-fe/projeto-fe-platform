@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/marca/logo";
+import { MenuDaConta } from "@/components/shell/menu-da-conta";
 import { NAVEGACAO } from "@/components/shell/navegacao";
 import { cn } from "@/lib/utils";
 
@@ -12,21 +13,15 @@ type Props = {
   children: React.ReactNode;
 };
 
-function iniciais(nome: string) {
-  const partes = nome.trim().split(/\s+/);
-  const primeira = partes[0]?.[0] ?? "";
-  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : "";
-  return (primeira + ultima).toUpperCase();
-}
-
 function estaAtivo(href: string, caminho: string) {
   return href === "/" ? caminho === "/" : caminho.startsWith(href);
 }
 
 export function AppShell({ usuario, children }: Props) {
   const caminho = usePathname();
-  const itens = NAVEGACAO.filter((i) => !i.somenteAdmin || usuario.isAdmin);
-  const noCelular = itens.filter((i) => i.noCelular).slice(0, 4);
+  const permitidos = NAVEGACAO.filter((i) => !i.somenteAdmin || usuario.isAdmin);
+  const itens = permitidos.filter((i) => !i.somenteCelular);
+  const noCelular = permitidos.filter((i) => i.noCelular).slice(0, 5);
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[236px_1fr]">
@@ -71,22 +66,16 @@ export function AppShell({ usuario, children }: Props) {
           })}
         </nav>
 
-        <div className="flex items-center gap-2.5 border-t border-line px-3 py-2.5">
-          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-inverse font-display text-[0.625rem] font-semibold text-ink-inverse">
-            {iniciais(usuario.nome)}
-          </span>
-          <span className="min-w-0 leading-tight">
-            <span className="block truncate text-sm font-semibold">{usuario.nome}</span>
-            <span className="block truncate text-xs text-ink-muted">{usuario.papel}</span>
-          </span>
+        <div className="border-t border-line p-1.5">
+          <MenuDaConta nome={usuario.nome} papel={usuario.papel} />
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-col">
         {children}
 
-        {/* Barra inferior: só no celular. Quatro itens alcançáveis com o polegar. */}
-        <nav className="sticky bottom-0 grid grid-cols-4 border-t border-line bg-surface-raised pb-[env(safe-area-inset-bottom)] md:hidden">
+        {/* Barra inferior: só no celular. Cinco itens alcançáveis com o polegar. */}
+        <nav className="sticky bottom-0 grid grid-cols-5 border-t border-line bg-surface-raised pb-[env(safe-area-inset-bottom)] md:hidden">
           {noCelular.map((item) => {
             const ativo = estaAtivo(item.href, caminho);
             const Icone = item.icone;
