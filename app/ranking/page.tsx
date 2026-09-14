@@ -9,8 +9,17 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-// Página aberta: revalida sozinha, não é gerada a cada visita.
-export const revalidate = 300;
+/**
+ * Renderizada sob demanda, não durante o build.
+ *
+ * Gerar esta página no build exigiria a chave de serviço na hora de compilar,
+ * e construir o site não deveria precisar da credencial que dá acesso total
+ * ao banco. Além disso o ranking muda ao longo do ano: prender o conteúdo ao
+ * momento do deploy entregaria pontuação velha até alguém publicar de novo.
+ *
+ * O custo é uma consulta por visita, irrelevante na escala deste projeto.
+ */
+export const dynamic = "force-dynamic";
 
 type Linha = { nome_publico: string; pontos: number };
 

@@ -43,7 +43,10 @@ export function criarClienteAdministrativo() {
 
   if (!chave) {
     throw new Error(
-      "SUPABASE_SERVICE_ROLE_KEY não está definida. Confira o .env.local.",
+      "SUPABASE_SERVICE_ROLE_KEY não está definida. Em desenvolvimento, confira " +
+        "o .env.local. Em produção, confira as variáveis de ambiente do projeto, " +
+        "lembrando que variável marcada como sensível fica disponível só em " +
+        "execução, nunca durante o build.",
     );
   }
 
