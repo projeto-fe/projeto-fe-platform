@@ -102,17 +102,13 @@ function montarHtmlDoConvite({
         <td align="center">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:${marca.branco};border-radius:12px;overflow:hidden;">
             <tr>
-              <td align="center" style="background:${marca.azul};padding:28px 28px 24px;">
-                <!-- Imagem hospedada no site do instituto: cliente de e-mail
-                     não renderiza SVG com confiança e costuma bloquear imagem
-                     embutida. Se for bloqueada, o texto alternativo aparece
-                     claro sobre o navy e ainda identifica quem escreveu. -->
-                <img
-                  src="https://projetofe.org/logo-full-light.png"
-                  alt="Instituto Projeto Fé"
-                  width="180"
-                  style="display:block;width:180px;max-width:70%;height:auto;border:0;color:${marca.branco};font-size:16px;font-weight:700;"
-                >
+              <td align="center" style="background:${marca.azul};padding:26px 28px;">
+                <!-- Nome em texto, não imagem: aparece sempre, inclusive nos
+                     clientes que bloqueiam imagem por padrão. -->
+                <div style="font-size:10px;letter-spacing:3px;color:${marcaNeutros.brancoTransparente70};font-weight:600;">INSTITUTO</div>
+                <div style="font-size:20px;font-weight:800;color:${marca.branco};margin-top:5px;">
+                  PROJETO <span style="color:${marca.laranja};">FÉ</span>
+                </div>
               </td>
             </tr>
             <tr>
