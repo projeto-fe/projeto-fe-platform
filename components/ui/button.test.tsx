@@ -19,12 +19,12 @@ describe("Button", () => {
   it("aceita asChild com um link sem quebrar", () => {
     render(
       <Button asChild size="sm">
-        <a href="/criancas/nova">Nova criança</a>
+        <a href="/destino-de-teste">Nova criança</a>
       </Button>,
     );
 
     const link = screen.getByRole("link", { name: "Nova criança" });
-    expect(link).toHaveAttribute("href", "/criancas/nova");
+    expect(link).toHaveAttribute("href", "/destino-de-teste");
     expect(link).toHaveClass("bg-action");
   });
 

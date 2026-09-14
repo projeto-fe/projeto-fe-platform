@@ -55,9 +55,11 @@ insert into criancas (id, nome_completo, nome_jogador, data_nascimento) values
 insert into criancas_dados_sensiveis (crianca_id, logradouro, telefone_principal) values
   ('cccccccc-0000-0000-0000-000000000001', 'Rua Inventada, 100', '(14) 90000-0000');
 
-insert into motivos_pontuacao (id, rotulo, valor) values
-  ('dddddddd-0000-0000-0000-000000000001', 'Ajudou um colega', 5),
-  ('dddddddd-0000-0000-0000-000000000002', 'Linguagem inadequada', -3);
+-- Os motivos vêm do catálogo criado por migration, não do teste.
+select espera(
+  (select count(*) from motivos_pontuacao where ativo) >= 2,
+  'catálogo de motivos veio populado pela migration'
+);
 
 -- =============================================================== teste 1
 -- Voluntário não lê dado sensível. Testado no banco, não na interface.
@@ -89,15 +91,16 @@ set "request.jwt.claim.sub" = '33333333-3333-3333-3333-333333333333';
 
 insert into pontuacao_eventos (crianca_id, motivo_id, valor_aplicado, lancado_por)
 values ('cccccccc-0000-0000-0000-000000000001',
-        'dddddddd-0000-0000-0000-000000000001',
+        (select id from motivos_pontuacao where rotulo = 'Ajudou um colega'),
         999,
         '33333333-3333-3333-3333-333333333333');
 
 select espera(
   (select valor_aplicado from pontuacao_eventos
     where crianca_id = 'cccccccc-0000-0000-0000-000000000001'
-      and estorna_evento_id is null) = 5,
-  'valor 999 enviado pelo cliente foi substituído pelos 5 do catálogo'
+      and estorna_evento_id is null)
+    = (select valor from motivos_pontuacao where rotulo = 'Ajudou um colega'),
+  'valor 999 enviado pelo cliente foi substituído pelo valor do catálogo'
 );
 
 -- =============================================================== teste 4
@@ -136,7 +139,7 @@ begin
   begin
     insert into pontuacao_eventos (crianca_id, motivo_id, valor_aplicado, lancado_por)
     values ('cccccccc-0000-0000-0000-000000000001',
-            'dddddddd-0000-0000-0000-000000000001', 5,
+            (select id from motivos_pontuacao where rotulo = 'Ajudou um colega'), 5,
             '11111111-1111-1111-1111-111111111111');
   exception when others then deu_erro := true;
   end;
@@ -184,13 +187,13 @@ select espera(
 -- =============================================================== teste 8
 -- Mudar o catálogo não reescreve o passado.
 set "request.jwt.claim.sub" = '11111111-1111-1111-1111-111111111111';
-update motivos_pontuacao set valor = 50
-  where id = 'dddddddd-0000-0000-0000-000000000001';
+update motivos_pontuacao set valor = 50 where rotulo = 'Ajudou um colega';
 
 select espera(
   (select valor_aplicado from pontuacao_eventos
-    where motivo_id = 'dddddddd-0000-0000-0000-000000000001') = 5,
-  'lançamento antigo manteve o valor aplicado na época'
+    where motivo_id = (select id from motivos_pontuacao where rotulo = 'Ajudou um colega')) = 5
+    and (select valor from motivos_pontuacao where rotulo = 'Ajudou um colega') = 50,
+  'catálogo mudou para 50 e o lançamento antigo continua valendo 5'
 );
 
 -- =============================================================== teste 9
