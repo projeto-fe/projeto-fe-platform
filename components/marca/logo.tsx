@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 type Props = {
-  /** Sobre fundo escuro, o texto inverte. */
+  /** Sobre o navy da marca (login e ranking público), o texto vira claro. */
   claro?: boolean;
   /** Só o símbolo, sem o nome. */
   compacto?: boolean;
@@ -22,7 +22,7 @@ export function Logo({ claro = false, compacto = false, className }: Props) {
           <span
             className={cn(
               "block font-display text-[0.625rem] font-medium tracking-[0.22em]",
-              claro ? "text-ink-inverse/70" : "text-ink-muted",
+              claro ? "text-brand-canvas-ink/70" : "text-ink-muted",
             )}
           >
             INSTITUTO
@@ -30,7 +30,7 @@ export function Logo({ claro = false, compacto = false, className }: Props) {
           <span
             className={cn(
               "mt-1 block font-display text-[0.9375rem] font-extrabold tracking-tight",
-              claro ? "text-ink-inverse" : "text-ink",
+              claro ? "text-brand-canvas-ink" : "text-ink",
             )}
           >
             PROJETO <span className="text-brand">FÉ</span>

@@ -94,6 +94,14 @@
   --action-hover: var(--c-navy-900);
   --action-ink: var(--c-paper-0);
 
+  /* Território de marca: capa do login e página pública do ranking.
+     Não inverte com o tema de propósito. A identidade do instituto é o
+     navy com o laranja, e ela precisa ser a mesma para quem chega, venha
+     o visitante com o sistema em claro ou em escuro. */
+  --brand-canvas: var(--c-navy-700);
+  --brand-canvas-deep: var(--c-navy-900);
+  --brand-canvas-ink: var(--c-paper-0);
+
   /* par fill/strong: fill preenche (fundo, barra), strong é a
      variante legível como TEXTO. A mesma cor raramente serve
      para as duas coisas.

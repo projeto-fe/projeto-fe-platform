@@ -38,14 +38,14 @@ export default async function RankingPublico() {
   const alturas = [112, 88, 74];
 
   return (
-    <main className="min-h-dvh bg-surface-inverse">
+    <main className="min-h-dvh bg-brand-canvas-deep">
       <header className="flex flex-col gap-6 px-5 pt-6 pb-5 md:px-8">
         <Logo claro />
         <div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink-inverse md:text-4xl">
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-brand-canvas-ink md:text-4xl">
             IDE JOGAI
           </h1>
-          <p className="mt-1.5 text-sm text-ink-inverse/60">
+          <p className="mt-1.5 text-sm text-brand-canvas-ink/60">
             Ranking de {new Date().getFullYear()}
           </p>
         </div>
@@ -53,7 +53,7 @@ export default async function RankingPublico() {
 
       <div className="px-5 pb-10 md:px-8">
         {linhas.length === 0 ? (
-          <p className="rounded-md border border-ink-inverse/10 bg-ink-inverse/5 px-4 py-6 text-center text-sm text-ink-inverse/60">
+          <p className="mx-auto max-w-lg rounded-md border border-brand-canvas-ink/10 bg-brand-canvas-ink/5 px-4 py-6 text-center text-sm text-brand-canvas-ink/60">
             O ranking começa assim que os primeiros pontos forem lançados.
           </p>
         ) : (
@@ -65,21 +65,21 @@ export default async function RankingPublico() {
                 const primeiro = indice === 0;
                 return (
                   <div key={linha.nome_jogador} className="flex flex-col items-center gap-2">
-                    <span className="text-center text-sm font-semibold break-words text-ink-inverse">
+                    <span className="text-center text-sm font-semibold break-words text-brand-canvas-ink">
                       {linha.nome_jogador}
                     </span>
                     <span
                       className={
                         primeiro
                           ? "flex w-full flex-col items-center justify-center gap-0.5 rounded-t-md bg-brand"
-                          : "flex w-full flex-col items-center justify-center gap-0.5 rounded-t-md border border-b-0 border-ink-inverse/12 bg-ink-inverse/8"
+                          : "flex w-full flex-col items-center justify-center gap-0.5 rounded-t-md border border-b-0 border-brand-canvas-ink/12 bg-brand-canvas-ink/8"
                       }
                       style={{ height: alturas[posicaoVisual] }}
                     >
-                      <span className="font-display text-[0.625rem] font-semibold tracking-wider text-ink-inverse/75">
+                      <span className="font-display text-[0.625rem] font-semibold tracking-wider text-brand-canvas-ink/75">
                         {indice + 1}º
                       </span>
-                      <span className="font-display text-xl font-extrabold tabular-nums text-ink-inverse">
+                      <span className="font-display text-xl font-extrabold tabular-nums text-brand-canvas-ink">
                         {linha.pontos}
                       </span>
                     </span>
@@ -89,25 +89,25 @@ export default async function RankingPublico() {
             </div>
 
             {demais.length > 0 ? (
-              <ol className="mx-auto mt-0 max-w-lg overflow-hidden rounded-b-md border border-ink-inverse/10 bg-ink-inverse/5">
+              <ol className="mx-auto mt-0 max-w-lg overflow-hidden rounded-b-md border border-brand-canvas-ink/10 bg-brand-canvas-ink/5">
                 {demais.map((linha, indice) => (
                   <li
                     key={linha.nome_jogador}
-                    className="flex items-center gap-3 border-b border-ink-inverse/7 px-4 py-2.5 last:border-b-0"
+                    className="flex items-center gap-3 border-b border-brand-canvas-ink/7 px-4 py-2.5 last:border-b-0"
                   >
-                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-ink-inverse/10 font-display text-[0.625rem] font-semibold tabular-nums text-ink-inverse/70">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-canvas-ink/10 font-display text-[0.625rem] font-semibold tabular-nums text-brand-canvas-ink/70">
                       {indice + 4}
                     </span>
-                    <span className="min-w-0 flex-1 text-sm font-semibold text-ink-inverse">
+                    <span className="min-w-0 flex-1 text-sm font-semibold text-brand-canvas-ink">
                       {linha.nome_jogador}
                     </span>
-                    <span className="hidden h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-ink-inverse/12 sm:block">
+                    <span className="hidden h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-brand-canvas-ink/12 sm:block">
                       <span
                         className="block h-full rounded-full bg-brand"
                         style={{ width: `${maior > 0 ? Math.round((linha.pontos / maior) * 100) : 0}%` }}
                       />
                     </span>
-                    <span className="w-11 shrink-0 text-right font-display text-[0.9375rem] font-semibold tabular-nums text-ink-inverse">
+                    <span className="w-11 shrink-0 text-right font-display text-[0.9375rem] font-semibold tabular-nums text-brand-canvas-ink">
                       {linha.pontos}
                     </span>
                   </li>
@@ -117,7 +117,7 @@ export default async function RankingPublico() {
           </>
         )}
 
-        <p className="mx-auto mt-5 max-w-[52ch] text-center text-xs text-ink-inverse/50">
+        <p className="mx-auto mt-5 max-w-[52ch] text-center text-xs text-brand-canvas-ink/50">
           Aparecem aqui apenas o nome de jogador e a pontuação. Nenhum nome completo, foto, idade
           ou outro dado das crianças é publicado.
         </p>

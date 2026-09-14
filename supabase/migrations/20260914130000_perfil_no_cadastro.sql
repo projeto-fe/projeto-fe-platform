@@ -10,6 +10,12 @@
 -- A regra só dispara com a tabela vazia, então vale exatamente uma vez.
 -- ============================================================================
 
+-- Criar gatilho em auth.users pede lock exclusivo numa tabela que o serviço
+-- de autenticação consulta o tempo todo. Sem limite, a migration espera para
+-- sempre em vez de falhar. Melhor falhar rápido e repetir.
+set lock_timeout = '10s';
+set statement_timeout = '60s';
+
 create or replace function criar_perfil_para_novo_usuario()
 returns trigger
 language plpgsql

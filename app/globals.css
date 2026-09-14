@@ -29,6 +29,10 @@
   --color-action-hover: var(--action-hover);
   --color-action-ink: var(--action-ink);
 
+  --color-brand-canvas: var(--brand-canvas);
+  --color-brand-canvas-deep: var(--brand-canvas-deep);
+  --color-brand-canvas-ink: var(--brand-canvas-ink);
+
   --color-positive: var(--positive);
   --color-positive-strong: var(--positive-strong);
   --color-positive-soft: var(--positive-soft);

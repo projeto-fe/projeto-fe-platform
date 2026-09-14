@@ -15,20 +15,20 @@ export default async function PaginaDeLogin({
 
   return (
     <main className="grid min-h-dvh md:grid-cols-2">
-      <section className="flex flex-col justify-between gap-7 bg-surface-inverse px-6 py-8 md:px-9 md:py-10">
+      <section className="flex flex-col justify-between gap-7 bg-brand-canvas px-6 py-8 md:px-9 md:py-10">
         <Logo claro />
 
         <div className="flex flex-col gap-3">
-          <h1 className="font-display text-3xl leading-[1.12] font-semibold text-ink-inverse md:text-4xl">
+          <h1 className="font-display text-3xl leading-[1.12] font-semibold text-brand-canvas-ink md:text-4xl">
             Cada criança tem um <span className="text-brand">nome</span>, uma história e um
             caminho.
           </h1>
-          <p className="max-w-[34ch] text-sm text-ink-inverse/70">
+          <p className="max-w-[34ch] text-sm text-brand-canvas-ink/70">
             Portal interno da equipe. Cadastro, acompanhamento e o IDE JOGAI num lugar só.
           </p>
         </div>
 
-        <p className="text-xs text-ink-inverse/50">
+        <p className="text-xs text-brand-canvas-ink/50">
           Instituto Projeto Fé · Marília, SP
         </p>
       </section>
