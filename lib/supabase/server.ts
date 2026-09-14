@@ -1,6 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import {
+  chaveDeServicoDoSupabase,
+  chavePublicaDoSupabase,
+  urlDoSupabase,
+} from "@/lib/ambiente";
+
 /**
  * Cliente para Server Components, Server Actions e Route Handlers.
  * Age como a pessoa autenticada, então continua sujeito às políticas do banco.
@@ -8,27 +14,23 @@ import { cookies } from "next/headers";
 export async function criarClienteDoServidor() {
   const armazemDeCookies = await cookies();
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return armazemDeCookies.getAll();
-        },
-        setAll(cookiesParaGravar) {
-          try {
-            for (const { name, value, options } of cookiesParaGravar) {
-              armazemDeCookies.set(name, value, options);
-            }
-          } catch {
-            // Server Component não pode gravar cookie. Quem renova a sessão
-            // é o proxy, então ignorar aqui é seguro.
+  return createServerClient(urlDoSupabase(), chavePublicaDoSupabase(), {
+    cookies: {
+      getAll() {
+        return armazemDeCookies.getAll();
+      },
+      setAll(cookiesParaGravar) {
+        try {
+          for (const { name, value, options } of cookiesParaGravar) {
+            armazemDeCookies.set(name, value, options);
           }
-        },
+        } catch {
+          // Server Component não pode gravar cookie. Quem renova a sessão
+          // é o proxy, então ignorar aqui é seguro.
+        }
       },
     },
-  );
+  });
 }
 
 /**
@@ -39,18 +41,7 @@ export async function criarClienteDoServidor() {
  * Nunca importe isto em componente de cliente.
  */
 export function criarClienteAdministrativo() {
-  const chave = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!chave) {
-    throw new Error(
-      "SUPABASE_SERVICE_ROLE_KEY não está definida. Em desenvolvimento, confira " +
-        "o .env.local. Em produção, confira as variáveis de ambiente do projeto, " +
-        "lembrando que variável marcada como sensível fica disponível só em " +
-        "execução, nunca durante o build.",
-    );
-  }
-
-  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, chave, {
+  return createServerClient(urlDoSupabase(), chaveDeServicoDoSupabase(), {
     cookies: { getAll: () => [], setAll: () => {} },
   });
 }

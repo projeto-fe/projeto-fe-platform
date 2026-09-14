@@ -5,6 +5,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { enderecoDoPortal } from "@/lib/ambiente";
 import { registrarAuditoria } from "@/lib/auditoria";
 import { enviarConviteNoEmail } from "@/lib/email";
 import { exigirPessoaLogada } from "@/lib/sessao";
@@ -102,18 +103,6 @@ export async function convidarPessoa(
   }
 
   return { sucesso: `Convite enviado para ${analise.data.email}.` };
-}
-
-/**
- * Endereço público do portal, usado para montar o link do convite.
- * Na Vercel vem pronto; em desenvolvimento cai para o servidor local.
- */
-function enderecoDoPortal() {
-  if (process.env.NEXT_PUBLIC_URL_DO_PORTAL) return process.env.NEXT_PUBLIC_URL_DO_PORTAL;
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  }
-  return "http://localhost:3000";
 }
 
 export async function cancelarConvite(dados: FormData) {
