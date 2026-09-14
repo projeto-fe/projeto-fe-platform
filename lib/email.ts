@@ -53,14 +53,14 @@ export async function enviarConviteNoEmail({
       subject: "Seu acesso ao Portal Projeto Fé",
       html: montarHtmlDoConvite({ link, quemConvidou, papelPorExtenso, ondeAtua, validade }),
       text: [
-        `${quemConvidou} criou um acesso para você no Portal do Instituto Projeto Fé,`,
+        `${quemConvidou} convidou você para o Portal do Instituto Projeto Fé,`,
         `para ${papelPorExtenso}${ondeAtua}.`,
         "",
-        "Abra o link abaixo para escolher sua senha:",
+        "Crie sua senha aqui:",
         link,
         "",
-        `O link vale até ${validade} e serve uma vez só.`,
-        "Se você não esperava este convite, ignore esta mensagem.",
+        `O link vale até ${validade}.`,
+        "Não esperava este convite? É só ignorar.",
       ].join("\n"),
     },
     // Reenviar o mesmo convite não dispara dois e-mails dentro de 24 horas.
@@ -100,45 +100,51 @@ function montarHtmlDoConvite({
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:${marca.branco};border-radius:12px;overflow:hidden;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:${marca.branco};border-radius:12px;overflow:hidden;">
             <tr>
-              <td style="background:${marca.azul};padding:24px 28px;">
-                <div style="font-size:10px;letter-spacing:3px;color:${marcaNeutros.brancoTransparente70};font-weight:600;">INSTITUTO</div>
-                <div style="font-size:19px;font-weight:800;color:${marca.branco};margin-top:4px;">
-                  PROJETO <span style="color:${marca.laranja};">FÉ</span>
-                </div>
+              <td align="center" style="background:${marca.azul};padding:28px 28px 24px;">
+                <!-- Imagem hospedada no site do instituto: cliente de e-mail
+                     não renderiza SVG com confiança e costuma bloquear imagem
+                     embutida. Se for bloqueada, o texto alternativo aparece
+                     claro sobre o navy e ainda identifica quem escreveu. -->
+                <img
+                  src="https://projetofe.org/logo-full-light.png"
+                  alt="Instituto Projeto Fé"
+                  width="180"
+                  style="display:block;width:180px;max-width:70%;height:auto;border:0;color:${marca.branco};font-size:16px;font-weight:700;"
+                >
               </td>
             </tr>
             <tr>
-              <td style="padding:28px;">
-                <h1 style="margin:0 0 14px;font-size:20px;font-weight:700;color:${marca.azul};">
-                  Seu acesso ao portal está pronto
+              <td align="center" style="padding:28px 28px 8px;">
+                <h1 style="margin:0;font-size:20px;font-weight:700;color:${marca.azul};">
+                  ${quemConvidou} convidou você
                 </h1>
-                <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${marcaNeutros.textoCorrido};">
-                  ${quemConvidou} criou um acesso para você no portal interno do Instituto,
-                  para ${papelPorExtenso}${ondeAtua}.
+                <p style="margin:8px 0 0;font-size:15px;line-height:1.5;color:${marcaNeutros.textoCorrido};">
+                  Para ${papelPorExtenso}${ondeAtua}.
                 </p>
-                <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:${marcaNeutros.textoCorrido};">
-                  Clique no botão abaixo para escolher sua senha e entrar.
-                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:20px 28px 26px;">
                 <table role="presentation" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="background:${marca.laranja};border-radius:6px;">
-                      <a href="${link}" style="display:inline-block;padding:13px 26px;font-size:15px;font-weight:700;color:${marca.branco};text-decoration:none;">
+                      <a href="${link}" style="display:inline-block;padding:14px 30px;font-size:16px;font-weight:700;color:${marca.branco};text-decoration:none;">
                         Criar minha senha
                       </a>
                     </td>
                   </tr>
                 </table>
-                <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:${marcaNeutros.textoDiscreto};">
-                  O link vale até ${validade} e serve uma vez só.
-                  Se você não esperava este convite, pode ignorar esta mensagem.
+                <p style="margin:16px 0 0;font-size:13px;color:${marcaNeutros.textoDiscreto};">
+                  O link vale até ${validade}.
                 </p>
               </td>
             </tr>
             <tr>
-              <td style="border-top:1px solid ${marcaNeutros.linha};padding:18px 28px;font-size:12px;color:${marcaNeutros.textoDiscreto};">
-                Instituto Projeto Fé · Marília, SP
+              <td align="center" style="border-top:1px solid ${marcaNeutros.linha};padding:16px 28px;font-size:12px;line-height:1.5;color:${marcaNeutros.textoDiscreto};">
+                Instituto Projeto Fé · Marília, SP<br>
+                Não esperava este convite? É só ignorar.
               </td>
             </tr>
           </table>
