@@ -9,6 +9,8 @@ import { criarClienteDoServidor } from "@/lib/supabase/server";
 
 export type EstadoDaCrianca = { erro?: string };
 
+const NAO_SALVOU = "Não foi possível salvar. Confira os campos e tente de novo.";
+
 const opcional = (esquema: z.ZodString) =>
   z.preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), esquema.optional());
 
@@ -20,11 +22,6 @@ const numeroOpcional = (min: number, max: number) =>
 
 const cadastro = z.object({
   nome_completo: z.string().trim().min(3, "Informe o nome completo."),
-  nome_jogador: z
-    .string()
-    .trim()
-    .min(2, "Informe o nome de jogador.")
-    .max(30, "Use no máximo 30 caracteres."),
   data_nascimento: z.string().min(1, "Informe a data de nascimento."),
   tem_problema_saude: z.coerce.boolean(),
   observacao_saude: opcional(z.string().max(300)),
@@ -80,7 +77,6 @@ export async function salvarCrianca(
 
   const basico = {
     nome_completo: v.nome_completo,
-    nome_jogador: v.nome_jogador,
     data_nascimento: v.data_nascimento,
     tem_problema_saude: v.tem_problema_saude,
     observacao_saude: v.observacao_saude ?? null,
@@ -96,14 +92,14 @@ export async function salvarCrianca(
 
   if (id) {
     const { error } = await supabase.from("criancas").update(basico).eq("id", id);
-    if (error) return { erro: mensagemDeErro(error.message) };
+    if (error) return { erro: NAO_SALVOU };
   } else {
     const { data, error } = await supabase
       .from("criancas")
       .insert({ ...basico, criado_por: pessoa.id })
       .select("id")
       .single();
-    if (error || !data) return { erro: mensagemDeErro(error?.message ?? "") };
+    if (error || !data) return { erro: NAO_SALVOU };
     criancaId = data.id;
   }
 
@@ -144,11 +140,4 @@ export async function salvarCrianca(
 
   revalidatePath("/criancas");
   redirect(`/criancas?salvo=${criancaId}`);
-}
-
-function mensagemDeErro(mensagem: string) {
-  if (mensagem.includes("criancas_nome_jogador_key")) {
-    return "Esse nome de jogador já está em uso. Escolha outro.";
-  }
-  return "Não foi possível salvar. Confira os campos e tente de novo.";
 }

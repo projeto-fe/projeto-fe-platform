@@ -17,7 +17,7 @@ export default async function Inicio() {
     supabase.from("perfis").select("id", { count: "exact", head: true }).eq("ativo", true),
     supabase
       .from("ranking_interno")
-      .select("crianca_id, nome_completo, nome_jogador, pontos")
+      .select("crianca_id, nome_completo, nome_publico, pontos")
       .order("pontos", { ascending: false })
       .limit(5),
   ]);
@@ -86,7 +86,7 @@ export default async function Inicio() {
                     <span className="min-w-0 flex-1 text-sm font-semibold">
                       {linha.nome_completo}
                       <span className="block text-xs font-normal text-ink-muted">
-                        {linha.nome_jogador}
+                        {linha.nome_publico}
                       </span>
                     </span>
                     <span className="hidden h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-surface-sunken sm:block">

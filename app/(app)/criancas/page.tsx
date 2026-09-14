@@ -16,7 +16,6 @@ export const metadata: Metadata = { title: "Crianças" };
 type LinhaDeCrianca = {
   id: string;
   nome_completo: string;
-  nome_jogador: string;
   data_nascimento: string;
   tem_problema_saude: boolean;
   observacao_saude: string | null;
@@ -44,7 +43,7 @@ export default async function Criancas({
   const [criancasResposta, atividadesResposta, inscricoesResposta] = await Promise.all([
     supabase
       .from("criancas")
-      .select("id, nome_completo, nome_jogador, data_nascimento, tem_problema_saude, observacao_saude")
+      .select("id, nome_completo, data_nascimento, tem_problema_saude, observacao_saude")
       .eq("ativo", true)
       .order("nome_completo"),
     supabase.from("areas").select("id, nome").eq("tipo", "atividade").eq("ativo", true).order("nome"),
@@ -71,9 +70,7 @@ export default async function Criancas({
   const linhas: LinhaDeCrianca[] = (criancasResposta.data ?? [])
     .map((c) => ({ ...c, atividades: atividadesPorCrianca.get(c.id) ?? [] }))
     .filter((c) => {
-      if (termo && !c.nome_completo.toLowerCase().includes(termo) && !c.nome_jogador.toLowerCase().includes(termo)) {
-        return false;
-      }
+      if (termo && !c.nome_completo.toLowerCase().includes(termo)) return false;
       if (atividade && !idsPorAtividade.get(atividade)?.has(c.id)) return false;
       return true;
     });
@@ -86,7 +83,7 @@ export default async function Criancas({
         <Link href={`/criancas/${linha.id}`} className="flex flex-col hover:text-brand-ink">
           <span className="font-semibold">{linha.nome_completo}</span>
           <span className="text-xs text-ink-muted">
-            {idade(linha.data_nascimento)} anos · {linha.nome_jogador}
+            {idade(linha.data_nascimento)} anos
           </span>
         </Link>
       ),

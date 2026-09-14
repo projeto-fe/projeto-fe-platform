@@ -32,7 +32,7 @@ export default async function Jogai() {
     supabase.from("areas").select("id, nome").eq("tipo", "atividade").eq("ativo", true).order("nome"),
     supabase
       .from("ranking_interno")
-      .select("crianca_id, nome_completo, nome_jogador, pontos")
+      .select("crianca_id, nome_completo, nome_publico, pontos")
       .order("pontos", { ascending: false }),
     supabase
       .from("pontuacao_eventos")
@@ -193,7 +193,7 @@ export default async function Jogai() {
                         {linha.nome_completo}
                       </span>
                       <span className="block truncate text-xs text-ink-muted">
-                        {linha.nome_jogador}
+                        {linha.nome_publico}
                       </span>
                     </span>
 
@@ -217,7 +217,7 @@ export default async function Jogai() {
             <CardBody className="border-t border-line">
               <p className="text-xs text-ink-muted">
                 Aqui a equipe vê o nome real. Na página pública, em{" "}
-                <span className="font-semibold">/ranking</span>, aparece só o nome de jogador.
+                <span className="font-semibold">/ranking</span>, aparece só o nome abreviado.
               </p>
             </CardBody>
           </Card>

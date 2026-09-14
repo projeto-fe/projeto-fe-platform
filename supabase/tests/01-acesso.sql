@@ -49,8 +49,8 @@ insert into area_membros (usuario_id, area_id, papel) values
   ('22222222-2222-2222-2222-222222222222', 'aaaaaaaa-0000-0000-0000-000000000001', 'coordenador'),
   ('33333333-3333-3333-3333-333333333333', 'aaaaaaaa-0000-0000-0000-000000000002', 'voluntario');
 
-insert into criancas (id, nome_completo, nome_jogador, data_nascimento) values
-  ('cccccccc-0000-0000-0000-000000000001', 'Criança Fictícia', 'Fictícia', '2016-05-10');
+insert into criancas (id, nome_completo, data_nascimento) values
+  ('cccccccc-0000-0000-0000-000000000001', 'Maria Fictícia Exemplo', '2016-05-10');
 
 insert into criancas_dados_sensiveis (crianca_id, logradouro, telefone_principal) values
   ('cccccccc-0000-0000-0000-000000000001', 'Rua Inventada, 100', '(14) 90000-0000');
@@ -303,6 +303,24 @@ end;
 $$;
 
 reset role;
+
+-- ============================================================== teste 13
+-- O nome que vai para a internet é derivado, nunca o nome completo.
+select espera(
+  nome_publico('Maria Fictícia Exemplo') = 'Maria E.',
+  'nome público reduz "Maria Fictícia Exemplo" para "Maria E."'
+);
+
+select espera(
+  nome_publico('Joana') = 'Joana',
+  'nome com uma palavra só continua inteiro'
+);
+
+select espera(
+  (select nome_publico from ranking_interno
+    where crianca_id = 'cccccccc-0000-0000-0000-000000000001') = 'Maria E.',
+  'a view de ranking expõe o nome derivado'
+);
 
 \echo ''
 \echo 'Todos os testes passaram.'

@@ -40,7 +40,7 @@ log de auditoria com autor e data.
 ### Buscar
 
 Lista com busca por nome ou por responsável, filtro por atividade. A lista mostra nome, idade,
-atividades, responsável e condição de saúde. Endereço e telefone não aparecem na lista.
+atividades e condição de saúde. Endereço e telefone não aparecem na lista.
 
 ### Registrar autorização
 
@@ -52,7 +52,7 @@ tela inicial.
 
 ```
 criancas
-  id, nome_completo, nome_jogador (único), data_nascimento,
+  id, nome_completo, data_nascimento,
   tem_problema_saude, observacao_saude,
   peso_kg, altura_m, numero_calcado, tamanho_uniforme,
   observacoes_gerais, ativo, criado_em, criado_por
@@ -87,4 +87,4 @@ Peso e altura em inteiro (gramas e centímetros), nunca ponto flutuante.
       pendências da tela inicial.
 - [ ] CEP inválido mostra mensagem dizendo o que fazer, e não trava o restante do formulário.
 - [ ] A tela funciona em largura de 390 pixels sem rolagem horizontal.
-- [ ] Nome de jogador duplicado é recusado com mensagem clara.
+- [ ] O nome que a página pública mostra é abreviado, derivado do nome completo.

@@ -12,12 +12,12 @@ export const metadata: Metadata = {
 // Página aberta: revalida sozinha, não é gerada a cada visita.
 export const revalidate = 300;
 
-type Linha = { nome_jogador: string; pontos: number };
+type Linha = { nome_publico: string; pontos: number };
 
 /**
  * Única página sem login do sistema.
  *
- * Renderizada no servidor e exibindo apenas nome de jogador e pontuação
+ * Renderizada no servidor e exibindo apenas o nome abreviado e a pontuação
  * (ADR 0006). Nenhuma credencial de banco chega ao navegador, então não
  * existe caminho entre quem visita e a tabela de crianças.
  */
@@ -26,7 +26,7 @@ export default async function RankingPublico() {
 
   const { data } = await supabase
     .from("ranking_interno")
-    .select("nome_jogador, pontos")
+    .select("nome_publico, pontos")
     .order("pontos", { ascending: false })
     .limit(50);
 
@@ -64,9 +64,9 @@ export default async function RankingPublico() {
                 if (!linha) return <span key={indice} />;
                 const primeiro = indice === 0;
                 return (
-                  <div key={linha.nome_jogador} className="flex flex-col items-center gap-2">
+                  <div key={linha.nome_publico} className="flex flex-col items-center gap-2">
                     <span className="text-center text-sm font-semibold break-words text-brand-canvas-ink">
-                      {linha.nome_jogador}
+                      {linha.nome_publico}
                     </span>
                     <span
                       className={
@@ -92,14 +92,14 @@ export default async function RankingPublico() {
               <ol className="mx-auto mt-0 max-w-lg overflow-hidden rounded-b-md border border-brand-canvas-ink/10 bg-brand-canvas-ink/5">
                 {demais.map((linha, indice) => (
                   <li
-                    key={linha.nome_jogador}
+                    key={linha.nome_publico}
                     className="flex items-center gap-3 border-b border-brand-canvas-ink/7 px-4 py-2.5 last:border-b-0"
                   >
                     <span className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-canvas-ink/10 font-display text-[0.625rem] font-semibold tabular-nums text-brand-canvas-ink/70">
                       {indice + 4}
                     </span>
                     <span className="min-w-0 flex-1 text-sm font-semibold text-brand-canvas-ink">
-                      {linha.nome_jogador}
+                      {linha.nome_publico}
                     </span>
                     <span className="hidden h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-brand-canvas-ink/12 sm:block">
                       <span
@@ -118,8 +118,8 @@ export default async function RankingPublico() {
         )}
 
         <p className="mx-auto mt-5 max-w-[52ch] text-center text-xs text-brand-canvas-ink/50">
-          Aparecem aqui apenas o nome de jogador e a pontuação. Nenhum nome completo, foto, idade
-          ou outro dado das crianças é publicado.
+          O nome aparece abreviado de propósito. Nenhum sobrenome completo, foto, idade, endereço
+          ou atividade das crianças é publicado aqui.
         </p>
       </div>
     </main>

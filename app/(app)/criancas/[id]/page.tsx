@@ -39,7 +39,6 @@ export default async function EditarCrianca({ params }: { params: Promise<{ id: 
           valores={{
             id: c.id,
             nome_completo: c.nome_completo,
-            nome_jogador: c.nome_jogador,
             data_nascimento: c.data_nascimento,
             tem_problema_saude: c.tem_problema_saude,
             observacao_saude: c.observacao_saude,

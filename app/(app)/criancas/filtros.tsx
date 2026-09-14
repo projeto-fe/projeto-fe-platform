@@ -48,7 +48,7 @@ export function Filtros({
           type="search"
           value={termo}
           onChange={(e) => setTermo(e.target.value)}
-          placeholder="Buscar por nome ou nome de jogador"
+          placeholder="Buscar por nome"
           aria-label="Buscar criança"
           className="w-full bg-transparent text-sm outline-none"
         />

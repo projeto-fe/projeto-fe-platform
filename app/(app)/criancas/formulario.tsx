@@ -21,7 +21,6 @@ const inicial: EstadoDaCrianca = {};
 export type ValoresDaCrianca = {
   id?: string;
   nome_completo?: string;
-  nome_jogador?: string;
   data_nascimento?: string;
   tem_problema_saude?: boolean;
   observacao_saude?: string | null;
@@ -121,16 +120,6 @@ export function FormularioDaCrianca({
                 colunas={4}
                 obrigatorio
                 defaultValue={valores.data_nascimento}
-              />
-              <Campo
-                id="nome_jogador"
-                name="nome_jogador"
-                rotulo="Nome de jogador"
-                colunas={6}
-                obrigatorio
-                maxLength={30}
-                defaultValue={valores.nome_jogador}
-                ajuda="É o único nome que aparece no ranking público. Evite o nome real."
               />
             </GradeDeCampos>
           </SecaoDoFormulario>

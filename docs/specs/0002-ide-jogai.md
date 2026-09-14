@@ -3,7 +3,7 @@
 - Status: pronta para implementar
 - Data: 2026-09-14
 - ADRs relacionados: [0003](../adr/0003-pontuacao-como-evento.md),
-  [0006](../adr/0006-ranking-publico-com-nome-de-jogador.md),
+  [0006](../adr/0006-ranking-publico-com-nome-abreviado.md),
   [0007](../adr/0007-voz-interpreta-humano-confirma.md)
 
 ## Problema
@@ -45,7 +45,7 @@ Ranking do ano com nome real, visível para a equipe autenticada.
 
 ### Ranking público
 
-Página aberta em `app.projetofe.org/ranking`, exibindo apenas nome de jogador, posição e
+Página aberta em `app.projetofe.org/ranking`, exibindo apenas o nome abreviado, a posição e a
 pontuação. Renderizada no servidor, com revalidação a cada 5 minutos.
 
 ## Modelo de dado
@@ -81,6 +81,6 @@ Ranking derivado por view. Nenhuma coluna de saldo é mantida.
 - [ ] Mudar o valor de um motivo no catálogo não altera a pontuação já lançada.
 - [ ] O ditado com frase ambígua mostra a sugestão e aguarda confirmação, sem gravar nada.
 - [ ] Recusar a sugestão do ditado não deixa nenhum registro de pontuação.
-- [ ] A página pública não expõe nome real em nenhum lugar, incluindo o HTML enviado ao navegador.
+- [ ] A página pública não expõe sobrenome completo em nenhum lugar, incluindo o HTML enviado ao navegador.
 - [ ] A página pública responde sem sessão e sem nenhuma credencial de banco no cliente.
 - [ ] Lançar ponto pelo celular leva no máximo três toques a partir da tela inicial.

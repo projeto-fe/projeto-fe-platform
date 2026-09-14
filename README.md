@@ -30,7 +30,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0003](docs/adr/0003-pontuacao-como-evento.md) | Pontuação é evento, não saldo |
 | [0004](docs/adr/0004-papel-por-area-nao-global.md) | Papel vale dentro da área |
 | [0005](docs/adr/0005-dado-sensivel-em-tabela-separada.md) | Dado sensível em tabela separada |
-| [0006](docs/adr/0006-ranking-publico-com-nome-de-jogador.md) | Ranking público usa nome de jogador |
+| [0006](docs/adr/0006-ranking-publico-com-nome-abreviado.md) | Ranking público usa nome abreviado |
 | [0007](docs/adr/0007-voz-interpreta-humano-confirma.md) | Ditado sugere, pessoa confirma |
 | [0008](docs/adr/0008-acesso-somente-por-convite.md) | Acesso apenas por convite |
 | [0009](docs/adr/0009-backup-por-export-agendado.md) | Backup por exportação agendada |
