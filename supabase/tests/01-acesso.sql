@@ -253,5 +253,53 @@ end;
 $$;
 
 reset role;
+
+-- ============================================================== teste 12
+-- service_role alcança o necessário para a página pública e a auditoria,
+-- e nada além disso.
+reset role;
+set role service_role;
+
+select espera(
+  (select count(*) from ranking_interno) >= 0,
+  'service_role lê a view de ranking (página pública)'
+);
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into auditoria (acao, entidade, entidade_id, sensivel)
+    values ('teste', 'nenhuma', 'x', false);
+  exception when others then deu_erro := true;
+  end;
+  perform espera(not deu_erro, 'service_role grava no log de auditoria');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from criancas_dados_sensiveis;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'service_role NÃO alcança dado sensível de criança');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    delete from auditoria;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'service_role não apaga log de auditoria');
+end;
+$$;
+
+reset role;
+
 \echo ''
 \echo 'Todos os testes passaram.'
