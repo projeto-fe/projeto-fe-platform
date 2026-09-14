@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check:tokens": "node scripts/check-design-tokens.mjs",
     "test": "vitest run",
+    "test:db": "./scripts/test-db.sh",
+    "db:push": "./scripts/db-push.sh",
     "verify": "npm run check:tokens && npm run lint && npm run typecheck && npm run test"
   },
   "dependencies": {
