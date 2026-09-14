@@ -44,6 +44,41 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0002](docs/specs/0002-ide-jogai.md) | IDE JOGAI: pontuação, extrato e ranking |
 | [0003](docs/specs/0003-estrutura-e-acessos.md) | Estrutura, pessoas e acessos |
 
+## Rodar localmente
+
+```bash
+npm install
+cp .env.example .env.local   # preencha com as chaves do projeto
+npm run dev
+```
+
+`npm run verify` roda os quatro portões de uma vez: tokens de design, lint, tipos e testes.
+`npm run test:db` sobe um Postgres descartável, aplica todas as migrações e tenta os acessos
+que devem ser negados. Nenhum banco remoto é tocado.
+
+## Publicação
+
+Produção em [app.projetofe.org](https://app.projetofe.org), na Vercel, publicando a partir de
+`main`. Banco e envio de e-mail em São Paulo.
+
+Variáveis necessárias em produção (ver `.env.example`):
+
+| Variável | Para quê |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | endereço do projeto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | chave pública, usada no navegador |
+| `SUPABASE_SERVICE_ROLE_KEY` | usada só no servidor: ranking público e log de auditoria |
+| `RESEND_API_KEY` | envio dos convites |
+| `EMAIL_REMETENTE` | remetente, de um domínio verificado no Resend |
+| `NEXT_PUBLIC_URL_DO_PORTAL` | monta o link do convite; em produção, `https://app.projetofe.org` |
+
+Sem `RESEND_API_KEY` o sistema continua de pé: o convite é criado e a tela avisa que o e-mail
+não saiu. Sem `SUPABASE_SERVICE_ROLE_KEY` o build falha de propósito, porque a página pública
+do ranking não teria como ser gerada.
+
+Migrações são aplicadas com `./scripts/db-push.sh <project-ref>`, que roda os testes antes e
+exige o alvo escrito à mão.
+
 ## Convenções
 
 - Código, comentários e documentação em português. Commits, branches e pull requests em inglês.
