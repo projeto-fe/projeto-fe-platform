@@ -4,6 +4,7 @@ import { AlertCircle } from "lucide-react";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { CampoDeSenha } from "@/components/ui/campo-de-senha";
 
 import { entrar, type EstadoDoLogin } from "./actions";
 
@@ -35,24 +36,15 @@ export function FormularioDeLogin({ proximo }: { proximo?: string }) {
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="senha"
-          className="font-display text-[0.6875rem] font-semibold tracking-wider text-ink-muted uppercase"
-        >
-          Senha
-        </label>
-        <input
-          id="senha"
-          name="senha"
-          type="password"
-          autoComplete="current-password"
-          required
-          aria-invalid={estado.erro ? true : undefined}
-          aria-describedby={estado.erro ? "erro-login" : undefined}
-          className="h-10 rounded-sm border border-line-strong bg-surface-raised px-3 outline-none focus:border-brand focus:ring-3 focus:ring-brand-soft"
-        />
-      </div>
+      <CampoDeSenha
+        id="senha"
+        name="senha"
+        rotulo="Senha"
+        autoComplete="current-password"
+        required
+        aria-invalid={estado.erro ? true : undefined}
+        aria-describedby={estado.erro ? "erro-login" : undefined}
+      />
 
       {estado.erro ? (
         <p

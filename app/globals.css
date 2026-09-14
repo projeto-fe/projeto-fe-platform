@@ -32,6 +32,7 @@
   --color-brand-canvas: var(--brand-canvas);
   --color-brand-canvas-deep: var(--brand-canvas-deep);
   --color-brand-canvas-ink: var(--brand-canvas-ink);
+  --color-brand-canvas-accent: var(--brand-canvas-accent);
 
   --color-positive: var(--positive);
   --color-positive-strong: var(--positive-strong);

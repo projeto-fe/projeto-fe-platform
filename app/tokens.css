@@ -101,6 +101,7 @@
   --brand-canvas: var(--c-navy-700);
   --brand-canvas-deep: var(--c-navy-900);
   --brand-canvas-ink: var(--c-paper-0);
+  --brand-canvas-accent: var(--c-orange-500);
 
   /* par fill/strong: fill preenche (fundo, barra), strong é a
      variante legível como TEXTO. A mesma cor raramente serve

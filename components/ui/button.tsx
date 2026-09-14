@@ -46,17 +46,26 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot : "button";
+  // Com asChild, o Radix Slot exige exatamente um filho, então o indicador de
+  // carregamento não pode ser acrescentado ao lado. Também não faria sentido:
+  // asChild é usado para links, que não têm estado de envio.
+  if (asChild) {
+    return (
+      <Slot className={cn(buttonVariants({ variant, size, className }))} {...props}>
+        {children}
+      </Slot>
+    );
+  }
 
   return (
-    <Comp
+    <button
       className={cn(buttonVariants({ variant, size, className }))}
       disabled={disabled || loading}
       {...props}
     >
       {loading ? <Loader2 className="animate-spin" aria-hidden /> : null}
       {children}
-    </Comp>
+    </button>
   );
 }
 

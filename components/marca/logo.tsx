@@ -1,5 +1,34 @@
 import { cn } from "@/lib/utils";
 
+/**
+ * O leão do Instituto, mesmo desenho usado no site.
+ *
+ * Carregado como arquivo e não embutido porque o traçado tem milhares de
+ * pontos. Fica como <img> em vez de next/image de propósito: o otimizador de
+ * imagem não processa SVG, então só acrescentaria uma volta pelo servidor
+ * para entregar exatamente o mesmo arquivo.
+ */
+function SimboloDaMarca({
+  titulo,
+  claro,
+  className,
+}: {
+  titulo?: string;
+  /** Sobre o navy da marca, usa a versão clara do desenho. */
+  claro?: boolean;
+  className?: string;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={claro ? "/logo-mark-light.svg" : "/logo-mark.svg"}
+      alt={titulo ?? ""}
+      aria-hidden={titulo ? undefined : true}
+      className={className}
+    />
+  );
+}
+
 type Props = {
   /** Sobre o navy da marca (login e ranking público), o texto vira claro. */
   claro?: boolean;
@@ -11,11 +40,10 @@ type Props = {
 export function Logo({ claro = false, compacto = false, className }: Props) {
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
-      <img
-        src="/lion.svg"
-        alt={compacto ? "Instituto Projeto Fé" : ""}
-        aria-hidden={compacto ? undefined : true}
-        className="size-8 shrink-0 rounded-lg"
+      <SimboloDaMarca
+        titulo={compacto ? "Instituto Projeto Fé" : undefined}
+        claro={claro}
+        className="h-9 w-auto shrink-0"
       />
       {compacto ? null : (
         <span className="leading-none">
