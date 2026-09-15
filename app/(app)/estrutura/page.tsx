@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { CabecalhoDaPagina, CorpoDaPagina } from "@/components/shell/cabecalho-da-pagina";
-import { carregarEstrutura, type NoDaEstrutura } from "@/lib/estrutura";
+import { carregarEstrutura, listarAreas } from "@/lib/estrutura";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
@@ -12,19 +12,6 @@ export const metadata: Metadata = {
   title: "Estrutura",
   description: "Áreas, atividades e quem coordena ou é voluntário em cada uma.",
 };
-
-/** Todas as áreas, em qualquer profundidade, na ordem em que aparecem na árvore. */
-function listarAreas(raizes: NoDaEstrutura[]) {
-  const achadas: { id: string; nome: string }[] = [];
-  function andar(no: NoDaEstrutura, prefixo: string) {
-    if (no.tipo !== "area") return;
-    const nome = prefixo ? `${prefixo} / ${no.nome}` : no.nome;
-    achadas.push({ id: no.id, nome });
-    for (const filho of no.filhos) andar(filho, nome);
-  }
-  for (const raiz of raizes) andar(raiz, "");
-  return achadas;
-}
 
 export default async function Estrutura() {
   const pessoa = await exigirPessoaLogada();

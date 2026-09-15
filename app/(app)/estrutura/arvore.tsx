@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronRight, Network, Plus, X } from "lucide-react";
+import { ArrowUpRight, ChevronRight, Network, Plus, X } from "lucide-react";
+import Link from "next/link";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,9 @@ import type { NoDaEstrutura } from "@/lib/estrutura";
 import { cn } from "@/lib/utils";
 
 import { desvincularPessoa } from "./actions";
-import { NovoNoDialogo, VincularDialogo } from "./dialogos";
+import { AcoesDoNo } from "./acoes-do-no";
+import { CronogramaDialogo, NovoNoDialogo, VincularDialogo } from "./dialogos";
+import { EquipeDaAtividadeDialogo } from "./equipe-da-atividade-dialogo";
 
 type Pessoa = { id: string; nome: string };
 type Area = { id: string; nome: string };
@@ -101,29 +104,52 @@ function BlocoDeArea({
   const raiz = nivel === 0;
 
   return (
-    <div className={cn(!raiz && "border-l border-line pl-4")}>
-      <button
-        type="button"
-        onClick={() => setAberto((antes) => !antes)}
-        aria-expanded={aberto}
-        className={cn(
-          "flex w-full items-center gap-3 text-left outline-none transition-colors focus-visible:ring-3 focus-visible:ring-brand-soft",
-          raiz ? "px-5 py-4 hover:bg-surface" : "rounded-md px-2 py-2.5 hover:bg-surface",
-        )}
-      >
-        <ChevronRight
+    <div className={cn(!raiz && "border-l border-line pl-4", !no.ativo && "opacity-60")}>
+      <div className={cn("flex w-full items-center gap-2", raiz ? "pr-5" : "pr-2")}>
+        <button
+          type="button"
+          onClick={() => setAberto((antes) => !antes)}
+          aria-expanded={aberto}
           className={cn(
-            "size-4 shrink-0 text-ink-subtle transition-transform duration-150 ease-out-soft",
-            aberto && "rotate-90",
+            "flex min-w-0 flex-1 items-center gap-3 text-left outline-none transition-colors focus-visible:ring-3 focus-visible:ring-brand-soft",
+            raiz ? "py-4 pl-5" : "rounded-md py-2.5 pl-2",
           )}
-          aria-hidden
-        />
-        <span className="flex min-w-0 flex-1 flex-col">
-          <span className={cn("truncate font-semibold", raiz ? "text-md" : "text-base")}>{no.nome}</span>
-          <span className="truncate text-xs text-ink-muted">{resumo}</span>
-        </span>
-        <Badge variant="brand">Área</Badge>
-      </button>
+        >
+          <ChevronRight
+            className={cn(
+              "size-4 shrink-0 text-ink-subtle transition-transform duration-150 ease-out-soft",
+              aberto && "rotate-90",
+            )}
+            aria-hidden
+          />
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className={cn("truncate font-semibold", raiz ? "text-md" : "text-base")}>{no.nome}</span>
+            <span className="truncate text-xs text-ink-muted">{resumo}</span>
+          </span>
+        </button>
+        <Link
+          href={`/estrutura/${no.id}`}
+          aria-label={`Abrir ${no.nome}`}
+          className="grid size-8 shrink-0 place-items-center rounded-md text-ink-subtle outline-none transition-colors hover:bg-surface-sunken hover:text-ink focus-visible:ring-2 focus-visible:ring-brand"
+        >
+          <ArrowUpRight className="size-4" aria-hidden />
+        </Link>
+        {podeEditar ? (
+          <AcoesDoNo
+            no={{
+              id: no.id,
+              nome: no.nome,
+              tipo: "area",
+              parent_id: no.parent_id,
+              descricao_horario: no.descricao_horario,
+              ativo: no.ativo,
+              temFilhosOuHistorico: no.filhos.length > 0,
+            }}
+            areas={areas}
+          />
+        ) : null}
+        {!no.ativo ? <Badge variant="neutral">Desativada</Badge> : null}
+      </div>
 
       {aberto ? (
         <div className={cn("flex flex-col", raiz && "border-t border-line")}>
@@ -203,17 +229,55 @@ function BlocoDeArea({
             {atividades.length > 0 ? (
               <Lista className={cn("border-t border-line", !raiz && "mx-2")}>
                 {atividades.map((atividade) => (
-                  <Linha key={atividade.id} className={cn(raiz ? "px-5" : "px-2")}>
+                  <Linha key={atividade.id} className={cn(raiz ? "px-5" : "px-2", !atividade.ativo && "opacity-60")}>
                     <LinhaTexto
-                      principal={atividade.nome}
+                      principal={
+                        <Link href={`/estrutura/${atividade.id}`} className="hover:text-brand-ink">
+                          {atividade.nome}
+                        </Link>
+                      }
                       secundario={[
                         plural(atividade.inscritos, "criança inscrita", "crianças inscritas"),
-                        atividade.descricao_horario,
+                        atividade.horarios.length > 0
+                          ? plural(atividade.horarios.length, "horário fixo", "horários fixos")
+                          : atividade.descricao_horario,
+                        atividade.membros.length > 0
+                          ? plural(atividade.membros.length, "pessoa vinculada", "pessoas vinculadas")
+                          : null,
                       ]
                         .filter(Boolean)
                         .join(" · ")}
                     />
-                    <Badge variant="neutral">Atividade</Badge>
+                    {podeEditar ? (
+                      <EquipeDaAtividadeDialogo
+                        atividadeId={atividade.id}
+                        atividadeNome={atividade.nome}
+                        membros={atividade.membros}
+                        pessoas={pessoas}
+                      />
+                    ) : null}
+                    {podeEditar ? (
+                      <CronogramaDialogo
+                        atividadeId={atividade.id}
+                        atividadeNome={atividade.nome}
+                        horarios={atividade.horarios}
+                      />
+                    ) : null}
+                    {podeEditar ? (
+                      <AcoesDoNo
+                        no={{
+                          id: atividade.id,
+                          nome: atividade.nome,
+                          tipo: "atividade",
+                          parent_id: atividade.parent_id,
+                          descricao_horario: atividade.descricao_horario,
+                          ativo: atividade.ativo,
+                          temFilhosOuHistorico: atividade.temHistoricoDePresenca,
+                        }}
+                        areas={areas}
+                      />
+                    ) : null}
+                    {!atividade.ativo ? <Badge variant="neutral">Desativada</Badge> : null}
                   </Linha>
                 ))}
               </Lista>
