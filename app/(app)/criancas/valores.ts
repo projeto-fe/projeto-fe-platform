@@ -2,6 +2,8 @@
 
 export type ValoresDaCrianca = {
   id?: string;
+  /** Gerada pelo banco, nunca digitada. Ausente enquanto a criança não existe. */
+  matricula?: number;
   nome_completo?: string;
   data_nascimento?: string;
   tem_problema_saude?: boolean;
@@ -33,6 +35,7 @@ export type Atividade = { id: string; nome: string; area: string };
 
 type LinhaDoBanco = {
   id: string;
+  matricula: number;
   nome_completo: string;
   data_nascimento: string;
   tem_problema_saude: boolean;
@@ -56,6 +59,7 @@ export function montarValores(
 ): ValoresDaCrianca {
   return {
     id: crianca.id,
+    matricula: crianca.matricula,
     nome_completo: crianca.nome_completo,
     data_nascimento: crianca.data_nascimento,
     tem_problema_saude: crianca.tem_problema_saude,
