@@ -4,7 +4,8 @@
 - Data: 2026-09-14
 - ADRs relacionados: [0003](../adr/0003-pontuacao-como-evento.md),
   [0006](../adr/0006-ranking-publico-com-nome-abreviado.md),
-  [0007](../adr/0007-voz-interpreta-humano-confirma.md)
+  [0007](../adr/0007-voz-interpreta-humano-confirma.md),
+  [0014](../adr/0014-captura-de-voz-web-speech-api.md)
 
 ## Problema
 
@@ -29,6 +30,11 @@ não é editável.
 Alternativa por ditado: com a criança já selecionada, o voluntário dita o que aconteceu, o sistema
 sugere o motivo correspondente, e o lançamento só ocorre após confirmação explícita. O valor
 continua vindo do catálogo.
+
+Entrega em duas fases. A primeira, já implementada, só transcreve: o texto ditado (ADR 0014)
+aparece na tela para conferência, sem sugerir motivo nenhum, e a escolha do motivo continua manual.
+A segunda fase, ainda não implementada, decide como o texto vira sugestão de motivo e fecha o fluxo
+descrito no ADR 0007.
 
 ### Estornar
 
@@ -79,8 +85,9 @@ Ranking derivado por view. Nenhuma coluna de saldo é mantida.
       testado contra o banco.
 - [ ] Estorno zera o efeito no ranking e mantém os dois eventos visíveis no extrato.
 - [ ] Mudar o valor de um motivo no catálogo não altera a pontuação já lançada.
-- [ ] O ditado com frase ambígua mostra a sugestão e aguarda confirmação, sem gravar nada.
-- [ ] Recusar a sugestão do ditado não deixa nenhum registro de pontuação.
+- [x] O botão de ditado transcreve a fala na tela e some sozinho em navegador sem suporte.
+- [ ] (fase 2) O ditado com frase ambígua mostra a sugestão e aguarda confirmação, sem gravar nada.
+- [ ] (fase 2) Recusar a sugestão do ditado não deixa nenhum registro de pontuação.
 - [ ] A página pública não expõe sobrenome completo em nenhum lugar, incluindo o HTML enviado ao navegador.
 - [ ] A página pública responde sem sessão e sem nenhuma credencial de banco no cliente.
 - [ ] Lançar ponto pelo celular leva no máximo três toques a partir da tela inicial.

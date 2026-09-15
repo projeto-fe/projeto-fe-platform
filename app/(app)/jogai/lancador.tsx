@@ -5,7 +5,8 @@ import Link from "next/link";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import { AvisoDoFormulario, CampoSelecao, GradeDeCampos } from "@/components/ui/campo";
+import { AvisoDoFormulario, CampoSelecao, CampoTexto, GradeDeCampos } from "@/components/ui/campo";
+import { BotaoDeDitado } from "@/components/ui/campo-de-ditado";
 import {
   Dialogo,
   DialogoAviso,
@@ -43,11 +44,13 @@ export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
   const [aberto, setAberto] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
   const [motivoEscolhido, setMotivoEscolhido] = React.useState(motivos[0]?.id ?? "");
+  const [textoDitado, setTextoDitado] = React.useState("");
 
   const concluir = React.useCallback(() => {
     setAberto(false);
     formRef.current?.reset();
     setMotivoEscolhido(motivos[0]?.id ?? "");
+    setTextoDitado("");
   }, [motivos]);
 
   const { estado, enviar, enviando } = useAcaoEmDialogo(lancarPonto, inicial, concluir);
@@ -102,6 +105,19 @@ export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
                   />
                 ) : null}
               </GradeDeCampos>
+
+              <div className="flex flex-col gap-2 rounded-md border border-line bg-surface-sunken p-3.5">
+                <BotaoDeDitado aoTranscrever={setTextoDitado} />
+                {textoDitado ? (
+                  <CampoTexto
+                    id="texto_ditado"
+                    rotulo="Você disse"
+                    ajuda="Ainda em teste: por enquanto o texto não escolhe o motivo sozinho, é só para conferência."
+                    value={textoDitado}
+                    onChange={(evento) => setTextoDitado(evento.target.value)}
+                  />
+                ) : null}
+              </div>
 
               <fieldset className="flex flex-col gap-2">
                 <legend className="mb-2 text-sm font-semibold text-ink">Motivo</legend>
