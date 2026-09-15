@@ -16,6 +16,7 @@ import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { FaixaDeResumo, Indicador } from "@/components/ui/indicador";
 import { Iniciais } from "@/components/ui/iniciais";
 import { Barra, Linha, LinhaTexto, Lista, Numero, Posicao } from "@/components/ui/lista";
+import { carregarRanking } from "@/lib/ranking";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
@@ -52,11 +53,7 @@ export default async function Inicio() {
     await Promise.all([
       supabase.from("criancas").select("id", { count: "exact" }).eq("ativo", true),
       supabase.from("perfis").select("id", { count: "exact", head: true }).eq("ativo", true),
-      supabase
-        .from("ranking_interno")
-        .select("crianca_id, nome_completo, nome_publico, pontos")
-        .order("pontos", { ascending: false })
-        .limit(5),
+      carregarRanking(),
       supabase
         .from("pontuacao_eventos")
         .select("id", { count: "exact", head: true })
@@ -90,7 +87,7 @@ export default async function Inicio() {
     (c) => new Date(c.expira_em) < new Date(),
   ).length;
 
-  const topo = ranking.data ?? [];
+  const topo = ranking.slice(0, 5);
   const maiorPontuacao = topo[0]?.pontos ?? 0;
   const primeiroNome = pessoa.nome.split(" ")[0];
 
