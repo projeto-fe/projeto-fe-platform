@@ -48,6 +48,12 @@ export async function salvarNome(
 
 export async function sair() {
   const supabase = await criarClienteDoServidor();
-  await supabase.auth.signOut();
+
+  // Escopo local: encerra só esta sessão. O padrão é global, que revoga a
+  // sessão em todos os aparelhos e cobra uma ida a mais ao servidor de
+  // autenticação. Sair do portal no computador não deveria derrubar a
+  // pessoa no celular.
+  await supabase.auth.signOut({ scope: "local" });
+
   redirect("/login");
 }
