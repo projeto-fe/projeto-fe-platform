@@ -230,8 +230,9 @@ create policy eventos_insercao on pontuacao_eventos
   for insert to authenticated
   with check (esta_ativo() and lancado_por = auth.uid());
 
--- Não existe policy de UPDATE nem de DELETE para ninguém, inclusive admin.
--- Correção é estorno, que é INSERT. Ver ADR 0003.
+-- Não existe policy de UPDATE para ninguém, inclusive admin. Correção
+-- comum é estorno, que é INSERT (ADR 0003). Administrador também pode
+-- excluir de vez, policy de DELETE adicionada depois (ADR 0016).
 
 -- O valor aplicado tem que vir do catálogo, nunca do cliente.
 create or replace function fixar_valor_do_evento()
@@ -337,8 +338,8 @@ grant select, insert, update, delete on criancas_dados_sensiveis to authenticate
 grant select, insert, update, delete on crianca_atividades       to authenticated;
 
 grant select, insert, update, delete on motivos_pontuacao        to authenticated;
--- eventos: só leitura e inserção. Sem UPDATE e sem DELETE no privilégio,
--- além de não existir policy. Duas barreiras independentes.
+-- eventos: sem UPDATE em privilégio nem policy, pra ninguém. DELETE é
+-- concedido aqui mas só administrador passa pela policy (ADR 0016).
 grant select, insert                 on pontuacao_eventos        to authenticated;
 
 grant select, insert, update, delete on convites                 to authenticated;

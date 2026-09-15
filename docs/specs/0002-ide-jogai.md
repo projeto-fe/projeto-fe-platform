@@ -5,7 +5,8 @@
 - ADRs relacionados: [0003](../adr/0003-pontuacao-como-evento.md),
   [0006](../adr/0006-ranking-publico-com-nome-abreviado.md),
   [0014](../adr/0014-captura-de-voz-web-speech-api.md),
-  [0015](../adr/0015-ditado-identifica-crianca-atividade-motivo.md)
+  [0015](../adr/0015-ditado-identifica-crianca-atividade-motivo.md),
+  [0016](../adr/0016-admin-exclui-lancamento-de-pontuacao.md)
 
 ## Problema
 
@@ -38,7 +39,15 @@ valor continua vindo do catálogo.
 ### Estornar
 
 Coordenador ou administrador estorna um lançamento. O estorno cria um evento novo que aponta para
-o original. O lançamento estornado continua visível no extrato, marcado como estornado.
+o original. O lançamento estornado continua visível no extrato, marcado como estornado. É o
+caminho normal de corrigir um lançamento de verdade, porque preserva o rastro (ADR 0003).
+
+### Excluir
+
+Só administrador. Remove a linha do banco de vez, sem deixar rastro (ADR 0016). Excluir um
+lançamento que já tem estorno remove os dois. Pensado para lançamento que nunca devia ter
+existido (teste, engano óbvio), não para desfazer pontuação de verdade, que continua sendo
+estorno.
 
 ### Ver extrato
 
@@ -72,8 +81,8 @@ Ranking derivado por view. Nenhuma coluna de saldo é mantida.
 
 ## Segurança
 
-- `pontuacao_eventos`: inserção por voluntário, coordenador e administrador. Nunca atualização ou
-  exclusão por ninguém, inclusive administrador. Correção é sempre estorno.
+- `pontuacao_eventos`: inserção por voluntário, coordenador e administrador. Nunca atualização por
+  ninguém. Exclusão só por administrador (ADR 0016); qualquer outra pessoa corrige por estorno.
 - `motivos_pontuacao`: escrita apenas por administrador.
 - A view pública expõe exclusivamente nome de jogador, posição e pontuação.
 - O ditado pode conter o nome da criança e vai para um LLM externo (ADR 0015). Nenhum outro dado
@@ -83,8 +92,9 @@ Ranking derivado por view. Nenhuma coluna de saldo é mantida.
 
 ## Critérios de aceite
 
-- [ ] Nenhum caminho da aplicação consegue atualizar ou excluir uma linha de `pontuacao_eventos`,
-      testado contra o banco.
+- [ ] Nenhum caminho da aplicação consegue atualizar uma linha de `pontuacao_eventos`, testado
+      contra o banco.
+- [ ] Só administrador consegue excluir uma linha de `pontuacao_eventos`, testado contra o banco.
 - [ ] Estorno zera o efeito no ranking e mantém os dois eventos visíveis no extrato.
 - [ ] Mudar o valor de um motivo no catálogo não altera a pontuação já lançada.
 - [x] O botão de ditado transcreve a fala na tela e some sozinho em navegador sem suporte.

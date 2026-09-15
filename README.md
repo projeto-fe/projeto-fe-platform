@@ -40,6 +40,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0013](docs/adr/0013-casca-publica-compartilhada.md) | Rotas públicas compartilham uma casca própria |
 | [0014](docs/adr/0014-captura-de-voz-web-speech-api.md) | Captura de voz pela Web Speech API do navegador |
 | [0015](docs/adr/0015-ditado-identifica-crianca-atividade-motivo.md) | Ditado identifica criança, atividade e motivo via LLM |
+| [0016](docs/adr/0016-admin-exclui-lancamento-de-pontuacao.md) | Administrador pode excluir um lançamento de pontuação |
 
 ## Especificações
 

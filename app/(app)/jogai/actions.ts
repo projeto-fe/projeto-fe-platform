@@ -76,6 +76,27 @@ export async function estornarLancamento(dados: FormData) {
   updateTag("ranking");
 }
 
+/**
+ * Exclusão de verdade, só administrador (ADR 0016). Se o lançamento já tem
+ * estorno, apaga os dois: a chave estrangeira do estorno não deixaria
+ * apagar só o original com o estorno ainda apontando pra ele.
+ */
+export async function excluirLancamento(dados: FormData) {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin) return;
+
+  const eventoId = String(dados.get("evento_id"));
+  const supabase = await criarClienteDoServidor();
+
+  await supabase.from("pontuacao_eventos").delete().eq("estorna_evento_id", eventoId);
+  await supabase.from("pontuacao_eventos").delete().eq("id", eventoId);
+
+  revalidatePath("/jogai");
+  revalidatePath("/");
+  revalidatePath("/ranking");
+  updateTag("ranking");
+}
+
 export type EstadoDoMotivo = { erro?: string; sucesso?: string };
 
 const novoMotivo = z.object({
