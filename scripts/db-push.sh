@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 #
-# Aplica migrations num projeto Supabase remoto, exigindo o alvo por argumento.
+# Aplica migrations no projeto Supabase remoto vinculado, exigindo o alvo por
+# argumento mesmo assim.
 #
 #   ./scripts/db-push.sh <project-ref>
 #
-# O CLI do Supabase usa o project_id do config.toml como alvo e NÃO verifica
-# contra qual servidor está falando. Já aconteceu de um comando sem alvo
-# explícito atingir produção mesmo depois de um `supabase link` em outro
-# ambiente. Por isso este script recusa rodar sem o ref na linha de comando.
+# `supabase db push` não aceita mais `--project-ref` a partir da versão 2.x
+# do CLI: só sabe empurrar para o projeto vinculado no momento (`--linked`).
+# Isso reabre exatamente o risco que este script existia para fechar — um
+# `supabase link` esquecido em outro projeto faria o push cair lá em vez de
+# no alvo pretendido, sem aviso nenhum. Por isso o script confere, antes de
+# empurrar qualquer coisa, que o projeto vinculado agora é o mesmo ref
+# digitado.
 #
 set -euo pipefail
 
@@ -29,6 +33,16 @@ RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$RAIZ"
 
 echo "Alvo: $REF"
+
+VINCULADO=$(supabase projects list -o json \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); print(next((p['ref'] for p in d if p.get('linked')), ''))")
+
+if [[ "$VINCULADO" != "$REF" ]]; then
+  echo "O projeto vinculado agora é '${VINCULADO:-nenhum}', não '${REF}'." >&2
+  echo "Rode 'supabase link --project-ref ${REF}' antes de tentar de novo." >&2
+  exit 1
+fi
+
 echo "Antes de aplicar em banco remoto, rodando os testes locais..."
 ./scripts/test-db.sh > /dev/null || { echo "Testes falharam. Nada foi aplicado."; exit 1; }
 echo "Testes passaram."
@@ -40,4 +54,4 @@ if [[ "$CONFIRMA" != "$REF" ]]; then
   exit 1
 fi
 
-supabase db push --project-ref "$REF"
+supabase db push --linked
