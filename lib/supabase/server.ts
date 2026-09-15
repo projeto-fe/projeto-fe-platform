@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 import {
   chaveDeServicoDoSupabase,
@@ -11,8 +12,11 @@ import {
 /**
  * Cliente para Server Components, Server Actions e Route Handlers.
  * Age como a pessoa autenticada, então continua sujeito às políticas do banco.
+ *
+ * Memoizado com `cache()` do React: várias chamadas dentro da mesma
+ * requisição reaproveitam o mesmo cliente em vez de recriar a cada import.
  */
-export async function criarClienteDoServidor() {
+export const criarClienteDoServidor = cache(async function criarClienteDoServidor() {
   const armazemDeCookies = await cookies();
 
   return createServerClient(urlDoSupabase(), chavePublicaDoSupabase(), {
@@ -32,7 +36,7 @@ export async function criarClienteDoServidor() {
       },
     },
   });
-}
+});
 
 /**
  * Cliente administrativo. Ignora as políticas do banco, então só pode ser
