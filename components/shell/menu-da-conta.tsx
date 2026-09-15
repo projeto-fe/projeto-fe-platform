@@ -7,23 +7,47 @@ import Link from "next/link";
 import { sair } from "@/app/(app)/conta/actions";
 import { SeletorDeTema } from "@/components/shell/tema";
 import { Iniciais } from "@/components/ui/iniciais";
+import { caminhoFotoDoUsuario, urlDaFoto } from "@/lib/fotos";
 
-export function MenuDaConta({ nome, papel }: { nome: string; papel: string }) {
+export function MenuDaConta({
+  usuarioId,
+  nome,
+  papel,
+  compacto = false,
+}: {
+  usuarioId: string;
+  nome: string;
+  papel: string;
+  /** Só o avatar como gatilho, para caber na barra do topo do celular. */
+  compacto?: boolean;
+}) {
+  const foto = urlDaFoto(caminhoFotoDoUsuario(usuarioId));
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger className="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left outline-none transition-colors hover:bg-surface-raised/70 focus-visible:ring-2 focus-visible:ring-brand data-[state=open]:bg-surface-raised">
-        <Iniciais nome={nome} tom="inverso" />
-        <span className="min-w-0 flex-1 leading-tight">
-          <span className="block truncate text-sm font-semibold">{nome}</span>
-          <span className="block truncate text-xs text-ink-muted">{papel}</span>
-        </span>
-        <ChevronsUpDown className="size-4 shrink-0 text-ink-subtle" aria-hidden />
+      <DropdownMenu.Trigger
+        aria-label={compacto ? `Conta de ${nome}` : undefined}
+        className={
+          compacto
+            ? "rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            : "flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left outline-none transition-colors hover:bg-surface-raised/70 focus-visible:ring-2 focus-visible:ring-brand data-[state=open]:bg-surface-raised"
+        }
+      >
+        <Iniciais nome={nome} foto={foto} tom="inverso" />
+        {compacto ? null : (
+          <>
+            <span className="min-w-0 flex-1 leading-tight">
+              <span className="block truncate text-sm font-semibold">{nome}</span>
+              <span className="block truncate text-xs text-ink-muted">{papel}</span>
+            </span>
+            <ChevronsUpDown className="size-4 shrink-0 text-ink-subtle" aria-hidden />
+          </>
+        )}
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          side="top"
-          align="start"
+          side={compacto ? "bottom" : "top"}
+          align={compacto ? "end" : "start"}
           sideOffset={8}
           className="z-50 w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-md border border-line bg-surface-raised p-1 shadow-pop animate-surgir"
         >

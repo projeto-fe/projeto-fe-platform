@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { caminhoDoGuiaCultural } from "@/lib/arquivos";
+import { enviarArquivo } from "@/lib/arquivos-dados";
+import { caminhoFotoDoUsuario } from "@/lib/fotos";
+import { enviarFoto, removerFoto } from "@/lib/fotos-dados";
+import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
 const nomeValido = z
@@ -44,6 +49,63 @@ export async function salvarNome(
 
   revalidatePath("/", "layout");
   return { sucesso: "Nome atualizado." };
+}
+
+export type EstadoDaFoto = { erro?: string };
+
+/** Foto do próprio usuário. Só quem está logado mexe na própria, nunca na de outra pessoa. */
+export async function enviarFotoDoUsuario(
+  _anterior: EstadoDaFoto,
+  dados: FormData,
+): Promise<EstadoDaFoto> {
+  const supabase = await criarClienteDoServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const arquivo = dados.get("foto");
+  if (!(arquivo instanceof File)) return { erro: "Escolha um arquivo de imagem." };
+
+  const resultado = await enviarFoto(caminhoFotoDoUsuario(user.id), arquivo);
+  if (resultado.erro) return resultado;
+
+  revalidatePath("/", "layout");
+  return {};
+}
+
+// O parâmetro não é usado: quem apaga é sempre a própria sessão. Existe só
+// para bater com a assinatura que `UploadDeFoto` espera de `acaoDeRemover`.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function removerFotoDoUsuario(_dados: FormData) {
+  const supabase = await criarClienteDoServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await removerFoto(caminhoFotoDoUsuario(user.id));
+  revalidatePath("/", "layout");
+}
+
+export type EstadoDoArquivo = { erro?: string };
+
+/** Guia cultural do Instituto: qualquer um vê e baixa, só administrador troca. */
+export async function enviarGuiaCultural(
+  _anterior: EstadoDoArquivo,
+  dados: FormData,
+): Promise<EstadoDoArquivo> {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin) return { erro: "Apenas administradores trocam o guia cultural." };
+
+  const arquivo = dados.get("arquivo");
+  if (!(arquivo instanceof File)) return { erro: "Escolha um arquivo." };
+
+  const resultado = await enviarArquivo(caminhoDoGuiaCultural(), arquivo);
+  if (resultado.erro) return resultado;
+
+  revalidatePath("/conta");
+  return {};
 }
 
 export async function sair() {

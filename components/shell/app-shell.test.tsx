@@ -6,8 +6,8 @@ import { AppShell } from "./app-shell";
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 vi.mock("@/app/(app)/conta/actions", () => ({ sair: vi.fn() }));
 
-const admin = { nome: "Matheus Rezende", papel: "Administrador", isAdmin: true };
-const voluntario = { nome: "Rafael Nogueira", papel: "Voluntário", isAdmin: false };
+const admin = { id: "11111111-1111-1111-1111-111111111111", nome: "Matheus Rezende", papel: "Administrador", isAdmin: true };
+const voluntario = { id: "22222222-2222-2222-2222-222222222222", nome: "Rafael Nogueira", papel: "Voluntário", isAdmin: false };
 
 function barraLateral() {
   return screen.getByRole("complementary");
@@ -49,7 +49,7 @@ describe("AppShell", () => {
     expect(within(barraLateral()).queryByRole("link", { name: "Minha conta" })).toBeNull();
   });
 
-  it("dá ao celular os cinco destinos, incluindo a conta", () => {
+  it("dá ao celular os cinco destinos, incluindo o calendário", () => {
     render(
       <AppShell usuario={voluntario}>
         <span />
@@ -61,9 +61,19 @@ describe("AppShell", () => {
       "/",
       "/criancas",
       "/jogai",
+      "/calendario",
       "/estrutura",
-      "/conta",
     ]);
+  });
+
+  it("a conta some da barra inferior, mas continua alcançável pelo avatar do topo", () => {
+    render(
+      <AppShell usuario={voluntario}>
+        <span />
+      </AppShell>,
+    );
+    expect(within(barraInferior()).queryByRole("link", { name: /conta/i })).toBeNull();
+    expect(screen.getByRole("button", { name: `Conta de ${voluntario.nome}` })).toBeVisible();
   });
 
   it("marca a rota atual para leitores de tela", () => {

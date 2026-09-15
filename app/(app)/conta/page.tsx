@@ -11,9 +11,15 @@ import {
   CardHeading,
   CardTitle,
 } from "@/components/ui/card";
+import { UploadDeFoto } from "@/components/ui/upload-de-foto";
+import { caminhoDoGuiaCultural, urlDoArquivo } from "@/lib/arquivos";
+import { existeArquivo } from "@/lib/arquivos-dados";
+import { caminhoFotoDoUsuario, urlDaFoto } from "@/lib/fotos";
 import { exigirPessoaLogada } from "@/lib/sessao";
 
+import { enviarFotoDoUsuario, removerFotoDoUsuario } from "./actions";
 import { BotaoDeEditarNome } from "./formulario";
+import { GuiaCultural } from "./guia-cultural";
 
 export const metadata: Metadata = {
   title: "Minha conta",
@@ -22,6 +28,7 @@ export const metadata: Metadata = {
 
 export default async function Conta() {
   const pessoa = await exigirPessoaLogada();
+  const guiaExiste = await existeArquivo(caminhoDoGuiaCultural());
 
   return (
     <>
@@ -35,6 +42,22 @@ export default async function Conta() {
         <Card className="max-w-xl">
           <CardHeader>
             <CardHeading>
+              <CardTitle>Guia cultural do Instituto</CardTitle>
+              <CardDescription>Material de referência da equipe.</CardDescription>
+            </CardHeading>
+          </CardHeader>
+          <CardBody>
+            <GuiaCultural
+              existe={guiaExiste}
+              url={urlDoArquivo(caminhoDoGuiaCultural())}
+              podeEnviar={pessoa.isAdmin}
+            />
+          </CardBody>
+        </Card>
+
+        <Card className="max-w-xl">
+          <CardHeader>
+            <CardHeading>
               <CardTitle>Seus dados</CardTitle>
               <CardDescription>Nome e e-mail de acesso.</CardDescription>
             </CardHeading>
@@ -42,6 +65,16 @@ export default async function Conta() {
           </CardHeader>
           <CardBody className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
+              <Rotulo>Foto</Rotulo>
+              <UploadDeFoto
+                nome={pessoa.nome}
+                foto={urlDaFoto(caminhoFotoDoUsuario(pessoa.id))}
+                acaoDeEnviar={enviarFotoDoUsuario}
+                acaoDeRemover={removerFotoDoUsuario}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5 border-t border-line pt-5">
               <Rotulo>Nome</Rotulo>
               <span className="text-base">{pessoa.nome}</span>
               <Ajuda>É assim que a equipe vê você no portal.</Ajuda>

@@ -12,8 +12,14 @@ import {
   GradeDeCampos,
   SecaoDoFormulario,
 } from "@/components/ui/campo";
+import { Button } from "@/components/ui/button";
+import { CampoData } from "@/components/ui/campo-data";
 import { OpcaoMarcavel } from "@/components/ui/checkbox";
 import { LinhaComInterruptor } from "@/components/ui/switch";
+import { UploadDeFoto } from "@/components/ui/upload-de-foto";
+import { caminhoFotoDaCrianca, urlDaFoto } from "@/lib/fotos";
+
+import { enviarFotoDaCrianca, removerFotoDaCrianca } from "./actions";
 
 import type { Atividade, ValoresDaCrianca } from "./valores";
 
@@ -35,6 +41,7 @@ export function CamposDaCrianca({
   atividades: Atividade[];
   podeVerSensiveis: boolean;
 }) {
+  const hoje = new Date().toISOString().slice(0, 10);
   const [temSaude, setTemSaude] = useState(valores.tem_problema_saude ?? false);
   const [endereco, setEndereco] = useState({
     logradouro: valores.sensiveis?.logradouro ?? "",
@@ -71,7 +78,23 @@ export function CamposDaCrianca({
     }
   }
 
-  const inscritaEm = new Set(valores.atividades ?? []);
+  const [selecionadas, setSelecionadas] = useState<Set<string>>(
+    () => new Set(valores.atividades ?? []),
+  );
+  const todasSelecionadas = atividades.length > 0 && selecionadas.size === atividades.length;
+
+  function alternarAtividade(id: string, marcada: boolean) {
+    setSelecionadas((atual) => {
+      const proxima = new Set(atual);
+      if (marcada) proxima.add(id);
+      else proxima.delete(id);
+      return proxima;
+    });
+  }
+
+  function alternarTodas() {
+    setSelecionadas(todasSelecionadas ? new Set() : new Set(atividades.map((a) => a.id)));
+  }
 
   return (
     <>
@@ -81,6 +104,17 @@ export function CamposDaCrianca({
         descricao="Como a criança aparece na lista e no ranking."
       >
         <GradeDeCampos>
+          {valores.id ? (
+            <div className="col-span-12">
+              <UploadDeFoto
+                nome={valores.nome_completo ?? "Criança"}
+                foto={urlDaFoto(caminhoFotoDaCrianca(valores.id))}
+                campos={{ crianca_id: valores.id }}
+                acaoDeEnviar={enviarFotoDaCrianca}
+                acaoDeRemover={removerFotoDaCrianca}
+              />
+            </div>
+          ) : null}
           <Campo
             id="nome_completo"
             name="nome_completo"
@@ -90,14 +124,14 @@ export function CamposDaCrianca({
             defaultValue={valores.nome_completo}
             autoComplete="off"
           />
-          <Campo
+          <CampoData
             id="data_nascimento"
             name="data_nascimento"
             rotulo="Data de nascimento"
-            type="date"
             colunas={4}
             obrigatorio
             defaultValue={valores.data_nascimento}
+            max={hoje}
           />
         </GradeDeCampos>
       </SecaoDoFormulario>
@@ -106,6 +140,13 @@ export function CamposDaCrianca({
         id="atividades"
         titulo="Atividades"
         descricao="A criança pode participar de mais de uma."
+        acao={
+          atividades.length > 0 ? (
+            <Button type="button" variant="outline" size="sm" onClick={alternarTodas}>
+              {todasSelecionadas ? "Limpar seleção" : "Selecionar todas"}
+            </Button>
+          ) : undefined
+        }
       >
         {atividades.length === 0 ? (
           <AvisoDoFormulario tom="info">
@@ -125,7 +166,8 @@ export function CamposDaCrianca({
                 value={atividade.id}
                 titulo={atividade.nome}
                 descricao={atividade.area}
-                defaultChecked={inscritaEm.has(atividade.id)}
+                checked={selecionadas.has(atividade.id)}
+                onCheckedChange={(marcada) => alternarAtividade(atividade.id, marcada)}
               />
             ))}
           </div>
@@ -346,13 +388,13 @@ export function CamposDaCrianca({
                 placeholder="Nome do responsável legal"
                 defaultValue={valores.sensiveis?.autorizacao_responsavel_nome ?? ""}
               />
-              <Campo
+              <CampoData
                 id="autorizacao_data"
                 name="autorizacao_data"
                 rotulo="Data da assinatura"
                 colunas={5}
-                type="date"
                 defaultValue={valores.sensiveis?.autorizacao_data ?? ""}
+                max={hoje}
               />
             </GradeDeCampos>
           </SecaoDoFormulario>

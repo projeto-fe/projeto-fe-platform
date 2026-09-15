@@ -9,7 +9,7 @@ export default async function LayoutAutenticado({
   const pessoa = await exigirPessoaLogada();
 
   return (
-    <AppShell usuario={{ nome: pessoa.nome, papel: pessoa.papel, isAdmin: pessoa.isAdmin }}>
+    <AppShell usuario={{ id: pessoa.id, nome: pessoa.nome, papel: pessoa.papel, isAdmin: pessoa.isAdmin }}>
       {children}
     </AppShell>
   );
