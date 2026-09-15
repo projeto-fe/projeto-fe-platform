@@ -4,8 +4,8 @@
 - Data: 2026-09-14
 - ADRs relacionados: [0003](../adr/0003-pontuacao-como-evento.md),
   [0006](../adr/0006-ranking-publico-com-nome-abreviado.md),
-  [0007](../adr/0007-voz-interpreta-humano-confirma.md),
-  [0014](../adr/0014-captura-de-voz-web-speech-api.md)
+  [0014](../adr/0014-captura-de-voz-web-speech-api.md),
+  [0015](../adr/0015-ditado-identifica-crianca-atividade-motivo.md)
 
 ## Problema
 
@@ -27,14 +27,13 @@ tem determinada pontuação, nem como ela acompanha sua posição.
 Voluntário seleciona a criança, escolhe o motivo no catálogo e confirma. O valor vem do motivo e
 não é editável.
 
-Alternativa por ditado: com a criança já selecionada, o voluntário dita o que aconteceu, o sistema
-sugere o motivo correspondente, e o lançamento só ocorre após confirmação explícita. O valor
-continua vindo do catálogo.
-
-Entrega em duas fases. A primeira, já implementada, só transcreve: o texto ditado (ADR 0014)
-aparece na tela para conferência, sem sugerir motivo nenhum, e a escolha do motivo continua manual.
-A segunda fase, ainda não implementada, decide como o texto vira sugestão de motivo e fecha o fluxo
-descrito no ADR 0007.
+Alternativa por ditado: o voluntário fala o que aconteceu, com quem e, quando fizer sentido, em
+qual atividade. O texto é transcrito no navegador (ADR 0014) e enviado a um LLM junto com as
+crianças, atividades e motivos ativos (ADR 0015), que devolve no máximo um palpite por campo,
+sempre um dos ids fornecidos ou `null`. Campo sem palpite fica em branco, pronto para escolha
+manual. O texto ditado continua visível para conferência, e o lançamento só ocorre após
+confirmação explícita nos três campos, iguais estejam eles preenchidos pelo modelo ou à mão. O
+valor continua vindo do catálogo.
 
 ### Estornar
 
@@ -77,7 +76,10 @@ Ranking derivado por view. Nenhuma coluna de saldo é mantida.
   exclusão por ninguém, inclusive administrador. Correção é sempre estorno.
 - `motivos_pontuacao`: escrita apenas por administrador.
 - A view pública expõe exclusivamente nome de jogador, posição e pontuação.
-- O ditado envia apenas o texto do que aconteceu, jamais o nome da criança.
+- O ditado pode conter o nome da criança e vai para um LLM externo (ADR 0015). Nenhum outro dado
+  sensível (endereço, contato do responsável, dado de tabela separada por ADR 0005) é enviado.
+- O LLM só devolve ids que já estavam nas listas enviadas; qualquer id fora disso é descartado no
+  código antes de chegar à tela.
 
 ## Critérios de aceite
 
@@ -86,8 +88,10 @@ Ranking derivado por view. Nenhuma coluna de saldo é mantida.
 - [ ] Estorno zera o efeito no ranking e mantém os dois eventos visíveis no extrato.
 - [ ] Mudar o valor de um motivo no catálogo não altera a pontuação já lançada.
 - [x] O botão de ditado transcreve a fala na tela e some sozinho em navegador sem suporte.
-- [ ] (fase 2) O ditado com frase ambígua mostra a sugestão e aguarda confirmação, sem gravar nada.
-- [ ] (fase 2) Recusar a sugestão do ditado não deixa nenhum registro de pontuação.
+- [x] O ditado sem palpite confiável deixa o campo em branco, sem travar o lançamento manual.
+- [x] Recusar ou corrigir a sugestão do ditado não deixa nenhum registro de pontuação até o toque
+      em "Lançar ponto".
+- [x] Sem `GEMINI_API_KEY`, o ditado continua transcrevendo e todos os campos ficam em branco.
 - [ ] A página pública não expõe sobrenome completo em nenhum lugar, incluindo o HTML enviado ao navegador.
 - [ ] A página pública responde sem sessão e sem nenhuma credencial de banco no cliente.
 - [ ] Lançar ponto pelo celular leva no máximo três toques a partir da tela inicial.

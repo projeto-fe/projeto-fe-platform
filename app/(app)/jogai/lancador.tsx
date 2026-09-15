@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Star } from "lucide-react";
+import { AlertCircle, Loader2, Star } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
@@ -24,8 +24,11 @@ import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { cn } from "@/lib/utils";
 
 import { lancarPonto, type EstadoDoLancamento } from "./actions";
+import { identificarLancamento, type SugestaoDeLancamento } from "./ditado-ia";
 
 const inicial: EstadoDoLancamento = {};
+
+type Fase = "ditando" | "processando" | "revisando";
 
 export type Motivo = { id: string; rotulo: string; valor: number };
 
@@ -43,24 +46,51 @@ type Props = {
 export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
   const [aberto, setAberto] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
-  const [motivoEscolhido, setMotivoEscolhido] = React.useState(motivos[0]?.id ?? "");
+  const [motivoEscolhido, setMotivoEscolhido] = React.useState("");
   const [textoDitado, setTextoDitado] = React.useState("");
-  const [motivoVisivel, setMotivoVisivel] = React.useState(false);
+  const [fase, setFase] = React.useState<Fase>("ditando");
+  const [sugestao, setSugestao] = React.useState<SugestaoDeLancamento | null>(null);
 
   const concluir = React.useCallback(() => {
     setAberto(false);
     formRef.current?.reset();
-    setMotivoEscolhido(motivos[0]?.id ?? "");
+    setMotivoEscolhido("");
     setTextoDitado("");
-    setMotivoVisivel(false);
-  }, [motivos]);
+    setFase("ditando");
+    setSugestao(null);
+  }, []);
 
-  function aoTranscrever(texto: string) {
-    setTextoDitado(texto);
-    if (texto.trim()) setMotivoVisivel(true);
+  async function aoPararDeOuvir(textoFinal: string) {
+    setTextoDitado(textoFinal);
+
+    if (!textoFinal.trim()) {
+      setSugestao(null);
+      setMotivoEscolhido("");
+      setFase("revisando");
+      return;
+    }
+
+    setFase("processando");
+    const resultado = await identificarLancamento(textoFinal, { criancas, atividades, motivos });
+    setSugestao(resultado);
+    setMotivoEscolhido(resultado.motivoId ?? "");
+    setFase("revisando");
+  }
+
+  function inserirManualmente() {
+    setSugestao(null);
+    setMotivoEscolhido("");
+    setFase("revisando");
+  }
+
+  function ditarDeNovo() {
+    setFase("ditando");
+    setSugestao(null);
+    setMotivoEscolhido("");
   }
 
   const { estado, enviar, enviando } = useAcaoEmDialogo(lancarPonto, inicial, concluir);
+  const dictou = textoDitado.trim().length > 0;
 
   const semCrianca = criancas.length === 0;
   const semMotivo = motivos.length === 0;
@@ -87,62 +117,86 @@ export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
             </DialogoCabecalho>
 
             <DialogoCorpo className="flex flex-col gap-5">
-              <GradeDeCampos>
-                <CampoSelecao
-                  id="crianca_id"
-                  name="crianca_id"
-                  rotulo="Criança"
-                  colunas={atividades.length > 0 ? 7 : 12}
-                  obrigatorio
-                  placeholder="Escolher criança"
-                  opcoes={criancas.map((c) => ({ value: c.id, label: c.nome_completo }))}
-                />
-
-                {atividades.length > 0 ? (
-                  <CampoSelecao
-                    id="atividade_id"
-                    name="atividade_id"
-                    rotulo="Durante qual atividade"
-                    colunas={5}
-                    defaultValue=""
-                    opcoes={[
-                      { value: "", label: "Não informar" },
-                      ...atividades.map((a) => ({ value: a.id, label: a.nome })),
-                    ]}
-                  />
-                ) : null}
-              </GradeDeCampos>
-
-              <div className="flex flex-col gap-3 rounded-md border border-line bg-surface-sunken p-3.5">
-                <BotaoDeDitado aoTranscrever={aoTranscrever} />
-
-                {!motivoVisivel ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="self-center"
-                    onClick={() => setMotivoVisivel(true)}
-                  >
+              {fase === "ditando" ? (
+                <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface-sunken p-5">
+                  <BotaoDeDitado aoTranscrever={setTextoDitado} aoParar={aoPararDeOuvir} />
+                  <Button type="button" variant="ghost" size="sm" onClick={inserirManualmente}>
                     Inserir manualmente
                   </Button>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
 
-              {motivoVisivel ? (
+              {fase === "processando" ? (
+                <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface-sunken p-8">
+                  <Loader2 aria-hidden className="size-6 animate-spin text-brand-ink" />
+                  <span className="text-sm font-semibold text-ink">
+                    Identificando criança, atividade e motivo...
+                  </span>
+                </div>
+              ) : null}
+
+              {fase === "revisando" ? (
                 <>
                   {textoDitado ? (
                     <CampoTexto
                       id="texto_ditado"
                       rotulo="Você disse"
-                      ajuda="Ainda em teste: por enquanto o texto não escolhe o motivo sozinho, é só para conferência."
+                      ajuda="Confira se o texto ficou certo. Ele não escolhe nada sozinho até você confirmar embaixo."
                       value={textoDitado}
                       onChange={(evento) => setTextoDitado(evento.target.value)}
                     />
                   ) : null}
 
+                  {sugestao?.erro ? (
+                    <AvisoDoFormulario tom="atencao">{sugestao.erro}</AvisoDoFormulario>
+                  ) : null}
+
+                  <GradeDeCampos>
+                    <CampoSelecao
+                      id="crianca_id"
+                      name="crianca_id"
+                      rotulo="Criança"
+                      colunas={atividades.length > 0 ? 7 : 12}
+                      obrigatorio
+                      placeholder="Escolher criança"
+                      defaultValue={sugestao?.criancaId ?? ""}
+                      ajuda={
+                        sugestao?.criancaId
+                          ? "Identificado pelo que você disse."
+                          : dictou
+                            ? "Não identificado no texto. Escolha manualmente."
+                            : undefined
+                      }
+                      opcoes={criancas.map((c) => ({ value: c.id, label: c.nome_completo }))}
+                    />
+
+                    {atividades.length > 0 ? (
+                      <CampoSelecao
+                        id="atividade_id"
+                        name="atividade_id"
+                        rotulo="Durante qual atividade"
+                        colunas={5}
+                        defaultValue={sugestao?.atividadeId ?? ""}
+                        ajuda={
+                          sugestao?.atividadeId ? "Identificado pelo que você disse." : undefined
+                        }
+                        opcoes={[
+                          { value: "", label: "Não informar" },
+                          ...atividades.map((a) => ({ value: a.id, label: a.nome })),
+                        ]}
+                      />
+                    ) : null}
+                  </GradeDeCampos>
+
                   <fieldset className="flex flex-col gap-2">
-                    <legend className="mb-2 text-sm font-semibold text-ink">Motivo</legend>
+                    <legend className="mb-2 text-sm font-semibold text-ink">
+                      Motivo
+                      {!sugestao?.motivoId && dictou ? (
+                        <span className="ml-2 font-normal text-ink-muted">
+                          Não identificado, escolha um
+                        </span>
+                      ) : null}
+                    </legend>
 
                     <div className="grid gap-2 sm:grid-cols-2">
                       {motivos.map((motivo) => {
@@ -184,6 +238,10 @@ export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
                       })}
                     </div>
                   </fieldset>
+
+                  <Button type="button" variant="ghost" size="sm" className="self-start" onClick={ditarDeNovo}>
+                    Ditar de novo
+                  </Button>
                 </>
               ) : null}
             </DialogoCorpo>

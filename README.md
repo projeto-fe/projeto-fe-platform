@@ -31,7 +31,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0004](docs/adr/0004-papel-por-area-nao-global.md) | Papel vale dentro da área |
 | [0005](docs/adr/0005-dado-sensivel-em-tabela-separada.md) | Dado sensível em tabela separada |
 | [0006](docs/adr/0006-ranking-publico-com-nome-abreviado.md) | Ranking público usa nome abreviado |
-| [0007](docs/adr/0007-voz-interpreta-humano-confirma.md) | Ditado sugere, pessoa confirma |
+| [0007](docs/adr/0007-voz-interpreta-humano-confirma.md) | Ditado sugere, pessoa confirma (substituído pelo 0015) |
 | [0008](docs/adr/0008-acesso-somente-por-convite.md) | Acesso apenas por convite |
 | [0009](docs/adr/0009-backup-por-export-agendado.md) | Backup por exportação agendada |
 | [0010](docs/adr/0010-libs-de-interface.md) | Bibliotecas de interface |
@@ -39,6 +39,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0012](docs/adr/0012-desativar-em-vez-de-apagar.md) | Desativar em vez de apagar |
 | [0013](docs/adr/0013-casca-publica-compartilhada.md) | Rotas públicas compartilham uma casca própria |
 | [0014](docs/adr/0014-captura-de-voz-web-speech-api.md) | Captura de voz pela Web Speech API do navegador |
+| [0015](docs/adr/0015-ditado-identifica-crianca-atividade-motivo.md) | Ditado identifica criança, atividade e motivo via LLM |
 
 ## Especificações
 
@@ -77,10 +78,12 @@ Variáveis necessárias em produção (ver `.env.example`):
 | `RESEND_API_KEY` | envio dos convites |
 | `EMAIL_REMETENTE` | remetente, de um domínio verificado no Resend |
 | `NEXT_PUBLIC_URL_DO_PORTAL` | monta o link do convite; em produção, `https://app.projetofe.org` |
+| `GEMINI_API_KEY` | identifica criança, atividade e motivo a partir do ditado (ADR 0015) |
 
 Sem `RESEND_API_KEY` o sistema continua de pé: o convite é criado e a tela avisa que o e-mail
 não saiu. Sem `SUPABASE_SERVICE_ROLE_KEY` o build falha de propósito, porque a página pública
-do ranking não teria como ser gerada.
+do ranking não teria como ser gerada. Sem `GEMINI_API_KEY` o ditado continua transcrevendo, só
+não sugere mais nada, os campos ficam sempre em branco para escolha manual.
 
 Migrações são aplicadas com `./scripts/db-push.sh <project-ref>`, que roda os testes antes e
 exige o alvo escrito à mão.
