@@ -38,6 +38,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0011](docs/adr/0011-padroes-de-interacao.md) | Padrões de interação: confirmação, aviso, diálogo e formulário |
 | [0012](docs/adr/0012-desativar-em-vez-de-apagar.md) | Desativar em vez de apagar |
 | [0013](docs/adr/0013-casca-publica-compartilhada.md) | Rotas públicas compartilham uma casca própria |
+| [0014](docs/adr/0014-captura-de-voz-web-speech-api.md) | Captura de voz pela Web Speech API do navegador |
 
 ## Especificações
 
