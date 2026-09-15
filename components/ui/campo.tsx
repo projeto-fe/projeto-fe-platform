@@ -77,7 +77,7 @@ export function MensagemDeErro({ className, ...props }: React.ComponentProps<"sp
   );
 }
 
-function Moldura({
+export function Moldura({
   id,
   rotulo,
   obrigatorio,
@@ -225,11 +225,13 @@ export function SecaoDoFormulario({
   id,
   titulo,
   descricao,
+  acao,
   children,
 }: {
   id?: string;
   titulo: string;
   descricao?: string;
+  acao?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -244,7 +246,10 @@ export function SecaoDoFormulario({
         </h3>
         {descricao ? <p className="text-sm text-ink-muted">{descricao}</p> : null}
       </div>
-      <div className="min-w-0">{children}</div>
+      <div className="min-w-0">
+        {acao ? <div className="mb-3 flex justify-end">{acao}</div> : null}
+        {children}
+      </div>
     </section>
   );
 }
