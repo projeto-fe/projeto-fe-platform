@@ -45,13 +45,20 @@ export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
   const formRef = React.useRef<HTMLFormElement>(null);
   const [motivoEscolhido, setMotivoEscolhido] = React.useState(motivos[0]?.id ?? "");
   const [textoDitado, setTextoDitado] = React.useState("");
+  const [motivoVisivel, setMotivoVisivel] = React.useState(false);
 
   const concluir = React.useCallback(() => {
     setAberto(false);
     formRef.current?.reset();
     setMotivoEscolhido(motivos[0]?.id ?? "");
     setTextoDitado("");
+    setMotivoVisivel(false);
   }, [motivos]);
+
+  function aoTranscrever(texto: string) {
+    setTextoDitado(texto);
+    if (texto.trim()) setMotivoVisivel(true);
+  }
 
   const { estado, enviar, enviando } = useAcaoEmDialogo(lancarPonto, inicial, concluir);
 
@@ -106,63 +113,79 @@ export function BotaoDeLancarPonto({ criancas, motivos, atividades }: Props) {
                 ) : null}
               </GradeDeCampos>
 
-              <div className="flex flex-col gap-2 rounded-md border border-line bg-surface-sunken p-3.5">
-                <BotaoDeDitado aoTranscrever={setTextoDitado} />
-                {textoDitado ? (
-                  <CampoTexto
-                    id="texto_ditado"
-                    rotulo="Você disse"
-                    ajuda="Ainda em teste: por enquanto o texto não escolhe o motivo sozinho, é só para conferência."
-                    value={textoDitado}
-                    onChange={(evento) => setTextoDitado(evento.target.value)}
-                  />
+              <div className="flex flex-col gap-3 rounded-md border border-line bg-surface-sunken p-3.5">
+                <BotaoDeDitado aoTranscrever={aoTranscrever} />
+
+                {!motivoVisivel ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="self-center"
+                    onClick={() => setMotivoVisivel(true)}
+                  >
+                    Inserir manualmente
+                  </Button>
                 ) : null}
               </div>
 
-              <fieldset className="flex flex-col gap-2">
-                <legend className="mb-2 text-sm font-semibold text-ink">Motivo</legend>
+              {motivoVisivel ? (
+                <>
+                  {textoDitado ? (
+                    <CampoTexto
+                      id="texto_ditado"
+                      rotulo="Você disse"
+                      ajuda="Ainda em teste: por enquanto o texto não escolhe o motivo sozinho, é só para conferência."
+                      value={textoDitado}
+                      onChange={(evento) => setTextoDitado(evento.target.value)}
+                    />
+                  ) : null}
 
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {motivos.map((motivo) => {
-                    const escolhido = motivo.id === motivoEscolhido;
-                    const positivo = motivo.valor > 0;
+                  <fieldset className="flex flex-col gap-2">
+                    <legend className="mb-2 text-sm font-semibold text-ink">Motivo</legend>
 
-                    return (
-                      <label
-                        key={motivo.id}
-                        className={cn(
-                          "flex cursor-pointer items-center gap-3 rounded-md border px-3.5 py-3 transition-colors duration-150 has-focus-visible:ring-3 has-focus-visible:ring-brand-soft",
-                          escolhido
-                            ? "border-brand bg-brand-soft"
-                            : "border-line bg-surface-raised hover:bg-surface-sunken",
-                        )}
-                      >
-                        <input
-                          type="radio"
-                          name="motivo_id"
-                          value={motivo.id}
-                          checked={escolhido}
-                          onChange={() => setMotivoEscolhido(motivo.id)}
-                          className="sr-only"
-                        />
-                        <span
-                          className={cn(
-                            "min-w-11 rounded-md px-2 py-1 text-center text-md font-semibold",
-                            positivo
-                              ? "bg-positive-soft text-positive-strong"
-                              : "bg-negative-soft text-negative-strong",
-                          )}
-                        >
-                          {positivo ? "+" : ""}
-                          {motivo.valor}
-                        </span>
-                        <span className="text-sm font-semibold">{motivo.rotulo}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </fieldset>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {motivos.map((motivo) => {
+                        const escolhido = motivo.id === motivoEscolhido;
+                        const positivo = motivo.valor > 0;
 
+                        return (
+                          <label
+                            key={motivo.id}
+                            className={cn(
+                              "flex cursor-pointer items-center gap-3 rounded-md border px-3.5 py-3 transition-colors duration-150 has-focus-visible:ring-3 has-focus-visible:ring-brand-soft",
+                              escolhido
+                                ? "border-brand bg-brand-soft"
+                                : "border-line bg-surface-raised hover:bg-surface-sunken",
+                            )}
+                          >
+                            <input
+                              type="radio"
+                              name="motivo_id"
+                              value={motivo.id}
+                              checked={escolhido}
+                              onChange={() => setMotivoEscolhido(motivo.id)}
+                              className="sr-only"
+                            />
+                            <span
+                              className={cn(
+                                "min-w-11 rounded-md px-2 py-1 text-center text-md font-semibold",
+                                positivo
+                                  ? "bg-positive-soft text-positive-strong"
+                                  : "bg-negative-soft text-negative-strong",
+                              )}
+                            >
+                              {positivo ? "+" : ""}
+                              {motivo.valor}
+                            </span>
+                            <span className="text-sm font-semibold">{motivo.rotulo}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                </>
+              ) : null}
             </DialogoCorpo>
 
             {estado.erro ? (

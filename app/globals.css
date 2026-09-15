@@ -119,6 +119,18 @@
       transform: none;
     }
   }
+
+  --animate-onda-de-voz: onda-de-voz 900ms ease-in-out infinite;
+
+  @keyframes onda-de-voz {
+    0%,
+    100% {
+      transform: scaleY(0.3);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
 }
 
 @layer base {
