@@ -36,3 +36,17 @@ $$;
 
 grant usage on schema auth to anon, authenticated, service_role;
 grant select on auth.users to authenticated, service_role;
+
+-- Só o suficiente de `storage` para a migration do bucket de fotos rodar:
+-- nenhuma migration deste projeto grava em storage.objects, então esta
+-- tabela não precisa de stub.
+create schema if not exists storage;
+
+create table storage.buckets (
+  id text primary key,
+  name text not null,
+  public boolean not null default false
+);
+
+grant usage on schema storage to service_role;
+grant select, insert on storage.buckets to service_role;

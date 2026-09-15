@@ -1,11 +1,13 @@
 "use client";
 
 import { AlertCircle, Info } from "lucide-react";
+import Link from "next/link";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { AvisoDoFormulario, Rotulo, estiloDeControle } from "@/components/ui/campo";
 import { CampoDeSenha } from "@/components/ui/campo-de-senha";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import { entrar, type EstadoDoLogin } from "./actions";
 
@@ -49,6 +51,19 @@ export function FormularioDeLogin({ proximo, aviso }: { proximo?: string; aviso?
         aria-invalid={estado.erro ? true : undefined}
         aria-describedby={estado.erro ? "erro-login" : undefined}
       />
+
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor="lembrar" className="flex cursor-pointer items-center gap-2 text-sm text-ink-muted">
+          <Checkbox id="lembrar" name="lembrar" value="sim" defaultChecked />
+          Lembrar de mim
+        </label>
+        <Link
+          href="/esqueci-senha"
+          className="text-sm font-semibold text-ink-muted underline-offset-2 hover:text-ink hover:underline"
+        >
+          Esqueci minha senha
+        </Link>
+      </div>
 
       {estado.erro ? (
         <AvisoDoFormulario id="erro-login" tom="erro" icone={<AlertCircle />}>
