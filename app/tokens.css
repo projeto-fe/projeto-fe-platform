@@ -1,5 +1,5 @@
 /* ============================================================
-   CAMADA 1 — PRIMITIVOS
+   CAMADA 1: PRIMITIVOS
    Paleta bruta da identidade visual do Instituto Projeto Fé.
    Nenhum componente consome daqui. Este é o único arquivo do
    projeto onde valor hexadecimal é permitido, e o CI verifica.
@@ -9,6 +9,7 @@
 :root {
   /* marca */
   --c-orange-50: #fdede6;
+  --c-orange-100: #fbd9c9;
   --c-orange-300: #ffb088;
   --c-orange-400: #ff8a4c;
   --c-orange-500: #f05a28;
@@ -25,11 +26,13 @@
   --c-paper-100: #edf1f7;
   --c-paper-200: #dde4ee;
   --c-paper-300: #c3cddc;
-  --c-paper-500: #6b7280;
+  --c-paper-400: #8d97aa;
+  --c-paper-500: #626b7d;
 
   /* neutros do tema escuro */
   --c-slate-100: #e8ecf4;
   --c-slate-400: #98a2b6;
+  --c-slate-500: #6f7a91;
   --c-slate-600: #4a5468;
   --c-slate-700: #3a4560;
   --c-slate-800: #2a3348;
@@ -53,22 +56,29 @@
   --c-amber-50: #fdf3e3;
   --c-amber-400: #fbbf24;
   --c-amber-600: #d97706;
+  --c-amber-700: #b45309;
   --c-amber-950: #33270f;
 
   /* sombra: rgb com alfa, derivada do navy da marca */
+  --c-shadow-navy-4: rgb(31 42 68 / 4%);
   --c-shadow-navy-6: rgb(31 42 68 / 6%);
-  --c-shadow-navy-5: rgb(31 42 68 / 5%);
+  --c-shadow-navy-10: rgb(31 42 68 / 10%);
   --c-shadow-navy-22: rgb(31 42 68 / 22%);
   --c-shadow-black-40: rgb(0 0 0 / 40%);
   --c-shadow-black-60: rgb(0 0 0 / 60%);
+  --c-scrim-navy-55: rgb(20 28 47 / 55%);
+  --c-scrim-black-70: rgb(0 0 0 / 70%);
 }
 
 /* ============================================================
-   CAMADA 2 — SEMÂNTICOS (tema claro)
+   CAMADA 2: SEMÂNTICOS (tema claro)
    É ISTO que os componentes consomem.
    Trocar a cor de todos os cards = mudar --surface-raised aqui.
    ============================================================ */
 :root {
+  /* três planos de superfície: a barra lateral fica um degrau abaixo
+     do conteúdo, e o conteúdo um degrau abaixo dos painéis. */
+  --surface-nav: var(--c-paper-100);
   --surface: var(--c-paper-50);
   --surface-raised: var(--c-paper-0);
   --surface-sunken: var(--c-paper-100);
@@ -76,7 +86,8 @@
 
   --ink: var(--c-navy-700);
   --ink-muted: var(--c-paper-500);
-  --ink-subtle: var(--c-paper-300);
+  --ink-subtle: var(--c-paper-400);
+  --ink-faint: var(--c-paper-300);
   --ink-inverse: var(--c-paper-0);
 
   --line: var(--c-paper-200);
@@ -87,6 +98,7 @@
   --brand: var(--c-orange-500);
   --brand-hover: var(--c-orange-600);
   --brand-soft: var(--c-orange-50);
+  --brand-soft-strong: var(--c-orange-100);
   --brand-ink: var(--c-orange-600);
 
   /* ação primária comum usa tinta, não marca */
@@ -117,27 +129,36 @@
   --negative-soft: var(--c-red-50);
 
   --warning: var(--c-amber-600);
-  --warning-strong: var(--c-amber-600);
+  --warning-strong: var(--c-amber-700);
   --warning-soft: var(--c-amber-50);
+
+  /* véu atrás de diálogo */
+  --scrim: var(--c-scrim-navy-55);
 
   --radius-sm: 6px;
   --radius: 10px;
   --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-pill: 999px;
 
   --shadow-card:
-    0 1px 2px var(--c-shadow-navy-6), 0 1px 3px var(--c-shadow-navy-5);
-  --shadow-pop: 0 8px 28px -8px var(--c-shadow-navy-22);
+    0 1px 2px var(--c-shadow-navy-4), 0 1px 3px var(--c-shadow-navy-6);
+  --shadow-pop:
+    0 12px 32px -12px var(--c-shadow-navy-22), 0 2px 6px var(--c-shadow-navy-10);
+  --shadow-modal:
+    0 24px 64px -16px var(--c-shadow-navy-22),
+    0 4px 12px var(--c-shadow-navy-10);
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --sidebar-w: 236px;
-  --header-h: 60px;
+  --sidebar-w: 256px;
+  --content-w: 1120px;
 }
 
 /* tema escuro no default do sistema (root sem carimbo) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --surface-nav: var(--c-ink-950);
     --surface: var(--c-ink-900);
     --surface-raised: var(--c-ink-800);
     --surface-sunken: var(--c-ink-950);
@@ -145,7 +166,8 @@
 
     --ink: var(--c-slate-100);
     --ink-muted: var(--c-slate-400);
-    --ink-subtle: var(--c-slate-600);
+    --ink-subtle: var(--c-slate-500);
+    --ink-faint: var(--c-slate-700);
     --ink-inverse: var(--c-navy-900);
 
     --line: var(--c-slate-800);
@@ -154,6 +176,7 @@
     --brand: var(--c-orange-400);
     --brand-hover: var(--c-orange-300);
     --brand-soft: var(--c-orange-950);
+    --brand-soft-strong: var(--c-orange-950);
     --brand-ink: var(--c-orange-300);
 
     --action: var(--c-slate-100);
@@ -167,13 +190,17 @@
     --warning-strong: var(--c-amber-400);
     --warning-soft: var(--c-amber-950);
 
+    --scrim: var(--c-scrim-black-70);
+
     --shadow-card: 0 1px 2px var(--c-shadow-black-40);
-    --shadow-pop: 0 8px 28px -8px var(--c-shadow-black-60);
+    --shadow-pop: 0 12px 32px -12px var(--c-shadow-black-60);
+    --shadow-modal: 0 24px 64px -16px var(--c-shadow-black-60);
   }
 }
 
 /* escolha explícita vence a preferência do sistema */
 :root[data-theme="dark"] {
+  --surface-nav: var(--c-ink-950);
   --surface: var(--c-ink-900);
   --surface-raised: var(--c-ink-800);
   --surface-sunken: var(--c-ink-950);
@@ -181,7 +208,8 @@
 
   --ink: var(--c-slate-100);
   --ink-muted: var(--c-slate-400);
-  --ink-subtle: var(--c-slate-600);
+  --ink-subtle: var(--c-slate-500);
+  --ink-faint: var(--c-slate-700);
   --ink-inverse: var(--c-navy-900);
 
   --line: var(--c-slate-800);
@@ -190,6 +218,7 @@
   --brand: var(--c-orange-400);
   --brand-hover: var(--c-orange-300);
   --brand-soft: var(--c-orange-950);
+  --brand-soft-strong: var(--c-orange-950);
   --brand-ink: var(--c-orange-300);
 
   --action: var(--c-slate-100);
@@ -203,6 +232,9 @@
   --warning-strong: var(--c-amber-400);
   --warning-soft: var(--c-amber-950);
 
+  --scrim: var(--c-scrim-black-70);
+
   --shadow-card: 0 1px 2px var(--c-shadow-black-40);
-  --shadow-pop: 0 8px 28px -8px var(--c-shadow-black-60);
+  --shadow-pop: 0 12px 32px -12px var(--c-shadow-black-60);
+  --shadow-modal: 0 24px 64px -16px var(--c-shadow-black-60);
 }

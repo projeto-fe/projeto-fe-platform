@@ -32,3 +32,8 @@ export const NAVEGACAO: ItemDeNavegacao[] = [
   // No desktop, conta e saída ficam no menu do rodapé da barra lateral.
   { href: "/conta", rotulo: "Minha conta", rotuloCurto: "Conta", icone: UserCog, grupo: "administracao", noCelular: true, somenteCelular: true },
 ];
+
+export const ROTULO_DO_GRUPO: Record<ItemDeNavegacao["grupo"], string> = {
+  operacao: "Operação",
+  administracao: "Administração",
+};

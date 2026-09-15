@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
 
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { Logo } from "@/components/marca/logo";
+import { CabecalhoDeEntrada, MolduraDeEntrada } from "@/components/shell/moldura-de-entrada";
+import { Button } from "@/components/ui/button";
 import { criarClienteAdministrativo } from "@/lib/supabase/server";
 
 import { FormularioDeAceite } from "./formulario";
@@ -36,51 +38,53 @@ export default async function AceitarConvite({
   else if (convite.aceito_em) situacao = "usado";
   else if (new Date(convite.expira_em) < new Date()) situacao = "expirado";
 
-  const recados: Record<Exclude<Situacao, "valido">, string> = {
-    inexistente: "Este convite não existe. Confira se o link veio completo.",
-    expirado: "Este convite venceu. Peça um novo à coordenação.",
-    usado: "Este convite já foi usado. Se a conta é sua, entre normalmente.",
+  const recados: Record<Exclude<Situacao, "valido">, { titulo: string; texto: string }> = {
+    inexistente: {
+      titulo: "Convite não encontrado",
+      texto: "Confira se o link veio completo no e-mail. Se continuar assim, peça um novo à coordenação.",
+    },
+    expirado: {
+      titulo: "Este convite venceu",
+      texto: "Convites valem 7 dias. Peça um novo à coordenação para criar seu acesso.",
+    },
+    usado: {
+      titulo: "Convite já usado",
+      texto: "Este link já criou uma conta. Se a conta é sua, entre normalmente.",
+    },
   };
 
   return (
-    <main className="grid min-h-dvh md:grid-cols-2">
-      <section className="flex flex-col justify-between gap-7 bg-brand-canvas px-6 py-8 md:px-9 md:py-10">
-        <Logo claro />
-        <div className="flex flex-col gap-3">
-          <h1 className="font-display text-3xl leading-[1.12] font-semibold text-brand-canvas-ink md:text-4xl">
-            Bem-vindo ao <span className="text-brand">Projeto Fé</span>.
-          </h1>
-          <p className="max-w-[34ch] text-sm text-brand-canvas-ink/70">
-            Falta só escolher sua senha para começar.
-          </p>
-        </div>
-        <p className="text-xs text-brand-canvas-ink/50">Instituto Projeto Fé · Marília, SP</p>
-      </section>
-
-      <section className="flex flex-col justify-center gap-5 bg-surface-raised px-6 py-10 md:px-9">
-        {situacao === "valido" && convite ? (
-          <>
-            <div className="flex flex-col gap-1">
-              <h2 className="font-display text-2xl font-semibold">Criar sua senha</h2>
-              <p className="text-sm text-ink-muted">
+    <MolduraDeEntrada
+      titulo={
+        <>
+          Bem-vindo ao <span className="text-brand">Projeto Fé</span>.
+        </>
+      }
+      frase="Falta só escolher sua senha para começar."
+    >
+      {situacao === "valido" && convite ? (
+        <>
+          <CabecalhoDeEntrada
+            titulo="Criar sua senha"
+            descricao={
+              <>
                 Convite para <span className="font-semibold text-ink">{convite.email}</span>.
-              </p>
-            </div>
-            <FormularioDeAceite token={token} email={convite.email} />
-          </>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <h2 className="font-display text-2xl font-semibold">Convite indisponível</h2>
-            <p className="text-sm text-ink-muted">{recados[situacao as Exclude<Situacao, "valido">]}</p>
-            <a
-              href="/login"
-              className="text-sm font-semibold text-brand-ink underline underline-offset-2"
-            >
-              Ir para a tela de entrada
-            </a>
-          </div>
-        )}
-      </section>
-    </main>
+              </>
+            }
+          />
+          <FormularioDeAceite token={token} email={convite.email} />
+        </>
+      ) : (
+        <>
+          <CabecalhoDeEntrada
+            titulo={recados[situacao as Exclude<Situacao, "valido">].titulo}
+            descricao={recados[situacao as Exclude<Situacao, "valido">].texto}
+          />
+          <Button asChild variant="outline" size="lg">
+            <Link href="/login">Ir para a tela de entrada</Link>
+          </Button>
+        </>
+      )}
+    </MolduraDeEntrada>
   );
 }

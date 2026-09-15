@@ -5,21 +5,13 @@ import { ChevronsUpDown, LogOut, UserCog } from "lucide-react";
 import Link from "next/link";
 
 import { sair } from "@/app/(app)/conta/actions";
-
-function iniciais(nome: string) {
-  const partes = nome.trim().split(/\s+/);
-  const primeira = partes[0]?.[0] ?? "";
-  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : "";
-  return (primeira + ultima).toUpperCase();
-}
+import { Iniciais } from "@/components/ui/iniciais";
 
 export function MenuDaConta({ nome, papel }: { nome: string; papel: string }) {
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger className="flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-left transition-colors hover:bg-surface-sunken">
-        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-inverse font-display text-[0.625rem] font-semibold text-ink-inverse">
-          {iniciais(nome)}
-        </span>
+      <DropdownMenu.Trigger className="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left outline-none transition-colors hover:bg-surface-raised/70 focus-visible:ring-2 focus-visible:ring-brand data-[state=open]:bg-surface-raised">
+        <Iniciais nome={nome} tom="inverso" />
         <span className="min-w-0 flex-1 leading-tight">
           <span className="block truncate text-sm font-semibold">{nome}</span>
           <span className="block truncate text-xs text-ink-muted">{papel}</span>
@@ -31,8 +23,8 @@ export function MenuDaConta({ nome, papel }: { nome: string; papel: string }) {
         <DropdownMenu.Content
           side="top"
           align="start"
-          sideOffset={6}
-          className="z-50 min-w-56 rounded-md border border-line bg-surface-raised p-1 shadow-pop"
+          sideOffset={8}
+          className="z-50 w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-md border border-line bg-surface-raised p-1 shadow-pop animate-surgir"
         >
           <DropdownMenu.Item asChild>
             <Link

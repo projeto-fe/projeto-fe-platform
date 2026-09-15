@@ -11,15 +11,21 @@ export const metadata: Metadata = { title: "Nova criança" };
 export default async function NovaCrianca() {
   const pessoa = await exigirPessoaLogada();
   const atividades = listarAtividades(await carregarEstrutura());
+  const veSensiveis = pessoa.isAdmin || pessoa.coordenaAlgumaArea;
 
   return (
     <>
-      <CabecalhoDaPagina titulo="Nova criança" />
+      <CabecalhoDaPagina
+        titulo="Nova criança"
+        voltar={{ href: "/criancas", rotulo: "Crianças" }}
+        descricao={
+          veSensiveis
+            ? "Todos os dados ficam restritos à equipe."
+            : "Cadastro básico; endereço e contato ficam com a coordenação."
+        }
+      />
       <CorpoDaPagina>
-        <FormularioDaCrianca
-          atividades={atividades}
-          podeVerSensiveis={pessoa.isAdmin || pessoa.coordenaAlgumaArea}
-        />
+        <FormularioDaCrianca atividades={atividades} podeVerSensiveis={veSensiveis} />
       </CorpoDaPagina>
     </>
   );

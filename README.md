@@ -35,6 +35,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0008](docs/adr/0008-acesso-somente-por-convite.md) | Acesso apenas por convite |
 | [0009](docs/adr/0009-backup-por-export-agendado.md) | Backup por exportação agendada |
 | [0010](docs/adr/0010-libs-de-interface.md) | Bibliotecas de interface |
+| [0011](docs/adr/0011-padroes-de-interacao.md) | Padrões de interação: confirmação, aviso, diálogo e formulário |
 
 ## Especificações
 
@@ -43,6 +44,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0001](docs/specs/0001-cadastro-de-criancas.md) | Cadastro de crianças |
 | [0002](docs/specs/0002-ide-jogai.md) | IDE JOGAI: pontuação, extrato e ranking |
 | [0003](docs/specs/0003-estrutura-e-acessos.md) | Estrutura, pessoas e acessos |
+| [0004](docs/specs/0004-redesenho-da-interface.md) | Redesenho da interface |
 
 ## Rodar localmente
 

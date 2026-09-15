@@ -6,23 +6,27 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-sm font-semibold whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap transition-[background-color,color,border-color,box-shadow,transform] duration-150 ease-out-soft outline-none select-none active:scale-[0.985] disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         // ação primária comum usa tinta, não marca (ADR 0002)
-        primary: "bg-action text-action-ink hover:bg-action-hover",
+        primary: "bg-action text-action-ink shadow-card hover:bg-action-hover",
         // marca reservada para a ação característica do produto
-        brand: "bg-brand text-action-ink hover:bg-brand-hover",
-        outline: "border border-line-strong bg-transparent text-ink hover:bg-surface-sunken",
+        brand: "bg-brand text-action-ink shadow-card hover:bg-brand-hover",
+        outline:
+          "border border-line-strong bg-surface-raised text-ink shadow-card hover:bg-surface-sunken",
+        subtle: "bg-surface-sunken text-ink hover:bg-line",
         ghost: "bg-transparent text-ink-muted hover:bg-surface-sunken hover:text-ink",
-        destructive: "bg-negative text-action-ink hover:opacity-90",
+        destructive: "bg-negative text-action-ink shadow-card hover:opacity-90",
+        link: "h-auto rounded-none px-0 text-brand-ink underline-offset-3 hover:underline",
       },
       size: {
-        default: "h-9 px-4 text-sm",
+        default: "h-9 px-3.5 text-sm",
         sm: "h-8 px-3 text-sm",
-        lg: "h-11 px-6",
+        lg: "h-11 px-5 text-base",
         icon: "size-9",
+        "icon-sm": "size-8",
       },
     },
     // botão sem variante nasce primário, não "preto por acidente"
@@ -61,6 +65,7 @@ export function Button({
     <button
       className={cn(buttonVariants({ variant, size, className }))}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading ? <Loader2 className="animate-spin" aria-hidden /> : null}

@@ -4,6 +4,7 @@ import { AlertCircle } from "lucide-react";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Ajuda, AvisoDoFormulario, Rotulo, estiloDeControle } from "@/components/ui/campo";
 import { CampoDeSenha } from "@/components/ui/campo-de-senha";
 
 import { aceitarConvite, type EstadoDoAceite } from "./actions";
@@ -19,21 +20,17 @@ export function FormularioDeAceite({ token, email }: { token: string; email: str
       <input type="hidden" name="email" value={email} autoComplete="username" />
 
       <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="nome"
-          className="font-display text-[0.6875rem] font-semibold tracking-wider text-ink-muted uppercase"
-        >
-          Seu nome
-        </label>
+        <Rotulo htmlFor="nome">Seu nome</Rotulo>
         <input
           id="nome"
           name="nome"
           required
           maxLength={80}
           autoComplete="name"
-          className="h-10 rounded-sm border border-line-strong bg-surface-raised px-3 outline-none focus:border-brand focus:ring-3 focus:ring-brand-soft"
+          autoFocus
+          className={`${estiloDeControle} h-11`}
         />
-        <span className="text-xs text-ink-muted">É assim que a equipe vai ver você.</span>
+        <Ajuda>É assim que a equipe vai ver você.</Ajuda>
       </div>
 
       <CampoDeSenha
@@ -43,6 +40,7 @@ export function FormularioDeAceite({ token, email }: { token: string; email: str
         autoComplete="new-password"
         required
         minLength={10}
+        ajuda="Pelo menos 10 caracteres."
       />
 
       <CampoDeSenha
@@ -54,19 +52,13 @@ export function FormularioDeAceite({ token, email }: { token: string; email: str
         minLength={10}
       />
 
-      <p className="text-xs text-ink-muted">Use pelo menos 10 caracteres.</p>
-
       {estado.erro ? (
-        <p
-          role="alert"
-          className="flex items-start gap-2 rounded-sm bg-negative-soft px-3 py-2.5 text-sm text-negative-strong"
-        >
-          <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+        <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
           {estado.erro}
-        </p>
+        </AvisoDoFormulario>
       ) : null}
 
-      <Button type="submit" size="lg" loading={enviando}>
+      <Button type="submit" size="lg" loading={enviando} className="mt-1 w-full">
         {enviando ? "Criando acesso" : "Criar acesso e entrar"}
       </Button>
     </form>

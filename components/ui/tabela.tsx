@@ -10,6 +10,8 @@ export type Coluna<T> = {
   numerica?: boolean;
   /** Coluna secundária: some no celular em vez de espremer a tabela. */
   escondeNoCelular?: boolean;
+  /** Largura fixa, para colunas de ação ou etiqueta. */
+  largura?: string;
 };
 
 type Props<T> = {
@@ -18,6 +20,8 @@ type Props<T> = {
   chaveDaLinha: (linha: T) => string;
   /** Mostrado quando não há nenhuma linha. Nunca deixe a tabela vazia e muda. */
   vazio: React.ReactNode;
+  /** Legenda para leitor de tela. */
+  legenda?: string;
 };
 
 /**
@@ -27,22 +31,24 @@ type Props<T> = {
  * deste produto: a mesma lista é consultada no computador da coordenação e
  * no celular do voluntário durante a atividade.
  */
-export function Tabela<T>({ colunas, linhas, chaveDaLinha, vazio }: Props<T>) {
+export function Tabela<T>({ colunas, linhas, chaveDaLinha, vazio, legenda }: Props<T>) {
   if (linhas.length === 0) {
-    return <div className="px-4 py-10 text-center text-sm text-ink-muted">{vazio}</div>;
+    return <>{vazio}</>;
   }
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
+        {legenda ? <caption className="sr-only">{legenda}</caption> : null}
         <thead>
           <tr>
             {colunas.map((coluna) => (
               <th
                 key={coluna.chave}
                 scope="col"
+                style={coluna.largura ? { width: coluna.largura } : undefined}
                 className={cn(
-                  "border-b border-line bg-surface-sunken px-4 py-2.5 text-left font-display text-[0.625rem] font-semibold tracking-wider text-ink-muted uppercase",
+                  "border-b border-line px-5 py-2.5 text-left text-xs font-semibold text-ink-muted",
                   coluna.numerica && "text-right",
                   coluna.escondeNoCelular && "hidden md:table-cell",
                 )}
@@ -52,15 +58,15 @@ export function Tabela<T>({ colunas, linhas, chaveDaLinha, vazio }: Props<T>) {
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-line">
           {linhas.map((linha) => (
-            <tr key={chaveDaLinha(linha)} className="hover:bg-surface-sunken">
+            <tr key={chaveDaLinha(linha)} className="transition-colors hover:bg-surface">
               {colunas.map((coluna) => (
                 <td
                   key={coluna.chave}
                   className={cn(
-                    "border-b border-line px-4 py-2.5 text-sm",
-                    coluna.numerica && "text-right tabular-nums",
+                    "px-5 py-3 text-sm align-middle",
+                    coluna.numerica && "text-right",
                     coluna.escondeNoCelular && "hidden md:table-cell",
                   )}
                 >

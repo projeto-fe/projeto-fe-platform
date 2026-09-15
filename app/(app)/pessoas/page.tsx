@@ -1,15 +1,28 @@
 import type { Metadata } from "next";
+import { Mail, ScrollText, ShieldCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { CabecalhoDaPagina, CorpoDaPagina } from "@/components/shell/cabecalho-da-pagina";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardHeading,
+  CardNota,
+  CardTitle,
+} from "@/components/ui/card";
+import { Confirmacao } from "@/components/ui/confirmacao";
+import { EstadoVazio } from "@/components/ui/estado-vazio";
+import { Iniciais } from "@/components/ui/iniciais";
+import { Linha, LinhaTexto, Lista } from "@/components/ui/lista";
 import { Tabela, type Coluna } from "@/components/ui/tabela";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
 import { alternarAcesso, cancelarConvite } from "./actions";
-import { FormularioDeConvite } from "./convite";
+import { ConvidarDialogo } from "./convite";
 
 export const metadata: Metadata = { title: "Pessoas e acessos" };
 
@@ -31,6 +44,10 @@ function quando(iso: string) {
   });
 }
 
+function plural(n: number, um: string, varios: string) {
+  return `${n} ${n === 1 ? um : varios}`;
+}
+
 export default async function Pessoas() {
   const eu = await exigirPessoaLogada();
   // A tela inteira é de administração. Quem não é admin não tem o que ver aqui,
@@ -42,7 +59,7 @@ export default async function Pessoas() {
   const [perfis, vinculos, areas, convites, auditoria] = await Promise.all([
     supabase.from("perfis").select("id, nome, email, is_admin, ativo").order("nome"),
     supabase.from("area_membros").select("usuario_id, area_id, papel"),
-    supabase.from("areas").select("id, nome").eq("ativo", true).order("nome"),
+    supabase.from("areas").select("id, nome").eq("ativo", true).eq("tipo", "area").order("nome"),
     supabase
       .from("convites")
       .select("id, email, papel, area_id, expira_em, aceito_em, criado_em")
@@ -55,7 +72,8 @@ export default async function Pessoas() {
       .limit(30),
   ]);
 
-  const nomeDaArea = new Map((areas.data ?? []).map((a) => [a.id, a.nome]));
+  const listaDeAreas = areas.data ?? [];
+  const nomeDaArea = new Map(listaDeAreas.map((a) => [a.id, a.nome]));
   const nomeDaPessoa = new Map((perfis.data ?? []).map((p) => [p.id, p.nome]));
 
   const vinculosPorPessoa = new Map<string, string[]>();
@@ -70,15 +88,22 @@ export default async function Pessoas() {
     ...p,
     vinculos: vinculosPorPessoa.get(p.id) ?? [],
   }));
+  const comAcesso = pessoas.filter((p) => p.ativo).length;
+
+  const pendentes = convites.data ?? [];
+  const registros = auditoria.data ?? [];
 
   const colunas: Coluna<Pessoa>[] = [
     {
       chave: "pessoa",
       cabecalho: "Pessoa",
       conteudo: (p) => (
-        <span className="flex flex-col">
-          <span className="font-semibold">{p.nome}</span>
-          <span className="text-xs text-ink-muted">{p.email}</span>
+        <span className="flex items-center gap-3">
+          <Iniciais nome={p.nome} tom={p.is_admin ? "marca" : "neutro"} />
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate font-semibold">{p.nome}</span>
+            <span className="truncate text-xs text-ink-muted">{p.email}</span>
+          </span>
         </span>
       ),
     },
@@ -89,9 +114,9 @@ export default async function Pessoas() {
         p.is_admin ? (
           <Badge variant="brand">Administrador</Badge>
         ) : p.vinculos.length === 0 ? (
-          <span className="text-ink-subtle">sem área</span>
+          <span className="text-ink-muted">Sem área</span>
         ) : (
-          <span className="text-xs">{p.vinculos.join(", ")}</span>
+          <span className="text-xs text-ink-muted">{p.vinculos.join(", ")}</span>
         ),
     },
     {
@@ -100,138 +125,203 @@ export default async function Pessoas() {
       escondeNoCelular: true,
       conteudo: (p) =>
         p.ativo ? (
-          <Badge variant="positive">ativo</Badge>
+          <Badge variant="positive" ponto>
+            Ativo
+          </Badge>
         ) : (
-          <Badge variant="negative">sem acesso</Badge>
+          <Badge variant="negative" ponto>
+            Sem acesso
+          </Badge>
         ),
     },
     {
       chave: "acao",
       cabecalho: "",
       numerica: true,
+      largura: "8rem",
       conteudo: (p) =>
         p.id === eu.id ? (
-          <span className="text-xs text-ink-subtle">você</span>
+          <span className="text-xs text-ink-muted">Você</span>
+        ) : p.ativo ? (
+          <Confirmacao
+            titulo={`Desativar acesso de ${p.nome}?`}
+            descricao="A pessoa perde o acesso na próxima requisição. Você pode reativar depois."
+            rotuloConfirmar="Desativar acesso"
+            perigoso
+            acao={alternarAcesso}
+            campos={{ usuario_id: p.id, ativar: "nao" }}
+            mensagemDeSucesso="Acesso desativado."
+          >
+            <Button variant="ghost" size="sm">
+              Desativar
+            </Button>
+          </Confirmacao>
         ) : (
-          <form action={alternarAcesso}>
-            <input type="hidden" name="usuario_id" value={p.id} />
-            <input type="hidden" name="ativar" value={p.ativo ? "nao" : "sim"} />
-            <button
-              type="submit"
-              className="rounded-sm px-2 py-1 text-xs font-semibold text-ink-muted hover:bg-surface-sunken hover:text-ink"
-            >
-              {p.ativo ? "Desativar" : "Reativar"}
-            </button>
-          </form>
+          <Confirmacao
+            titulo={`Reativar acesso de ${p.nome}?`}
+            descricao="A pessoa volta a entrar no portal com a mesma conta e os mesmos vínculos de área."
+            rotuloConfirmar="Reativar acesso"
+            acao={alternarAcesso}
+            campos={{ usuario_id: p.id, ativar: "sim" }}
+            mensagemDeSucesso="Acesso reativado."
+          >
+            <Button variant="ghost" size="sm">
+              Reativar
+            </Button>
+          </Confirmacao>
         ),
     },
   ];
 
   return (
     <>
-      <CabecalhoDaPagina titulo="Pessoas e acessos" />
+      <CabecalhoDaPagina
+        titulo="Pessoas e acessos"
+        descricao="Quem entra no portal e o que cada pessoa faz. Ninguém cria conta sozinho: só por convite."
+        acao={<ConvidarDialogo areas={listaDeAreas} />}
+      />
 
       <CorpoDaPagina>
-        <Card className="overflow-hidden">
+        <Card>
           <CardHeader>
-            <CardTitle>Equipe</CardTitle>
-            <span className="flex-1" />
-            <Badge variant="warning">Cadastro aberto desligado</Badge>
+            <CardHeading>
+              <CardTitle>Equipe</CardTitle>
+              <CardDescription>
+                {plural(pessoas.length, "pessoa", "pessoas")}, {comAcesso} com acesso
+              </CardDescription>
+            </CardHeading>
           </CardHeader>
           <Tabela
             colunas={colunas}
             linhas={pessoas}
             chaveDaLinha={(p) => p.id}
-            vazio="Nenhuma pessoa cadastrada."
+            legenda="Equipe com acesso ao portal"
+            vazio={
+              <EstadoVazio
+                compacto
+                icone={ShieldCheck}
+                titulo="Nenhuma pessoa cadastrada"
+                descricao="A equipe aparece aqui assim que alguém aceitar um convite."
+              />
+            }
           />
+          <CardNota>Cadastro aberto está desligado: toda conta nasce de um convite.</CardNota>
         </Card>
 
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-          <div className="flex flex-col gap-4">
-            <FormularioDeConvite areas={areas.data ?? []} />
+        <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+          <Card>
+            <CardHeader>
+              <CardTitle>Convites pendentes</CardTitle>
+              <Badge variant="neutral">{pendentes.length}</Badge>
+            </CardHeader>
 
-            {(convites.data ?? []).length > 0 ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Convites pendentes</CardTitle>
-                </CardHeader>
-                <ul className="flex flex-col">
-                  {(convites.data ?? []).map((c) => {
-                    const expirado = new Date(c.expira_em) < new Date();
-                    return (
-                      <li
-                        key={c.id}
-                        className="flex items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0"
+            {pendentes.length === 0 ? (
+              <EstadoVazio
+                compacto
+                icone={Mail}
+                titulo="Nenhum convite pendente"
+                descricao="Convites enviados e ainda não aceitos aparecem aqui, com a validade."
+                acao={
+                  <ConvidarDialogo
+                    areas={listaDeAreas}
+                    gatilho={
+                      <Button variant="outline" size="sm">
+                        Convidar pessoa
+                      </Button>
+                    }
+                  />
+                }
+              />
+            ) : (
+              <Lista className="border-t border-line">
+                {pendentes.map((c) => {
+                  const expirado = new Date(c.expira_em) < new Date();
+                  const papel = c.papel === "coordenador" ? "Coordenação" : "Voluntário";
+                  const area = c.area_id ? nomeDaArea.get(c.area_id) : null;
+                  return (
+                    <Linha key={c.id}>
+                      <LinhaTexto
+                        principal={c.email}
+                        secundario={[papel, area, expirado ? "expirado" : `vale até ${quando(c.expira_em)}`]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      />
+                      {expirado ? (
+                        <Badge variant="negative" ponto>
+                          Expirado
+                        </Badge>
+                      ) : null}
+                      <Confirmacao
+                        titulo="Cancelar este convite?"
+                        descricao="O link do e-mail deixa de funcionar. Você pode convidar de novo depois."
+                        rotuloConfirmar="Cancelar convite"
+                        perigoso
+                        acao={cancelarConvite}
+                        campos={{ convite_id: c.id }}
+                        mensagemDeSucesso="Convite cancelado."
                       >
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-semibold">{c.email}</span>
-                          <span className="block text-xs text-ink-muted">
-                            {c.papel === "coordenador" ? "Coordenação" : "Voluntário"}
-                            {c.area_id ? ` · ${nomeDaArea.get(c.area_id) ?? ""}` : ""}
-                            {" · "}
-                            {expirado ? "expirado" : `vale até ${quando(c.expira_em)}`}
-                          </span>
-                        </span>
-                        {expirado ? <Badge variant="negative">expirado</Badge> : null}
-                        <form action={cancelarConvite}>
-                          <input type="hidden" name="convite_id" value={c.id} />
-                          <button
-                            type="submit"
-                            className="rounded-sm px-2 py-1 text-xs font-semibold text-ink-muted hover:bg-negative-soft hover:text-negative-strong"
-                          >
-                            Cancelar
-                          </button>
-                        </form>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </Card>
-            ) : null}
-          </div>
+                        <Button variant="ghost" size="sm">
+                          Cancelar
+                        </Button>
+                      </Confirmacao>
+                    </Linha>
+                  );
+                })}
+              </Lista>
+            )}
+          </Card>
 
           <Card>
             <CardHeader>
               <CardTitle>Registro de atividade</CardTitle>
-              <span className="flex-1" />
-              <Badge>últimos 30</Badge>
+              <Badge variant="neutral">Últimos 30</Badge>
             </CardHeader>
 
-            {(auditoria.data ?? []).length === 0 ? (
-              <CardBody>
-                <p className="text-sm text-ink-muted">Nada registrado ainda.</p>
-              </CardBody>
+            {registros.length === 0 ? (
+              <EstadoVazio
+                compacto
+                icone={ScrollText}
+                titulo="Nada registrado ainda"
+                descricao="Convites, acessos e alterações sensíveis ficam gravados aqui, com quem fez e quando."
+              />
             ) : (
-              <ul className="flex flex-col">
-                {(auditoria.data ?? []).map((registro) => (
-                  <li
-                    key={registro.id}
-                    className="flex items-start gap-3 border-b border-line px-4 py-2.5 last:border-b-0"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">
-                        {nomeDaPessoa.get(registro.ator_id ?? "") ?? "Sistema"} {registro.acao}
-                      </span>
-                      <span className="block truncate text-xs text-ink-muted">
-                        {registro.detalhe
-                          ? Object.values(registro.detalhe as Record<string, unknown>).join(" · ")
-                          : registro.entidade}
-                        {" · "}
-                        {quando(registro.criado_em)}
-                      </span>
-                    </span>
-                    {registro.sensivel ? <Badge variant="negative">sensível</Badge> : null}
-                  </li>
-                ))}
-              </ul>
+              <Lista className="border-t border-line">
+                {registros.map((registro) => {
+                  const ator = registro.ator_id ? nomeDaPessoa.get(registro.ator_id) : undefined;
+                  const detalhe = registro.detalhe
+                    ? Object.values(registro.detalhe as Record<string, unknown>).join(" · ")
+                    : registro.entidade;
+                  return (
+                    <Linha key={registro.id} className="items-start py-3">
+                      {ator ? (
+                        <Iniciais nome={ator} tamanho="sm" />
+                      ) : (
+                        <span
+                          className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-sunken text-ink-subtle"
+                          aria-hidden
+                        >
+                          <ShieldCheck className="size-3.5" />
+                        </span>
+                      )}
+                      <LinhaTexto
+                        principal={`${ator ?? "Sistema"} ${registro.acao}`}
+                        secundario={`${detalhe} · ${quando(registro.criado_em)}`}
+                      />
+                      {registro.sensivel ? (
+                        <Badge variant="warning" ponto>
+                          Sensível
+                        </Badge>
+                      ) : null}
+                    </Linha>
+                  );
+                })}
+              </Lista>
             )}
 
-            <CardBody className="border-t border-line">
-              <p className="text-xs text-ink-muted">
-                O registro é gravado pelo servidor e ninguém consegue alterá-lo ou apagá-lo,
-                nem administradores.
-              </p>
-            </CardBody>
+            <CardNota>
+              O registro é gravado pelo servidor e ninguém consegue alterá-lo ou apagá-lo, nem
+              administradores.
+            </CardNota>
           </Card>
         </div>
       </CorpoDaPagina>

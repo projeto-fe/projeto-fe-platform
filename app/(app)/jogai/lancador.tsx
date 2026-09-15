@@ -1,11 +1,14 @@
 "use client";
 
-import { AlertCircle, Check } from "lucide-react";
-import { useActionState, useState } from "react";
+import { AlertCircle, Star } from "lucide-react";
+import Link from "next/link";
+import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { CampoSelecao, GradeDeCampos } from "@/components/ui/campo";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { AvisoDoFormulario, CampoSelecao, GradeDeCampos } from "@/components/ui/campo";
+import { Card, CardBody, CardDescription, CardHeader, CardHeading, CardTitle } from "@/components/ui/card";
+import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { cn } from "@/lib/utils";
 
 import { lancarPonto, type EstadoDoLancamento } from "./actions";
@@ -26,19 +29,37 @@ export function Lancador({
   const [estado, acao, enviando] = useActionState(lancarPonto, inicial);
   const [motivoEscolhido, setMotivoEscolhido] = useState<string>(motivos[0]?.id ?? "");
 
+  useEffect(() => {
+    if (estado.sucesso) toast.success(estado.sucesso);
+  }, [estado]);
+
   if (criancas.length === 0 || motivos.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Lançar pontos</CardTitle>
+          <CardHeading>
+            <CardTitle>Lançar pontos</CardTitle>
+            <CardDescription>O valor vem do catálogo, igual para todo mundo.</CardDescription>
+          </CardHeading>
         </CardHeader>
-        <CardBody>
-          <p className="text-sm text-ink-muted">
-            {criancas.length === 0
-              ? "Cadastre ao menos uma criança para começar a lançar pontos."
-              : "Nenhum motivo cadastrado no catálogo."}
-          </p>
-        </CardBody>
+        {criancas.length === 0 ? (
+          <EstadoVazio
+            icone={Star}
+            titulo="Ainda não há crianças para pontuar"
+            descricao="Cadastre a primeira criança e os motivos do catálogo aparecem aqui prontos para lançar."
+            acao={
+              <Button asChild>
+                <Link href="/criancas/nova">Cadastrar criança</Link>
+              </Button>
+            }
+          />
+        ) : (
+          <EstadoVazio
+            icone={Star}
+            titulo="Nenhum motivo no catálogo"
+            descricao="Os motivos de pontuação são cadastrados no banco. Fale com a administração para ativar o catálogo."
+          />
+        )}
       </Card>
     );
   }
@@ -46,40 +67,41 @@ export function Lancador({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Lançar pontos</CardTitle>
+        <CardHeading>
+          <CardTitle>Lançar pontos</CardTitle>
+          <CardDescription>O valor vem do catálogo, igual para todo mundo.</CardDescription>
+        </CardHeading>
       </CardHeader>
       <CardBody>
-        <form action={acao} className="flex flex-col gap-4">
+        <form action={acao} className="flex flex-col gap-5">
           <GradeDeCampos>
-            <CampoSelecao id="crianca_id" name="crianca_id" rotulo="Criança" colunas={12}>
-              {criancas.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nome_completo}
-                </option>
-              ))}
-            </CampoSelecao>
+            <CampoSelecao
+              id="crianca_id"
+              name="crianca_id"
+              rotulo="Criança"
+              colunas={atividades.length > 0 ? 7 : 12}
+              obrigatorio
+              placeholder="Escolher criança"
+              opcoes={criancas.map((c) => ({ value: c.id, label: c.nome_completo }))}
+            />
 
             {atividades.length > 0 ? (
               <CampoSelecao
                 id="atividade_id"
                 name="atividade_id"
                 rotulo="Durante qual atividade"
-                colunas={12}
-              >
-                <option value="">Não informar</option>
-                {atividades.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.nome}
-                  </option>
-                ))}
-              </CampoSelecao>
+                colunas={5}
+                defaultValue=""
+                opcoes={[
+                  { value: "", label: "Não informar" },
+                  ...atividades.map((a) => ({ value: a.id, label: a.nome })),
+                ]}
+              />
             ) : null}
           </GradeDeCampos>
 
           <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 font-display text-[0.6875rem] font-semibold tracking-wider text-ink-muted uppercase">
-              Motivo
-            </legend>
+            <legend className="mb-2 text-sm font-semibold text-ink">Motivo</legend>
 
             <div className="grid gap-2 sm:grid-cols-2">
               {motivos.map((motivo) => {
@@ -90,10 +112,10 @@ export function Lancador({
                   <label
                     key={motivo.id}
                     className={cn(
-                      "flex cursor-pointer items-center gap-3 rounded-sm border px-3 py-2.5 transition-colors",
+                      "flex cursor-pointer items-center gap-3 rounded-md border px-3.5 py-3 transition-colors duration-150 has-focus-visible:ring-3 has-focus-visible:ring-brand-soft",
                       escolhido
                         ? "border-brand bg-brand-soft"
-                        : "border-line hover:bg-surface-sunken",
+                        : "border-line bg-surface-raised hover:bg-surface-sunken",
                     )}
                   >
                     <input
@@ -106,7 +128,7 @@ export function Lancador({
                     />
                     <span
                       className={cn(
-                        "min-w-10 rounded-sm px-2 py-1 text-center font-display text-[0.9375rem] font-semibold tabular-nums",
+                        "min-w-11 rounded-md px-2 py-1 text-center text-md font-semibold",
                         positivo
                           ? "bg-positive-soft text-positive-strong"
                           : "bg-negative-soft text-negative-strong",
@@ -123,32 +145,17 @@ export function Lancador({
           </fieldset>
 
           {estado.erro ? (
-            <p
-              role="alert"
-              className="flex items-start gap-2 rounded-sm bg-negative-soft px-3 py-2.5 text-sm text-negative-strong"
-            >
-              <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+            <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
               {estado.erro}
-            </p>
+            </AvisoDoFormulario>
           ) : null}
 
-          {estado.sucesso ? (
-            <p
-              role="status"
-              className="flex items-center gap-2 rounded-sm bg-positive-soft px-3 py-2.5 text-sm text-positive-strong"
-            >
-              <Check className="size-4 shrink-0" aria-hidden />
-              {estado.sucesso}
-            </p>
-          ) : null}
-
-          <Button type="submit" variant="brand" size="lg" loading={enviando}>
+          <Button type="submit" variant="brand" size="lg" loading={enviando} className="w-full sm:w-auto sm:self-start">
             Lançar ponto
           </Button>
 
-          <p className="text-xs text-ink-muted">
-            O valor vem do catálogo, não do formulário, para que o mesmo acontecimento valha o
-            mesmo ponto independente de quem lança. Todo lançamento fica registrado em seu nome.
+          <p className="text-xs leading-relaxed text-ink-muted">
+            Todo lançamento fica registrado em seu nome, com data e motivo.
           </p>
         </form>
       </CardBody>

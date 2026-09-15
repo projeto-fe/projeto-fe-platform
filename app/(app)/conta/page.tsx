@@ -2,7 +2,15 @@ import type { Metadata } from "next";
 
 import { CabecalhoDaPagina, CorpoDaPagina } from "@/components/shell/cabecalho-da-pagina";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { Ajuda, Rotulo } from "@/components/ui/campo";
+import {
+  Card,
+  CardBody,
+  CardDescription,
+  CardHeader,
+  CardHeading,
+  CardTitle,
+} from "@/components/ui/card";
 import { exigirPessoaLogada } from "@/lib/sessao";
 
 import { FormularioDeNome } from "./formulario";
@@ -14,26 +22,24 @@ export default async function Conta() {
 
   return (
     <>
-      <CabecalhoDaPagina titulo="Minha conta" />
+      <CabecalhoDaPagina titulo="Minha conta" descricao="Como você aparece para a equipe." />
 
       <CorpoDaPagina>
         <Card className="max-w-xl">
           <CardHeader>
-            <CardTitle>Seus dados</CardTitle>
-            <span className="flex-1" />
+            <CardHeading>
+              <CardTitle>Seus dados</CardTitle>
+              <CardDescription>Nome e e-mail de acesso.</CardDescription>
+            </CardHeading>
             <Badge variant={pessoa.isAdmin ? "brand" : "neutral"}>{pessoa.papel}</Badge>
           </CardHeader>
-          <CardBody className="flex flex-col gap-4">
+          <CardBody className="flex flex-col gap-5">
             <FormularioDeNome nome={pessoa.nome} />
 
-            <div className="flex flex-col gap-1 border-t border-line pt-4">
-              <span className="font-display text-[0.6875rem] font-semibold tracking-wider text-ink-muted uppercase">
-                E-mail
-              </span>
-              <span className="text-sm">{pessoa.email}</span>
-              <span className="text-xs text-ink-muted">
-                Para trocar o e-mail, fale com um administrador.
-              </span>
+            <div className="flex flex-col gap-1.5 border-t border-line pt-5">
+              <Rotulo>E-mail</Rotulo>
+              <span className="text-base">{pessoa.email}</span>
+              <Ajuda>Para trocar o e-mail, fale com um administrador.</Ajuda>
             </div>
           </CardBody>
         </Card>

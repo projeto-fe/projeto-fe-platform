@@ -1,11 +1,12 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Lock } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
+  AvisoDoFormulario,
   Campo,
   CampoSelecao,
   CampoTexto,
@@ -13,10 +14,14 @@ import {
   SecaoDoFormulario,
 } from "@/components/ui/campo";
 import { Card, CardBody, CardFooter } from "@/components/ui/card";
+import { OpcaoMarcavel } from "@/components/ui/checkbox";
+import { LinhaComInterruptor } from "@/components/ui/switch";
 
 import { salvarCrianca, type EstadoDaCrianca } from "./actions";
 
 const inicial: EstadoDaCrianca = {};
+
+const TAMANHOS_DE_UNIFORME = ["PP", "P", "M", "G", "GG"];
 
 export type ValoresDaCrianca = {
   id?: string;
@@ -99,9 +104,9 @@ export function FormularioDaCrianca({
     <form action={acao}>
       {valores.id ? <input type="hidden" name="id" value={valores.id} /> : null}
 
-      <Card>
-        <CardBody className="flex flex-col gap-5">
-          <SecaoDoFormulario titulo="Identificação">
+      <Card className="overflow-visible">
+        <CardBody className="flex flex-col pt-6">
+          <SecaoDoFormulario id="identificacao" titulo="Identificação" descricao="Como a criança aparece na lista e no ranking.">
             <GradeDeCampos>
               <Campo
                 id="nome_completo"
@@ -125,73 +130,68 @@ export function FormularioDaCrianca({
           </SecaoDoFormulario>
 
           <SecaoDoFormulario
+            id="atividades"
             titulo="Atividades"
             descricao="A criança pode participar de mais de uma."
           >
             {atividades.length === 0 ? (
-              <p className="text-sm text-ink-muted">
-                Nenhuma atividade cadastrada.{" "}
-                <Link href="/estrutura" className="font-semibold text-brand-ink underline">
-                  Monte a estrutura primeiro
-                </Link>
-                .
-              </p>
+              <AvisoDoFormulario tom="info">
+                Nenhuma atividade cadastrada ainda.{" "}
+                <Link href="/estrutura" className="font-semibold text-brand-ink underline underline-offset-2">
+                  Monte a estrutura
+                </Link>{" "}
+                para inscrever a criança depois.
+              </AvisoDoFormulario>
             ) : (
               <div className="grid gap-2 sm:grid-cols-2">
                 {atividades.map((atividade) => (
-                  <label
+                  <OpcaoMarcavel
                     key={atividade.id}
-                    className="flex cursor-pointer items-center gap-2.5 rounded-sm border border-line px-3 py-2.5 hover:bg-surface-sunken has-checked:border-brand has-checked:bg-brand-soft"
-                  >
-                    <input
-                      type="checkbox"
-                      name="atividades"
-                      value={atividade.id}
-                      defaultChecked={inscritaEm.has(atividade.id)}
-                      className="size-4 accent-brand"
-                    />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">{atividade.nome}</span>
-                      <span className="block text-xs text-ink-muted">{atividade.area}</span>
-                    </span>
-                  </label>
+                    id={`atividade-${atividade.id}`}
+                    name="atividades"
+                    value={atividade.id}
+                    titulo={atividade.nome}
+                    descricao={atividade.area}
+                    defaultChecked={inscritaEm.has(atividade.id)}
+                  />
                 ))}
               </div>
             )}
           </SecaoDoFormulario>
 
           <SecaoDoFormulario
+            id="saude"
             titulo="Saúde"
             descricao="Informação usada pela equipe durante as atividades."
           >
-            <GradeDeCampos>
-              <CampoSelecao
-                id="tem_problema_saude"
-                name="tem_problema_saude"
-                rotulo="Tem problema de saúde?"
-                colunas={4}
-                value={temSaude ? "sim" : "nao"}
-                onChange={(e) => setTemSaude(e.target.value === "sim")}
-              >
-                <option value="nao">Não</option>
-                <option value="sim">Sim</option>
-              </CampoSelecao>
-
+            <div className="flex flex-col gap-4">
+              <input type="hidden" name="tem_problema_saude" value={temSaude ? "sim" : "nao"} />
+              <LinhaComInterruptor
+                id="tem_problema_saude_switch"
+                titulo="Tem problema de saúde"
+                descricao="Alergia, medicação de uso contínuo, restrição"
+                checked={temSaude}
+                onCheckedChange={setTemSaude}
+              />
               {temSaude ? (
-                <Campo
-                  id="observacao_saude"
-                  name="observacao_saude"
-                  rotulo="Qual"
-                  colunas={8}
-                  maxLength={300}
-                  defaultValue={valores.observacao_saude ?? ""}
-                  placeholder="Alergia, medicação de uso contínuo, restrição"
-                />
+                <GradeDeCampos>
+                  <Campo
+                    id="observacao_saude"
+                    name="observacao_saude"
+                    rotulo="Qual"
+                    colunas={12}
+                    maxLength={300}
+                    defaultValue={valores.observacao_saude ?? ""}
+                    placeholder="Alergia a amendoim, uso de bombinha"
+                    autoFocus
+                  />
+                </GradeDeCampos>
               ) : null}
-            </GradeDeCampos>
+            </div>
           </SecaoDoFormulario>
 
           <SecaoDoFormulario
+            id="medidas"
             titulo="Medidas e uniforme"
             descricao="Usado para entrega de uniforme e calçado."
           >
@@ -221,7 +221,7 @@ export function FormularioDaCrianca({
               <Campo
                 id="numero_calcado"
                 name="numero_calcado"
-                rotulo="Nº calçado"
+                rotulo="Calçado"
                 colunas={3}
                 metadeNoCelular
                 type="number"
@@ -235,20 +235,18 @@ export function FormularioDaCrianca({
                 colunas={3}
                 metadeNoCelular
                 defaultValue={valores.uniforme ?? ""}
-              >
-                <option value="">—</option>
-                {["PP", "P", "M", "G", "GG"].map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </CampoSelecao>
+                opcoes={[
+                  { value: "", label: "Não informado" },
+                  ...TAMANHOS_DE_UNIFORME.map((t) => ({ value: t, label: t })),
+                ]}
+              />
             </GradeDeCampos>
           </SecaoDoFormulario>
 
           {podeVerSensiveis ? (
             <>
               <SecaoDoFormulario
+                id="endereco"
                 titulo="Endereço"
                 descricao="Digite o CEP e o resto é preenchido sozinho."
               >
@@ -321,7 +319,11 @@ export function FormularioDaCrianca({
                 </GradeDeCampos>
               </SecaoDoFormulario>
 
-              <SecaoDoFormulario titulo="Contato e responsáveis">
+              <SecaoDoFormulario
+                id="contato"
+                titulo="Contato e responsáveis"
+                descricao="Quem a equipe chama quando precisa."
+              >
                 <GradeDeCampos>
                   <Campo
                     id="telefone_principal"
@@ -358,6 +360,7 @@ export function FormularioDaCrianca({
               </SecaoDoFormulario>
 
               <SecaoDoFormulario
+                id="autorizacao"
                 titulo="Autorização do responsável"
                 descricao="O termo é assinado em papel. Aqui fica o registro de que ele existe."
               >
@@ -382,46 +385,53 @@ export function FormularioDaCrianca({
               </SecaoDoFormulario>
             </>
           ) : (
-            <SecaoDoFormulario titulo="Endereço, contato e autorização">
-              <p className="rounded-sm bg-surface-sunken px-3 py-2.5 text-sm text-ink-muted">
-                Estes dados ficam com a coordenação. Você consegue cadastrar a criança sem eles,
-                e alguém da coordenação completa depois.
-              </p>
+            <SecaoDoFormulario
+              id="endereco"
+              titulo="Endereço, contato e autorização"
+              descricao="Dados que ficam com a coordenação."
+            >
+              <AvisoDoFormulario tom="info" icone={<Lock />}>
+                Você consegue cadastrar a criança sem estes dados. Alguém da coordenação completa
+                depois.
+              </AvisoDoFormulario>
             </SecaoDoFormulario>
           )}
 
-          <SecaoDoFormulario titulo="Observações gerais">
+          <SecaoDoFormulario
+            id="observacoes"
+            titulo="Observações gerais"
+            descricao="Qualquer coisa que a equipe precise saber."
+          >
             <GradeDeCampos>
               <CampoTexto
                 id="observacoes_gerais"
                 name="observacoes_gerais"
-                rotulo="Qualquer coisa que a equipe precise saber"
+                rotulo="Observações"
                 colunas={12}
                 maxLength={1000}
                 defaultValue={valores.observacoes_gerais ?? ""}
+                placeholder="Preferências, combinados com a família, cuidados especiais"
               />
             </GradeDeCampos>
           </SecaoDoFormulario>
 
           {estado.erro ? (
-            <p
-              role="alert"
-              className="flex items-start gap-2 rounded-sm bg-negative-soft px-3 py-2.5 text-sm text-negative-strong"
-            >
-              <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
-              {estado.erro}
-            </p>
+            <div className="pt-6">
+              <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
+                {estado.erro}
+              </AvisoDoFormulario>
+            </div>
           ) : null}
         </CardBody>
 
-        <CardFooter className="flex-col-reverse gap-2 sm:flex-row">
-          <span className="mr-auto text-xs text-ink-muted">
+        <CardFooter className="z-10 flex-wrap gap-2 rounded-b-lg md:sticky md:bottom-0">
+          <span className="w-full text-xs text-ink-muted sm:mr-auto sm:w-auto">
             Campos com <span className="text-brand">*</span> são obrigatórios.
           </span>
-          <Button asChild variant="outline" className="w-full sm:w-auto">
+          <Button asChild variant="outline" className="flex-1 sm:flex-none">
             <Link href="/criancas">Cancelar</Link>
           </Button>
-          <Button type="submit" loading={salvando} className="w-full sm:w-auto">
+          <Button type="submit" loading={salvando} className="flex-1 sm:flex-none">
             Salvar cadastro
           </Button>
         </CardFooter>

@@ -1,8 +1,12 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import { estiloDeControle } from "@/components/ui/campo";
+import { Select } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export function Filtros({
   atividades,
@@ -41,8 +45,13 @@ export function Filtros({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="flex h-10 min-w-48 flex-1 items-center gap-2 rounded-sm border border-line bg-surface-raised px-3">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div
+        className={cn(
+          estiloDeControle,
+          "flex flex-1 items-center gap-2 px-3 focus-within:border-brand focus-within:ring-3 focus-within:ring-brand-soft",
+        )}
+      >
         <Search className="size-4 shrink-0 text-ink-subtle" aria-hidden />
         <input
           type="search"
@@ -50,23 +59,31 @@ export function Filtros({
           onChange={(e) => setTermo(e.target.value)}
           placeholder="Buscar por nome"
           aria-label="Buscar criança"
-          className="w-full bg-transparent text-sm outline-none"
+          className="h-full w-full min-w-0 bg-transparent text-base outline-none [&::-webkit-search-cancel-button]:hidden"
         />
+        {termo ? (
+          <button
+            type="button"
+            onClick={() => setTermo("")}
+            aria-label="Limpar busca"
+            className="grid size-6 shrink-0 place-items-center rounded-sm text-ink-subtle transition-colors hover:bg-surface-sunken hover:text-ink"
+          >
+            <X className="size-3.5" aria-hidden />
+          </button>
+        ) : null}
       </div>
 
-      <select
-        value={atividade ?? ""}
-        onChange={(e) => trocarAtividade(e.target.value)}
-        aria-label="Filtrar por atividade"
-        className="h-10 cursor-pointer rounded-sm border border-line bg-surface-raised px-2.5 text-sm font-semibold"
-      >
-        <option value="">Todas as atividades</option>
-        {atividades.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.nome}
-          </option>
-        ))}
-      </select>
+      <div className="sm:w-64">
+        <Select
+          aria-label="Filtrar por atividade"
+          value={atividade ?? ""}
+          onValueChange={trocarAtividade}
+          opcoes={[
+            { value: "", label: "Todas as atividades" },
+            ...atividades.map((a) => ({ value: a.id, label: a.nome })),
+          ]}
+        />
+      </div>
     </div>
   );
 }

@@ -1,9 +1,14 @@
 import * as React from "react";
 
+import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-const estiloDeControle =
-  "h-10 w-full rounded-sm border border-line-strong bg-surface-raised px-3 outline-none transition-colors focus:border-brand focus:ring-3 focus:ring-brand-soft disabled:bg-surface-sunken disabled:text-ink-muted read-only:bg-surface-sunken read-only:text-ink-muted";
+/**
+ * Aparência única de todo controle de texto do sistema. Quem precisa de um
+ * input avulso (login, filtro) importa daqui em vez de repetir classes.
+ */
+export const estiloDeControle =
+  "h-10 w-full min-w-0 rounded-md border border-line-strong bg-surface-raised px-3 text-base text-ink shadow-card outline-none transition-[border-color,box-shadow] duration-150 focus:border-brand focus:ring-3 focus:ring-brand-soft aria-invalid:border-negative aria-invalid:focus:ring-negative-soft disabled:bg-surface-sunken disabled:text-ink-muted disabled:shadow-none read-only:bg-surface-sunken read-only:shadow-none";
 
 type BaseProps = {
   id: string;
@@ -30,6 +35,48 @@ const larguras: Record<number, string> = {
   12: "md:col-span-12",
 };
 
+export function Rotulo({
+  className,
+  obrigatorio,
+  children,
+  htmlFor,
+  ...props
+}: React.ComponentProps<"label"> & { obrigatorio?: boolean }) {
+  const conteudo = (
+    <>
+      {children}
+      {obrigatorio ? (
+        <span className="text-brand" aria-label="obrigatório">
+          {" *"}
+        </span>
+      ) : null}
+    </>
+  );
+  const classes = cn("text-sm font-semibold text-ink", className);
+
+  // Sem controle associado (um dado só de leitura), <label> não faz sentido
+  // semântico: vira texto comum com o mesmo desenho.
+  if (!htmlFor) {
+    return <span className={classes}>{conteudo}</span>;
+  }
+
+  return (
+    <label htmlFor={htmlFor} className={classes} {...props}>
+      {conteudo}
+    </label>
+  );
+}
+
+export function Ajuda({ className, ...props }: React.ComponentProps<"span">) {
+  return <span className={cn("text-xs text-ink-muted", className)} {...props} />;
+}
+
+export function MensagemDeErro({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <span role="alert" className={cn("text-xs font-medium text-negative-strong", className)} {...props} />
+  );
+}
+
 function Moldura({
   id,
   rotulo,
@@ -48,34 +95,22 @@ function Moldura({
         larguras[colunas],
       )}
     >
-      <label
-        htmlFor={id}
-        className="font-display text-[0.6875rem] font-semibold tracking-wider text-ink-muted uppercase"
-      >
+      <Rotulo htmlFor={id} obrigatorio={obrigatorio}>
         {rotulo}
-        {obrigatorio ? (
-          <span className="text-brand" aria-label="obrigatório">
-            {" *"}
-          </span>
-        ) : null}
-      </label>
+      </Rotulo>
 
       {children}
 
       {erro ? (
-        <span id={`${id}-erro`} role="alert" className="text-xs text-negative-strong">
-          {erro}
-        </span>
+        <MensagemDeErro id={`${id}-erro`}>{erro}</MensagemDeErro>
       ) : ajuda ? (
-        <span id={`${id}-ajuda`} className="text-xs text-ink-muted">
-          {ajuda}
-        </span>
+        <Ajuda id={`${id}-ajuda`}>{ajuda}</Ajuda>
       ) : null}
     </div>
   );
 }
 
-function acessibilidade(id: string, erro?: string, ajuda?: string) {
+export function acessibilidadeDoCampo(id: string, erro?: string, ajuda?: string) {
   return {
     "aria-invalid": erro ? (true as const) : undefined,
     "aria-describedby": erro ? `${id}-erro` : ajuda ? `${id}-ajuda` : undefined,
@@ -94,31 +129,64 @@ export function Campo({
         id={id}
         required={obrigatorio}
         className={cn(estiloDeControle, className)}
-        {...acessibilidade(id, erro, ajuda)}
+        {...acessibilidadeDoCampo(id, erro, ajuda)}
         {...resto}
       />
     </Moldura>
   );
 }
 
-export function CampoSelecao({
-  className,
-  children,
-  ...props
-}: BaseProps & Omit<React.ComponentProps<"select">, "id">) {
-  const { id, rotulo, obrigatorio, ajuda, erro, colunas, metadeNoCelular, ...resto } = props;
+export type OpcaoDeSelecao = { value: string; label: string; descricao?: string };
+
+type PropsDeSelecao = BaseProps & {
+  name?: string;
+  opcoes: OpcaoDeSelecao[];
+  placeholder?: string;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (valor: string) => void;
+  disabled?: boolean;
+  className?: string;
+};
+
+/**
+ * Seleção com o mesmo desenho em todo navegador. Aceita `value: ""` para
+ * "nenhum", que o servidor já trata como nulo.
+ */
+export function CampoSelecao(props: PropsDeSelecao) {
+  const {
+    id,
+    rotulo,
+    obrigatorio,
+    ajuda,
+    erro,
+    colunas,
+    metadeNoCelular,
+    name,
+    opcoes,
+    placeholder,
+    value,
+    defaultValue,
+    onValueChange,
+    disabled,
+    className,
+  } = props;
 
   return (
     <Moldura {...{ id, rotulo, obrigatorio, ajuda, erro, colunas, metadeNoCelular }}>
-      <select
+      <Select
         id={id}
-        required={obrigatorio}
-        className={cn(estiloDeControle, "cursor-pointer", className)}
-        {...acessibilidade(id, erro, ajuda)}
-        {...resto}
-      >
-        {children}
-      </select>
+        name={name}
+        opcoes={opcoes}
+        placeholder={placeholder}
+        value={value}
+        defaultValue={defaultValue}
+        onValueChange={onValueChange}
+        disabled={disabled}
+        obrigatorio={obrigatorio}
+        className={className}
+        {...acessibilidadeDoCampo(id, erro, ajuda)}
+      />
     </Moldura>
   );
 }
@@ -135,8 +203,8 @@ export function CampoTexto({
         id={id}
         required={obrigatorio}
         rows={3}
-        className={cn(estiloDeControle, "h-auto resize-y py-2.5 text-sm", className)}
-        {...acessibilidade(id, erro, ajuda)}
+        className={cn(estiloDeControle, "h-auto min-h-24 resize-y py-2.5 leading-relaxed", className)}
+        {...acessibilidadeDoCampo(id, erro, ajuda)}
         {...resto}
       />
     </Moldura>
@@ -144,27 +212,72 @@ export function CampoTexto({
 }
 
 /** Grade de 12 colunas que as telas de formulário usam. */
-export function GradeDeCampos({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-12 gap-3">{children}</div>;
+export function GradeDeCampos({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={cn("grid grid-cols-12 gap-x-4 gap-y-4", className)}>{children}</div>;
 }
 
-/** Bloco com título, para agrupar campos por assunto dentro do formulário. */
+/**
+ * Seção de formulário longo: título e explicação à esquerda, campos à
+ * direita. No celular empilha. É o que deixa um cadastro de vinte campos
+ * legível de uma passada só.
+ */
 export function SecaoDoFormulario({
+  id,
   titulo,
   descricao,
   children,
 }: {
+  id?: string;
   titulo: string;
   descricao?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-3 border-t border-line pt-5 first:border-t-0 first:pt-0">
-      <div className="flex flex-col gap-0.5">
-        <h3 className="font-display text-[0.9375rem] font-semibold">{titulo}</h3>
-        {descricao ? <p className="text-xs text-ink-muted">{descricao}</p> : null}
+    <section
+      id={id}
+      aria-labelledby={id ? `${id}-titulo` : undefined}
+      className="grid gap-4 border-t border-line py-6 first:border-t-0 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:gap-8"
+    >
+      <div className="flex flex-col gap-1">
+        <h3 id={id ? `${id}-titulo` : undefined} className="text-md font-semibold">
+          {titulo}
+        </h3>
+        {descricao ? <p className="text-sm text-ink-muted">{descricao}</p> : null}
       </div>
-      {children}
+      <div className="min-w-0">{children}</div>
     </section>
+  );
+}
+
+/**
+ * Aviso dentro do formulário: erro do servidor ou informação de contexto.
+ * Ícone à esquerda, texto que diz o que houve e o próximo passo.
+ */
+export function AvisoDoFormulario({
+  tom = "erro",
+  icone,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"p"> & { tom?: "erro" | "sucesso" | "info" | "atencao"; icone?: React.ReactNode }) {
+  const tons = {
+    erro: "bg-negative-soft text-negative-strong",
+    sucesso: "bg-positive-soft text-positive-strong",
+    atencao: "bg-warning-soft text-warning-strong",
+    info: "bg-surface-sunken text-ink-muted",
+  };
+  return (
+    <p
+      role={tom === "erro" ? "alert" : "status"}
+      className={cn(
+        "flex items-start gap-2.5 rounded-md px-3.5 py-3 text-sm leading-relaxed",
+        tons[tom],
+        className,
+      )}
+      {...props}
+    >
+      {icone ? <span className="mt-0.5 shrink-0 [&>svg]:size-4">{icone}</span> : null}
+      <span className="min-w-0">{children}</span>
+    </p>
   );
 }

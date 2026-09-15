@@ -28,14 +28,23 @@ export default async function EditarCrianca({ params }: { params: Promise<{ id: 
 
   const c = crianca.data;
   const s = sensiveis.data;
+  const veSensiveis = pessoa.isAdmin || pessoa.coordenaAlgumaArea;
 
   return (
     <>
-      <CabecalhoDaPagina titulo={c.nome_completo} />
+      <CabecalhoDaPagina
+        titulo={c.nome_completo}
+        voltar={{ href: "/criancas", rotulo: "Crianças" }}
+        descricao={
+          veSensiveis
+            ? "Todos os dados ficam restritos à equipe."
+            : "Cadastro básico; endereço e contato ficam com a coordenação."
+        }
+      />
       <CorpoDaPagina>
         <FormularioDaCrianca
           atividades={listarAtividades(estrutura)}
-          podeVerSensiveis={pessoa.isAdmin || pessoa.coordenaAlgumaArea}
+          podeVerSensiveis={veSensiveis}
           valores={{
             id: c.id,
             nome_completo: c.nome_completo,

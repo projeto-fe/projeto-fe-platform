@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Open_Sans } from "next/font/google";
 
+import { Toaster } from "@/components/ui/toaster";
 import { marca } from "@/lib/brand";
 
 import "./globals.css";
@@ -8,7 +9,7 @@ import "./globals.css";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -36,7 +37,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${poppins.variable} ${openSans.variable}`}>{children}</body>
+      <body className={`${poppins.variable} ${openSans.variable}`}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

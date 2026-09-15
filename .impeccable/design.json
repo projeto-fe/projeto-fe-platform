@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-15T00:36:57Z",
+  "title": "Design System: Portal Projeto Fé",
+  "extensions": {
+    "colorMeta": {
+      "brand": { "role": "primary", "displayName": "Laranja da marca", "canonical": "#f05a28", "tonalRamp": ["#3a2318", "#d14418", "#f05a28", "#ff8a4c", "#ffb088", "#fbd9c9", "#fdede6", "#ffffff"] },
+      "brand-hover": { "role": "primary", "displayName": "Laranja de hover", "canonical": "#d14418", "tonalRamp": ["#3a2318", "#d14418", "#f05a28", "#ff8a4c", "#ffb088", "#fbd9c9", "#fdede6", "#ffffff"] },
+      "brand-soft": { "role": "primary", "displayName": "Laranja suave", "canonical": "#fdede6", "tonalRamp": ["#3a2318", "#d14418", "#f05a28", "#ff8a4c", "#ffb088", "#fbd9c9", "#fdede6", "#ffffff"] },
+      "brand-soft-strong": { "role": "primary", "displayName": "Laranja suave forte (seleção de texto)", "canonical": "#fbd9c9", "tonalRamp": ["#3a2318", "#d14418", "#f05a28", "#ff8a4c", "#ffb088", "#fbd9c9", "#fdede6", "#ffffff"] },
+      "brand-ink": { "role": "primary", "displayName": "Laranja de texto", "canonical": "#d14418", "tonalRamp": ["#3a2318", "#d14418", "#f05a28", "#ff8a4c", "#ffb088", "#fbd9c9", "#fdede6", "#ffffff"] },
+      "action": { "role": "secondary", "displayName": "Tinta de ação (navy)", "canonical": "#1f2a44", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#4a5468", "#6f7a91", "#98a2b6", "#e8ecf4"] },
+      "action-hover": { "role": "secondary", "displayName": "Tinta de ação, hover", "canonical": "#141c2f", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#4a5468", "#6f7a91", "#98a2b6", "#e8ecf4"] },
+      "action-ink": { "role": "secondary", "displayName": "Texto sobre ação", "canonical": "#ffffff", "tonalRamp": ["#141c2f", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7", "#f6f8fb", "#ffffff"] },
+      "brand-canvas": { "role": "secondary", "displayName": "Território de marca (navy)", "canonical": "#1f2a44", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#4a5468", "#6f7a91", "#98a2b6", "#e8ecf4"] },
+      "brand-canvas-deep": { "role": "secondary", "displayName": "Território de marca, fundo profundo", "canonical": "#141c2f", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#4a5468", "#6f7a91", "#98a2b6", "#e8ecf4"] },
+      "brand-canvas-ink": { "role": "secondary", "displayName": "Texto sobre território de marca", "canonical": "#ffffff", "tonalRamp": ["#141c2f", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7", "#f6f8fb", "#ffffff"] },
+      "brand-canvas-accent": { "role": "secondary", "displayName": "Acento sobre território de marca", "canonical": "#f05a28", "tonalRamp": ["#3a2318", "#d14418", "#f05a28", "#ff8a4c", "#ffb088", "#fbd9c9", "#fdede6", "#ffffff"] },
+      "positive": { "role": "tertiary", "displayName": "Positivo (preenchimento)", "canonical": "#16a34a", "tonalRamp": ["#13301f", "#15803d", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#eaf7ef"] },
+      "positive-strong": { "role": "tertiary", "displayName": "Positivo (texto)", "canonical": "#15803d", "tonalRamp": ["#13301f", "#15803d", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#eaf7ef"] },
+      "positive-soft": { "role": "tertiary", "displayName": "Positivo suave", "canonical": "#eaf7ef", "tonalRamp": ["#13301f", "#15803d", "#16a34a", "#22c55e", "#4ade80", "#86efac", "#bbf7d0", "#eaf7ef"] },
+      "negative": { "role": "tertiary", "displayName": "Negativo (preenchimento)", "canonical": "#dc2626", "tonalRamp": ["#331819", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fdecec"] },
+      "negative-strong": { "role": "tertiary", "displayName": "Negativo (texto)", "canonical": "#b91c1c", "tonalRamp": ["#331819", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fdecec"] },
+      "negative-soft": { "role": "tertiary", "displayName": "Negativo suave", "canonical": "#fdecec", "tonalRamp": ["#331819", "#b91c1c", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca", "#fdecec"] },
+      "warning": { "role": "tertiary", "displayName": "Atenção (preenchimento)", "canonical": "#d97706", "tonalRamp": ["#33270f", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fcd34d", "#fde68a", "#fdf3e3"] },
+      "warning-strong": { "role": "tertiary", "displayName": "Atenção (texto)", "canonical": "#b45309", "tonalRamp": ["#33270f", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fcd34d", "#fde68a", "#fdf3e3"] },
+      "warning-soft": { "role": "tertiary", "displayName": "Atenção suave", "canonical": "#fdf3e3", "tonalRamp": ["#33270f", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fcd34d", "#fde68a", "#fdf3e3"] },
+      "surface-nav": { "role": "neutral", "displayName": "Superfície de navegação", "canonical": "#edf1f7", "tonalRamp": ["#0d121c", "#121826", "#1b2333", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7"] },
+      "surface": { "role": "neutral", "displayName": "Superfície de conteúdo", "canonical": "#f6f8fb", "tonalRamp": ["#0d121c", "#121826", "#1b2333", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#f6f8fb"] },
+      "surface-raised": { "role": "neutral", "displayName": "Painel", "canonical": "#ffffff", "tonalRamp": ["#0d121c", "#121826", "#1b2333", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#ffffff"] },
+      "surface-sunken": { "role": "neutral", "displayName": "Recuo", "canonical": "#edf1f7", "tonalRamp": ["#0d121c", "#121826", "#1b2333", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7"] },
+      "surface-inverse": { "role": "neutral", "displayName": "Superfície inversa", "canonical": "#1f2a44", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#4a5468", "#6f7a91", "#98a2b6", "#e8ecf4"] },
+      "ink": { "role": "neutral", "displayName": "Tinta", "canonical": "#1f2a44", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#626b7d", "#8d97aa", "#c3cddc", "#e8ecf4"] },
+      "ink-muted": { "role": "neutral", "displayName": "Tinta apagada", "canonical": "#626b7d", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#626b7d", "#8d97aa", "#c3cddc", "#e8ecf4"] },
+      "ink-subtle": { "role": "neutral", "displayName": "Tinta sutil", "canonical": "#8d97aa", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#626b7d", "#8d97aa", "#c3cddc", "#e8ecf4"] },
+      "ink-faint": { "role": "neutral", "displayName": "Tinta tênue", "canonical": "#c3cddc", "tonalRamp": ["#0d121c", "#141c2f", "#1f2a44", "#2e3e63", "#626b7d", "#8d97aa", "#c3cddc", "#e8ecf4"] },
+      "ink-inverse": { "role": "neutral", "displayName": "Tinta inversa", "canonical": "#ffffff", "tonalRamp": ["#141c2f", "#626b7d", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7", "#f6f8fb", "#ffffff"] },
+      "line": { "role": "neutral", "displayName": "Fio", "canonical": "#dde4ee", "tonalRamp": ["#2a3348", "#3a4560", "#4a5468", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7", "#f6f8fb"] },
+      "line-strong": { "role": "neutral", "displayName": "Fio forte", "canonical": "#c3cddc", "tonalRamp": ["#2a3348", "#3a4560", "#4a5468", "#8d97aa", "#c3cddc", "#dde4ee", "#edf1f7", "#f6f8fb"] },
+      "scrim": { "role": "neutral", "displayName": "Véu", "canonical": "rgb(20 28 47 / 55%)", "tonalRamp": ["rgb(20 28 47 / 90%)", "rgb(20 28 47 / 80%)", "rgb(20 28 47 / 70%)", "rgb(20 28 47 / 55%)", "rgb(20 28 47 / 40%)", "rgb(20 28 47 / 25%)", "rgb(20 28 47 / 10%)", "rgb(20 28 47 / 4%)"] }
+    },
+    "darkTheme": {
+      "activation": "prefers-color-scheme: dark quando :root não tem data-theme=\"light\"; :root[data-theme=\"dark\"] força. brand-canvas, brand-canvas-deep, brand-canvas-ink, brand-canvas-accent, positive, negative e warning (preenchimento) não mudam.",
+      "values": {
+        "surface-nav": "#0d121c", "surface": "#121826", "surface-raised": "#1b2333", "surface-sunken": "#0d121c", "surface-inverse": "#ffffff",
+        "ink": "#e8ecf4", "ink-muted": "#98a2b6", "ink-subtle": "#6f7a91", "ink-faint": "#3a4560", "ink-inverse": "#141c2f",
+        "line": "#2a3348", "line-strong": "#3a4560",
+        "brand": "#ff8a4c", "brand-hover": "#ffb088", "brand-soft": "#3a2318", "brand-soft-strong": "#3a2318", "brand-ink": "#ffb088",
+        "action": "#e8ecf4", "action-hover": "#ffffff", "action-ink": "#141c2f",
+        "positive-strong": "#4ade80", "positive-soft": "#13301f", "negative-strong": "#f87171", "negative-soft": "#331819", "warning-strong": "#fbbf24", "warning-soft": "#33270f",
+        "scrim": "rgb(0 0 0 / 70%)",
+        "shadow-card": "0 1px 2px rgb(0 0 0 / 40%)", "shadow-pop": "0 12px 32px -12px rgb(0 0 0 / 60%)", "shadow-modal": "0 24px 64px -16px rgb(0 0 0 / 60%)"
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Manchete do ranking público, manchete da capa de entrada em desktop e página não encontrada. Poppins 600, tracking-tight." },
+      "headline": { "displayName": "Título de página", "purpose": "h1 de CabecalhoDaPagina (1.375rem no celular, 1.75rem em md) e h2 de CabecalhoDeEntrada. Poppins 600." },
+      "numeral": { "displayName": "Número grande", "purpose": "Valor do Indicador na faixa de resumo. Poppins 600 em 1.75rem; no pódio público Poppins 700 em 1.375rem." },
+      "title": { "displayName": "Título de bloco", "purpose": "CardTitle, título de SecaoDoFormulario, Numero de lista e chip de valor. Open Sans 600, 0.9375rem. Diálogo e confirmação em 1.0625rem." },
+      "body": { "displayName": "Texto", "purpose": "body, controle de formulário, botão lg, frase da capa. Open Sans 400, 0.875rem." },
+      "label": { "displayName": "Rótulo", "purpose": "Rótulo de campo, item de navegação, botão padrão, descrição de card, linha de lista e célula de tabela. Open Sans 600 (400 em descrição), 0.8125rem, caixa de frase." },
+      "caption": { "displayName": "Apoio", "purpose": "Ajuda, erro (500), texto secundário, cabeçalho de tabela (600), etiqueta, nota de card. 0.75rem." },
+      "micro": { "displayName": "Micro", "purpose": "Rótulo de grupo da barra lateral e rótulo da barra inferior. 0.6875rem, 600, tracking 0.025em, caixa de frase." }
+    },
+    "shadows": [
+      { "name": "shadow-card", "value": "0 1px 2px rgb(31 42 68 / 4%), 0 1px 3px rgb(31 42 68 / 6%)", "purpose": "Painel, controle, botão com fundo, item de navegação ativo, polegar do interruptor. Quase invisível de propósito." },
+      { "name": "shadow-pop", "value": "0 12px 32px -12px rgb(31 42 68 / 22%), 0 2px 6px rgb(31 42 68 / 10%)", "purpose": "Menu suspenso, lista do select, toast. Flutua sem véu." },
+      { "name": "shadow-modal", "value": "0 24px 64px -16px rgb(31 42 68 / 22%), 0 4px 12px rgb(31 42 68 / 10%)", "purpose": "Diálogo e confirmação, sempre com scrim e desfoque de 2px." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.22, 0.61, 0.36, 1)", "purpose": "Única curva do sistema (ease-out-soft no Tailwind). Transições de estado em 150ms." },
+      { "name": "surgir", "value": "180ms, opacity 0 para 1, translateY(6px) scale(0.985) para none", "purpose": "Menu, select, diálogo em desktop, check da caixa." },
+      { "name": "esmaecer", "value": "160ms, opacity 0 para 1", "purpose": "Véu atrás de diálogo." },
+      { "name": "deslizar-de-baixo", "value": "220ms, opacity 0 para 1, translateY(16px) para none", "purpose": "Folha de diálogo no celular." },
+      { "name": "reduced-motion", "value": "animation-duration e transition-duration 0.01ms", "purpose": "prefers-reduced-motion zera tudo." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px", "purpose": "Diálogo centraliza, barra proporcional aparece, grade de motivos em duas colunas." },
+      { "name": "md", "value": "768px", "purpose": "Barra lateral de 256px, colunas secundárias de tabela, seção de formulário em duas colunas." },
+      { "name": "lg", "value": "1024px", "purpose": "Faixa de resumo em quatro colunas, início em 1.5fr 1fr, IDE JOGAI em duas colunas." }
+    ],
+    "layout": [
+      { "name": "sidebar-w", "value": "256px" },
+      { "name": "content-w", "value": "1120px" },
+      { "name": "panel-inset-x", "value": "20px" },
+      { "name": "row-min-height", "value": "52px" },
+      { "name": "control-height", "value": "40px" },
+      { "name": "control-height-entry", "value": "44px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação primária comum: tinta navy, nunca laranja. Padrão sem variante.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Nova criança</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: var(--radius, 10px); font-family: var(--font-open-sans), system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease), transform 150ms var(--ease); } .ds-btn:active { transform: scale(0.985); } .ds-btn:disabled { opacity: 0.5; pointer-events: none; } .ds-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; } .ds-btn-primary { background: var(--action); color: var(--action-ink); box-shadow: var(--shadow-card); } .ds-btn-primary:hover { background: var(--action-hover); }"
+    },
+    {
+      "name": "Botão de marca",
+      "kind": "button",
+      "refersTo": "button-brand",
+      "description": "Só para a ação característica do produto: lançar ponto no IDE JOGAI. Tamanho lg de 44px.",
+      "html": "<button class=\"ds-btn ds-btn-brand ds-btn-lg\">Lançar ponto</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: var(--radius, 10px); font-family: var(--font-open-sans), system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 150ms var(--ease), transform 150ms var(--ease); } .ds-btn:active { transform: scale(0.985); } .ds-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; } .ds-btn-lg { height: 44px; padding: 0 20px; font-size: 0.875rem; line-height: 1.375rem; } .ds-btn-brand { background: var(--brand); color: var(--action-ink); box-shadow: var(--shadow-card); } .ds-btn-brand:hover { background: var(--brand-hover); }"
+    },
+    {
+      "name": "Botão outline",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Ação secundária e o Voltar da confirmação.",
+      "html": "<button class=\"ds-btn ds-btn-outline\">Voltar</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: var(--radius, 10px); font-family: var(--font-open-sans), system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 150ms var(--ease), transform 150ms var(--ease); } .ds-btn:active { transform: scale(0.985); } .ds-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; } .ds-btn-outline { background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); box-shadow: var(--shadow-card); } .ds-btn-outline:hover { background: var(--surface-sunken); }"
+    },
+    {
+      "name": "Botão ghost",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Ação terciária: Ver tudo, botão de ícone, estorno.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">Ver tudo</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 12px; border: 0; border-radius: var(--radius, 10px); font-family: var(--font-open-sans), system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease); } .ds-btn:active { transform: scale(0.985); } .ds-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; } .ds-btn-ghost { background: transparent; color: var(--ink-muted); } .ds-btn-ghost:hover { background: var(--surface-sunken); color: var(--ink); }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "estiloDeControle: rótulo em caixa de frase acima, controle de 40px, ajuda ou erro abaixo (nunca os dois).",
+      "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"ds-nome\">Nome completo<span class=\"ds-req\" aria-label=\"obrigatório\"> *</span></label><input class=\"ds-input\" id=\"ds-nome\" placeholder=\"Como aparece na lista\" /><span class=\"ds-help\">Sobrenome completo ajuda a distinguir irmãos.</span></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; max-width: 360px; font-family: var(--font-open-sans), system-ui, sans-serif; } .ds-label { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; color: var(--ink); } .ds-req { color: var(--brand); } .ds-input { height: 40px; width: 100%; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--radius, 10px); background: var(--surface-raised); color: var(--ink); font: inherit; font-size: 0.875rem; box-shadow: var(--shadow-card); outline: none; caret-color: var(--brand); transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease); } .ds-input::placeholder { color: var(--ink-muted); } .ds-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); } .ds-input[aria-invalid=\"true\"] { border-color: var(--negative); } .ds-input[aria-invalid=\"true\"]:focus { box-shadow: 0 0 0 3px var(--negative-soft); } .ds-input:disabled { background: var(--surface-sunken); color: var(--ink-muted); box-shadow: none; } .ds-help { font-size: 0.75rem; line-height: 1.125rem; color: var(--ink-muted); }"
+    },
+    {
+      "name": "Etiqueta",
+      "kind": "chip",
+      "refersTo": "badge-positive",
+      "description": "Pílula de 24px. Com ponto marca situação; sem ponto é classificação. Estado usa -soft de fundo e -strong de texto.",
+      "html": "<span class=\"ds-badge ds-badge-positive\"><span class=\"ds-badge-dot\" aria-hidden=\"true\"></span>ativo</span> <span class=\"ds-badge ds-badge-neutral\">2026</span> <span class=\"ds-badge ds-badge-brand\">Esportiva</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 9999px; font-family: var(--font-open-sans), system-ui, sans-serif; font-size: 0.75rem; line-height: 1.125rem; font-weight: 600; white-space: nowrap; } .ds-badge-dot { width: 6px; height: 6px; border-radius: 9999px; } .ds-badge-neutral { background: var(--surface-sunken); color: var(--ink-muted); } .ds-badge-neutral .ds-badge-dot { background: var(--ink-subtle); } .ds-badge-brand { background: var(--brand-soft); color: var(--brand-ink); } .ds-badge-brand .ds-badge-dot { background: var(--brand); } .ds-badge-positive { background: var(--positive-soft); color: var(--positive-strong); } .ds-badge-positive .ds-badge-dot { background: var(--positive); }"
+    },
+    {
+      "name": "Painel com lista",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Card: fundo raised, borda line, 14px, shadow-card. Cabeçalho de 52px e lista encostada na borda com fio entre linhas.",
+      "html": "<section class=\"ds-card\"><header class=\"ds-card-header\"><div class=\"ds-card-heading\"><h2 class=\"ds-card-title\">Ranking IDE JOGAI</h2><p class=\"ds-card-desc\">Cinco primeiros do ano</p></div><span class=\"ds-card-badge\">2026</span></header><ol class=\"ds-list\"><li class=\"ds-row\"><span class=\"ds-pos ds-pos-1\">1</span><span class=\"ds-row-text\"><span class=\"ds-row-main\">Ana Souza</span><span class=\"ds-row-sub\">Ana S.</span></span><span class=\"ds-bar\" aria-hidden=\"true\"><span class=\"ds-bar-fill\" style=\"width:100%\"></span></span><span class=\"ds-num\">128</span></li><li class=\"ds-row\"><span class=\"ds-pos ds-pos-2\">2</span><span class=\"ds-row-text\"><span class=\"ds-row-main\">Pedro Lima</span><span class=\"ds-row-sub\">Pedro L.</span></span><span class=\"ds-bar\" aria-hidden=\"true\"><span class=\"ds-bar-fill\" style=\"width:72%\"></span></span><span class=\"ds-num\">92</span></li><li class=\"ds-row\"><span class=\"ds-pos\">4</span><span class=\"ds-row-text\"><span class=\"ds-row-main\">Júlia Reis</span><span class=\"ds-row-sub\">Júlia R.</span></span><span class=\"ds-bar\" aria-hidden=\"true\"><span class=\"ds-bar-fill\" style=\"width:41%\"></span></span><span class=\"ds-num\">52</span></li></ol></section>",
+      "css": ".ds-card { display: flex; flex-direction: column; overflow: hidden; max-width: 480px; border: 1px solid var(--line); border-radius: var(--radius-lg, 14px); background: var(--surface-raised); box-shadow: var(--shadow-card); font-family: var(--font-open-sans), system-ui, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; } .ds-card-header { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 16px 20px 12px; } .ds-card-heading { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; } .ds-card-title { margin: 0; font-size: 0.9375rem; line-height: 1.5rem; font-weight: 600; letter-spacing: -0.025em; } .ds-card-desc { margin: 0; font-size: 0.8125rem; line-height: 1.25rem; color: var(--ink-muted); } .ds-card-badge { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px; background: var(--surface-sunken); color: var(--ink-muted); font-size: 0.75rem; font-weight: 600; } .ds-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); } .ds-row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 10px 20px; font-size: 0.8125rem; line-height: 1.25rem; } .ds-row + .ds-row { border-top: 1px solid var(--line); } .ds-pos { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 9999px; background: var(--surface-sunken); color: var(--ink-muted); font-size: 0.75rem; font-weight: 700; } .ds-pos-1 { background: var(--brand); color: var(--action-ink); } .ds-pos-2 { background: var(--brand-soft); color: var(--brand-ink); } .ds-row-text { display: flex; flex: 1; min-width: 0; flex-direction: column; } .ds-row-main { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-row-sub { font-size: 0.75rem; line-height: 1.125rem; color: var(--ink-muted); } .ds-bar { display: block; width: 96px; height: 6px; flex-shrink: 0; overflow: hidden; border-radius: 9999px; background: var(--surface-sunken); } .ds-bar-fill { display: block; height: 100%; border-radius: 9999px; background: var(--brand); } .ds-num { width: 48px; flex-shrink: 0; text-align: right; font-size: 0.9375rem; font-weight: 600; }"
+    },
+    {
+      "name": "Navegação lateral",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Barra lateral em surface-nav; grupo em micro caixa de frase; item ativo em painel branco com shadow-card e ícone laranja.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Principal\"><span class=\"ds-nav-group\">Operação</span><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\" aria-current=\"page\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/></svg>Início</a><a class=\"ds-nav-item\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>Crianças</a><a class=\"ds-nav-item\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg>IDE JOGAI</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 2px; width: 232px; padding: 12px; border-radius: var(--radius-lg, 14px); background: var(--surface-nav); font-family: var(--font-open-sans), system-ui, sans-serif; } .ds-nav-group { padding: 0 10px 6px; font-size: 0.6875rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.025em; color: var(--ink-muted); } .ds-nav-item { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: var(--radius, 10px); color: var(--ink-muted); font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; text-decoration: none; outline: none; transition: background-color 150ms var(--ease), color 150ms var(--ease); } .ds-nav-item:hover { background: color-mix(in srgb, var(--surface-raised) 60%, transparent); color: var(--ink); } .ds-nav-item:focus-visible { box-shadow: 0 0 0 2px var(--brand); } .ds-nav-item-active { background: var(--surface-raised); color: var(--ink); box-shadow: var(--shadow-card); } .ds-nav-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--ink-subtle); } .ds-nav-item-active .ds-nav-icon { color: var(--brand); }"
+    },
+    {
+      "name": "Indicador",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Célula da faixa de resumo: rótulo apagado, valor em Poppins 1.75rem, detalhe pequeno. Um painel só dividido por fio.",
+      "html": "<div class=\"ds-faixa\"><a class=\"ds-ind\" href=\"#\"><span class=\"ds-ind-label\">Crianças ativas<svg class=\"ds-ind-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></span><span class=\"ds-ind-value\">96</span><span class=\"ds-ind-detail\">cadastradas e ativas</span></a><a class=\"ds-ind\" href=\"#\"><span class=\"ds-ind-label\">Pontos lançados<svg class=\"ds-ind-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></span><span class=\"ds-ind-value\">31</span><span class=\"ds-ind-detail\">desde segunda</span></a><div class=\"ds-ind\"><span class=\"ds-ind-label\">Sem termo</span><span class=\"ds-ind-value ds-ind-value-warn\">4</span><span class=\"ds-ind-detail\">aguardando assinatura</span></div></div>",
+      "css": ".ds-faixa { display: grid; grid-template-columns: repeat(3, 1fr); overflow: hidden; max-width: 560px; border: 1px solid var(--line); border-radius: var(--radius-lg, 14px); background: var(--surface-raised); box-shadow: var(--shadow-card); font-family: var(--font-open-sans), system-ui, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; } .ds-ind { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; text-decoration: none; color: inherit; outline: none; transition: background-color 150ms var(--ease); } .ds-ind + .ds-ind { border-left: 1px solid var(--line); } a.ds-ind:hover, a.ds-ind:focus-visible { background: var(--surface); } .ds-ind-label { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; font-size: 0.8125rem; line-height: 1.25rem; font-weight: 500; color: var(--ink-muted); } .ds-ind-arrow { width: 16px; height: 16px; color: var(--ink-subtle); transition: color 150ms var(--ease), transform 150ms var(--ease); } a.ds-ind:hover .ds-ind-arrow { color: var(--brand); transform: translate(1px, -1px); } .ds-ind-value { font-family: var(--font-poppins), Montserrat, system-ui, sans-serif; font-size: 1.75rem; line-height: 2.125rem; font-weight: 600; letter-spacing: -0.025em; } .ds-ind-value-warn { color: var(--warning-strong); } .ds-ind-detail { font-size: 0.75rem; line-height: 1.125rem; color: var(--ink-muted); }"
+    },
+    {
+      "name": "Cartão de opção",
+      "kind": "custom",
+      "refersTo": "input",
+      "description": "OpcaoMarcavel e cartão de motivo: a linha inteira é a opção; selecionado em borda brand e fundo brand-soft; chip de valor em par soft/strong.",
+      "html": "<div class=\"ds-opts\"><label class=\"ds-opt ds-opt-on\"><input class=\"ds-opt-radio\" type=\"radio\" name=\"ds-motivo\" checked /><span class=\"ds-chip ds-chip-pos\">+5</span><span class=\"ds-opt-label\">Ajudou um colega</span></label><label class=\"ds-opt\"><input class=\"ds-opt-radio\" type=\"radio\" name=\"ds-motivo\" /><span class=\"ds-chip ds-chip-neg\">-2</span><span class=\"ds-opt-label\">Faltou sem avisar</span></label></div>",
+      "css": ".ds-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 480px; font-family: var(--font-open-sans), system-ui, sans-serif; color: var(--ink); } .ds-opt { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius, 10px); background: var(--surface-raised); cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); } .ds-opt:hover { background: var(--surface-sunken); } .ds-opt:has(:focus-visible) { box-shadow: 0 0 0 3px var(--brand-soft); } .ds-opt-on, .ds-opt:has(:checked) { border-color: var(--brand); background: var(--brand-soft); } .ds-opt-radio { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .ds-chip { min-width: 44px; padding: 4px 8px; border-radius: var(--radius, 10px); text-align: center; font-size: 0.9375rem; line-height: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-chip-pos { background: var(--positive-soft); color: var(--positive-strong); } .ds-chip-neg { background: var(--negative-soft); color: var(--negative-strong); } .ds-opt-label { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 600; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A prancheta da quadra",
+    "overview": "O portal é uma ferramenta de operar, não de impressionar. A cena que decide tudo é o voluntário com o celular na quadra de dia e a coordenação à mesa à noite: a interface precisa ser lida de relance, com números que alinham e rótulos que não pedem interpretação. Por isso a cor é contida (neutros com viés navy, nunca cinza puro), a tipografia é uma escala fixa em rem (11 a 36 px) e a marca laranja aparece como acento raro: foco, item ativo, primeiro lugar do ranking e o botão de lançar ponto.\n\nA profundidade vem de três planos de superfície empilhados, não de sombra dramática: a barra lateral fica um degrau abaixo do conteúdo, o conteúdo um degrau abaixo dos painéis. Um painel nunca fica dentro de outro. Lista, tabela e formulário moram dentro do painel encostados na borda, separados por fio. Isso é o que deixa uma tela com quatro indicadores, um ranking e um formulário parecer uma coisa só.\n\nDuas superfícies fogem da regra de propósito: a capa de entrada (login e convite) e o ranking público vivem sobre o navy da marca e não invertem com o tema, porque a identidade do Instituto precisa ser a mesma para quem chega, venha a pessoa com o sistema em claro ou em escuro. O tema escuro do app, esse sim, segue o sistema e redefine só a camada semântica de tokens.",
+    "keyCharacteristics": [
+      "Cor só nasce em app/tokens.css; componente consome token semântico e o CI (scripts/check-design-tokens.mjs) falha o build se encontrar hex, rgb(), hsl(), oklch() ou color-mix() fora dali (e de lib/brand.ts).",
+      "Marca laranja é acento, a ação primária comum é tinta navy (--action), nunca laranja.",
+      "Três planos: --surface-nav, --surface, --surface-raised, com --surface-sunken como recuo dentro do painel.",
+      "Poppins (font-display) só em título de página, número grande, lockup da marca e manchete de login e ranking; Open Sans em tudo o mais, inclusive dado.",
+      "Algarismos tabulares no body inteiro; rótulos em caixa baixa com peso 600, nunca caixa alta com espaçamento.",
+      "Celular primeiro: barra inferior de cinco destinos, diálogo que sobe do rodapé como folha, coluna de tabela que declara se some no celular."
+    ],
+    "rules": [
+      { "name": "A regra do acento", "body": "A marca laranja aparece em foco, item ativo, posição 1 do ranking e no botão de lançar ponto. A ação primária comum usa --action (tinta navy). Se um botão laranja aparecer fora do IDE JOGAI, está errado.", "section": "colors" },
+      { "name": "A regra da cor só em tokens.css", "body": "Componente nunca escreve cor literal. Cor nova exige primitivo em app/tokens.css mais um nome semântico, e o CI recusa o build com hex ou função de cor fora dali. lib/brand.ts é a única exceção, para themeColor, manifest e HTML de e-mail.", "section": "colors" },
+      { "name": "A regra fill e strong", "body": "Cor de estado vem em par: --positive preenche barra ou ponto, --positive-strong é o que vira texto. Etiqueta e chip de valor usam sempre -strong sobre -soft. Usar o preenchimento como texto produz o verde ilegível clássico.", "section": "colors" },
+      { "name": "A regra do território de marca", "body": "--brand-canvas e companhia não invertem com o tema. Sobre esse navy, botão primário e outline não têm contraste; o botão de entrar no ranking público usa borda e texto em brand-canvas-ink com alfa.", "section": "colors" },
+      { "name": "A regra da Poppins", "body": "font-display só em título de página, número grande, lockup da marca e manchete de login e ranking. Título de card, título de diálogo, tabela e todo dado ficam em Open Sans. Se um card ganhar Poppins, virou pôster.", "section": "typography" },
+      { "name": "A regra do rótulo em caixa baixa", "body": "Rótulo tem peso 600 e caixa de frase, nunca caixa alta com espaçamento. A única caixa alta do sistema é o lockup da marca (INSTITUTO e PROJETO FÉ), que é o desenho da identidade, não um rótulo.", "section": "typography" },
+      { "name": "A regra dos algarismos tabulares", "body": "font-variant-numeric: tabular-nums no body inteiro. Coluna numérica alinha à direita. Número em lista vive em Numero com largura fixa de 3rem.", "section": "typography" },
+      { "name": "A regra do plano antes da sombra", "body": "Se dois elementos precisam parecer em níveis diferentes, muda-se o token de superfície primeiro. Sombra maior que shadow-card é só para o que sai do fluxo: menu, toast, diálogo.", "section": "elevation" },
+      { "name": "A regra do controle sem sombra em repouso morto", "body": "Controle desabilitado e somente leitura perde a sombra (shadow-none) e recua para --surface-sunken. Sombra sinaliza \"dá para mexer\".", "section": "elevation" },
+      { "name": "A regra do painel único", "body": "Um Card nunca fica dentro de outro Card. Dentro do painel, agrupamento se faz com fio (divide-y divide-line) e recuo (--surface-sunken), não com outro painel.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do consumir só token semântico (bg-surface-raised, text-ink-muted, border-line); cor nova nasce em app/tokens.css como primitivo mais nome semântico, e o CI recusa o resto.",
+      "Do usar --action no botão primário comum e reservar variant=\"brand\" para lançar ponto; a marca fica em foco, item ativo, posição 1 e nas seleções em --brand-soft.",
+      "Do manter os três planos: barra lateral em --surface-nav, corpo em --surface, painel em --surface-raised, recuo interno em --surface-sunken.",
+      "Do usar Poppins (font-display) só em título de página, número do Indicador, lockup e manchete de login e ranking, sempre com tracking-tight e peso 600.",
+      "Do escrever rótulo em caixa de frase com peso 600 e 0.8125rem; texto de apoio em 0.75rem --ink-muted.",
+      "Do encostar lista, tabela e formulário na borda do painel, separando com divide-y divide-line; padding horizontal de 20px em todo nível do painel.",
+      "Do dar a toda ação sem desfazer um Confirmacao que nomeia a ação, e a toda ação concluída um toast.success com frase que diz o que aconteceu.",
+      "Do declarar em cada coluna de tabela se ela some no celular, e oferecer EstadoVazio com título, frase e primeira ação em vez de tabela vazia.",
+      "Do usar o par -soft de fundo e -strong de texto para toda cor de estado que vira texto."
+    ],
+    "donts": [
+      "Don't escrever hex, rgb(), hsl(), oklch() ou color-mix() em componente, tela ou CSS fora de app/tokens.css e lib/brand.ts.",
+      "Don't pintar botão comum de laranja nem usar --brand como fundo de área grande; marca é acento, não papel de parede.",
+      "Don't colocar Card dentro de Card, nem inventar borda dupla ou sombra maior que shadow-card para elemento no fluxo.",
+      "Don't usar Poppins em título de card, diálogo, tabela ou dado; Open Sans carrega tudo isso.",
+      "Don't escrever rótulo, grupo ou cabeçalho de tabela em caixa alta com espaçamento; a única caixa alta é o lockup da marca.",
+      "Don't usar --positive, --negative ou --warning (preenchimento) como cor de texto; texto usa -strong.",
+      "Don't inverter --brand-canvas com o tema nem usar botão primário ou outline sobre ele; a capa de entrada e o ranking público ficam navy nos dois temas.",
+      "Don't mostrar ajuda e erro do campo ao mesmo tempo; erro substitui ajuda.",
+      "Don't usar select, checkbox ou switch nativos do navegador ao lado dos desenhados; Select, Checkbox e Switch são o desenho único."
+    ]
+  }
+}

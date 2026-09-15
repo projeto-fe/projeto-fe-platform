@@ -2,11 +2,12 @@
 @import "./tokens.css";
 
 /* ============================================================
-   PONTE — expõe a camada semântica como utilitário do Tailwind.
+   PONTE: expõe a camada semântica como utilitário do Tailwind.
    É o que permite escrever bg-surface-raised, text-ink-muted etc.
    Nenhuma cor nova nasce aqui: tudo aponta para tokens.css.
    ============================================================ */
 @theme inline {
+  --color-surface-nav: var(--surface-nav);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-surface-sunken: var(--surface-sunken);
@@ -15,6 +16,7 @@
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-subtle: var(--ink-subtle);
+  --color-ink-faint: var(--ink-faint);
   --color-ink-inverse: var(--ink-inverse);
 
   --color-line: var(--line);
@@ -23,6 +25,7 @@
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-strong: var(--brand-soft-strong);
   --color-brand-ink: var(--brand-ink);
 
   --color-action: var(--action);
@@ -46,15 +49,76 @@
   --color-warning-strong: var(--warning-strong);
   --color-warning-soft: var(--warning-soft);
 
+  --color-scrim: var(--scrim);
+
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius);
   --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
 
   --shadow-card: var(--shadow-card);
   --shadow-pop: var(--shadow-pop);
+  --shadow-modal: var(--shadow-modal);
+
+  --ease-out-soft: var(--ease);
 
   --font-display: var(--font-poppins), "Montserrat", system-ui, sans-serif;
   --font-sans: var(--font-open-sans), system-ui, sans-serif;
+
+  /* escala fixa em rem, própria de interface de produto */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.375rem;
+  --text-md: 0.9375rem;
+  --text-md--line-height: 1.5rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.625rem;
+  --text-2xl: 1.375rem;
+  --text-2xl--line-height: 1.75rem;
+  --text-3xl: 1.75rem;
+  --text-3xl--line-height: 2.125rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+
+  --animate-surgir: surgir 180ms var(--ease) both;
+  --animate-esmaecer: esmaecer 160ms var(--ease) both;
+  --animate-deslizar-de-baixo: deslizar-de-baixo 220ms var(--ease) both;
+
+  @keyframes surgir {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes esmaecer {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes deslizar-de-baixo {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 @layer base {
@@ -66,7 +130,10 @@
     background: var(--surface);
     color: var(--ink);
     font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   h1,
@@ -74,9 +141,13 @@
   h3,
   h4,
   h5 {
-    font-family: var(--font-display);
     letter-spacing: -0.01em;
     text-wrap: balance;
+  }
+
+  /* algarismos alinhados em toda a interface: tabela, ranking, resumo */
+  body {
+    font-variant-numeric: tabular-nums;
   }
 
   :focus-visible {
@@ -86,8 +157,37 @@
   }
 
   ::selection {
-    background: var(--brand-soft);
-    color: var(--brand-ink);
+    background: var(--brand-soft-strong);
+    color: var(--ink);
+  }
+
+  /* superfícies do navegador também carregam o desenho */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  input,
+  textarea {
+    caret-color: var(--brand);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--ink-muted);
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    opacity: 0.55;
+    cursor: pointer;
+  }
+
+  /* formulário nativo quando ainda aparece: mesma cor de esquema do tema */
+  select,
+  input,
+  textarea {
+    color-scheme: inherit;
   }
 }
 

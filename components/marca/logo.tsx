@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * imagem não processa SVG, então só acrescentaria uma volta pelo servidor
  * para entregar exatamente o mesmo arquivo.
  */
-function SimboloDaMarca({
+export function SimboloDaMarca({
   titulo,
   claro,
   className,
@@ -46,10 +46,10 @@ export function Logo({ claro = false, compacto = false, className }: Props) {
         className="h-9 w-auto shrink-0"
       />
       {compacto ? null : (
-        <span className="leading-none">
+        <span className="flex flex-col leading-none">
           <span
             className={cn(
-              "block font-display text-[0.625rem] font-medium tracking-[0.22em]",
+              "font-display text-2xs font-medium tracking-[0.2em]",
               claro ? "text-brand-canvas-ink/70" : "text-ink-muted",
             )}
           >
@@ -57,7 +57,7 @@ export function Logo({ claro = false, compacto = false, className }: Props) {
           </span>
           <span
             className={cn(
-              "mt-1 block font-display text-[0.9375rem] font-extrabold tracking-tight",
+              "mt-1 font-display text-md font-extrabold tracking-tight",
               claro ? "text-brand-canvas-ink" : "text-ink",
             )}
           >
