@@ -152,7 +152,11 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   --sidebar-w: 256px;
-  --content-w: 1120px;
+  /* 1120px sobrava vazio demais em tela grande (monitor externo, a
+     calendário e tabela são os que mais sentem). 1440px ainda limita
+     parágrafo longo a uma linha legível, só dá mais respiro pro que é
+     naturalmente largo. */
+  --content-w: 1440px;
 }
 
 /* tema escuro no default do sistema (root sem carimbo) */
