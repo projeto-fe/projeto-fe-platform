@@ -24,7 +24,10 @@ import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { alternarAcesso, cancelarConvite } from "./actions";
 import { ConvidarDialogo } from "./convite";
 
-export const metadata: Metadata = { title: "Pessoas e acessos" };
+export const metadata: Metadata = {
+  title: "Pessoas e acessos",
+  description: "Quem entra no portal, com que papel, e o registro do que foi feito.",
+};
 
 type Pessoa = {
   id: string;

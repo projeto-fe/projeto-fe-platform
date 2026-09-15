@@ -20,7 +20,6 @@ export function MolduraDeEntrada({
     <main className="grid min-h-dvh md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-cols-2">
       <section className="relative flex flex-col justify-between gap-10 overflow-hidden bg-brand-canvas px-6 py-7 text-brand-canvas-ink md:px-10 md:py-10">
         <SimboloDaMarca
-          claro
           className="pointer-events-none absolute -right-24 -bottom-24 h-[28rem] w-auto opacity-[0.07] select-none md:-right-28 md:-bottom-32 md:h-[36rem]"
         />
 

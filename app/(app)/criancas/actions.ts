@@ -1,13 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
-export type EstadoDaCrianca = { erro?: string };
+import { montarValores, type ValoresDaCrianca } from "./valores";
+
+export type EstadoDaCrianca = { erro?: string; sucesso?: string };
 
 const NAO_SALVOU = "Não foi possível salvar. Confira os campos e tente de novo.";
 
@@ -139,5 +140,33 @@ export async function salvarCrianca(
   }
 
   revalidatePath("/criancas");
-  redirect(`/criancas?salvo=${criancaId}`);
+  revalidatePath("/");
+
+  // Sem redirect: quem chamou decide o que fazer. O diálogo fecha sobre a
+  // lista já atualizada; a página própria volta para a lista.
+  return { sucesso: id ? "Cadastro atualizado." : "Criança cadastrada." };
+}
+
+/**
+ * Carrega o cadastro de uma criança para abrir no diálogo da lista.
+ *
+ * Só o diálogo usa: a página `/criancas/[id]` já lê tudo no servidor. Roda
+ * com a sessão de quem pediu, então a política do banco decide sozinha se os
+ * dados sensíveis vêm ou não.
+ */
+export async function carregarCadastroDaCrianca(
+  id: string,
+): Promise<{ valores?: ValoresDaCrianca; erro?: string }> {
+  await exigirPessoaLogada();
+  const supabase = await criarClienteDoServidor();
+
+  const [crianca, sensiveis, inscricoes] = await Promise.all([
+    supabase.from("criancas").select("*").eq("id", id).maybeSingle(),
+    supabase.from("criancas_dados_sensiveis").select("*").eq("crianca_id", id).maybeSingle(),
+    supabase.from("crianca_atividades").select("atividade_id").eq("crianca_id", id),
+  ]);
+
+  if (!crianca.data) return { erro: "Este cadastro não existe mais." };
+
+  return { valores: montarValores(crianca.data, sensiveis.data, inscricoes.data ?? []) };
 }

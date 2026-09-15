@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { CheckCircle2, MailWarning, Network, Star, UserPlus, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -18,6 +19,11 @@ import { Barra, Linha, LinhaTexto, Lista, Numero, Posicao } from "@/components/u
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Início",
+  description: "Resumo do dia: crianças ativas, equipe com acesso, pontos da semana e o que ainda falta fazer.",
+};
 
 /** Segunda-feira desta semana, 00:00 no horário local do servidor. */
 function inicioDaSemana() {

@@ -13,16 +13,23 @@ import {
 } from "@/components/ui/card";
 import { exigirPessoaLogada } from "@/lib/sessao";
 
-import { FormularioDeNome } from "./formulario";
+import { BotaoDeEditarNome } from "./formulario";
 
-export const metadata: Metadata = { title: "Minha conta" };
+export const metadata: Metadata = {
+  title: "Minha conta",
+  description: "Seu nome no portal e o e-mail de acesso.",
+};
 
 export default async function Conta() {
   const pessoa = await exigirPessoaLogada();
 
   return (
     <>
-      <CabecalhoDaPagina titulo="Minha conta" descricao="Como você aparece para a equipe." />
+      <CabecalhoDaPagina
+        titulo="Minha conta"
+        descricao="Como você aparece para a equipe."
+        acao={<BotaoDeEditarNome nome={pessoa.nome} />}
+      />
 
       <CorpoDaPagina>
         <Card className="max-w-xl">
@@ -34,7 +41,11 @@ export default async function Conta() {
             <Badge variant={pessoa.isAdmin ? "brand" : "neutral"}>{pessoa.papel}</Badge>
           </CardHeader>
           <CardBody className="flex flex-col gap-5">
-            <FormularioDeNome nome={pessoa.nome} />
+            <div className="flex flex-col gap-1.5">
+              <Rotulo>Nome</Rotulo>
+              <span className="text-base">{pessoa.nome}</span>
+              <Ajuda>É assim que a equipe vê você no portal.</Ajuda>
+            </div>
 
             <div className="flex flex-col gap-1.5 border-t border-line pt-5">
               <Rotulo>E-mail</Rotulo>

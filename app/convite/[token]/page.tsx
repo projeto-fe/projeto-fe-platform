@@ -9,7 +9,11 @@ import { criarClienteAdministrativo } from "@/lib/supabase/server";
 
 import { FormularioDeAceite } from "./formulario";
 
-export const metadata: Metadata = { title: "Aceitar convite", robots: { index: false } };
+export const metadata: Metadata = {
+  title: "Aceitar convite",
+  description: "Crie sua senha e entre no portal do Instituto Projeto Fé.",
+  robots: { index: false },
+};
 
 type Situacao = "valido" | "inexistente" | "expirado" | "usado" | "falha";
 

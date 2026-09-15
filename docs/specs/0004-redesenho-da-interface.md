@@ -42,11 +42,14 @@ celular na quadra de dia (claro). Os dois temas são verificados.
   Ranking dos cinco primeiros e um painel de próximos passos derivado do estado real.
 - **Crianças**: busca e filtro numa barra, contagem visível, tabela com iniciais, idade e
   atividades; estado vazio que ensina. Aviso de "salvo" ao voltar do cadastro.
-- **Cadastro de criança**: seções com título e explicação à esquerda e campos à direita;
-  interruptor para saúde; atividades como opções marcáveis; seleção padronizada; rodapé fixo
-  com cancelar e salvar.
-- **IDE JOGAI**: lançador em foco com motivos como opções de cartão e botão de marca; ranking à
-  direita; últimos lançamentos com estorno atrás de confirmação.
+- **Cadastro de criança**: abre em diálogo largo, a partir do botão da lista ou clicando na
+  criança; seções com título e explicação à esquerda e campos à direita; interruptor para
+  saúde; atividades como opções marcáveis; seleção padronizada; rodapé fixo com cancelar e
+  salvar. As rotas `/criancas/nova` e `/criancas/[id]` seguem existindo como página, para
+  link compartilhado e acesso direto.
+- **IDE JOGAI**: "Lançar ponto" no cabeçalho, em botão de marca, abrindo o lançador em diálogo
+  com os motivos como opções de cartão; a tela fica com últimos lançamentos e ranking lado a
+  lado, e o estorno atrás de confirmação.
 - **Estrutura**: árvore limpa; "Nova área" e "Nova atividade" abrem diálogo; vincular pessoa
   em diálogo; remover vínculo pede confirmação.
 - **Pessoas e acessos**: "Convidar pessoa" em diálogo a partir do cabeçalho; convites
@@ -58,6 +61,9 @@ celular na quadra de dia (claro). Os dois temas são verificados.
 
 - [ ] `npm run verify` passa (tokens, lint, tipos, testes).
 - [ ] Nenhum rótulo de campo em caixa alta; nenhum `<select>` nativo em tela autenticada.
+- [ ] Nenhum formulário de criar ou editar parado dentro de uma tela: todos abrem em diálogo
+      a partir de um botão.
+- [ ] Erro de validação continua visível sem rolar, e não apaga o que já foi digitado.
 - [ ] Toda ação sem desfazer (desativar acesso, cancelar convite, remover vínculo, estornar)
       abre confirmação antes de executar.
 - [ ] Toda ação concluída dá aviso (toast) com o que aconteceu.

@@ -8,7 +8,10 @@ import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { Arvore } from "./arvore";
 import { NovoNoDialogo } from "./dialogos";
 
-export const metadata: Metadata = { title: "Estrutura" };
+export const metadata: Metadata = {
+  title: "Estrutura",
+  description: "Áreas, atividades e quem coordena ou é voluntário em cada uma.",
+};
 
 /** Todas as áreas, em qualquer profundidade, na ordem em que aparecem na árvore. */
 function listarAreas(raizes: NoDaEstrutura[]) {

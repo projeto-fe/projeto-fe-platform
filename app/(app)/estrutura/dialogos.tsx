@@ -2,13 +2,12 @@
 
 import { AlertCircle, Plus, UserPlus } from "lucide-react";
 import * as React from "react";
-import { useActionState } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { AvisoDoFormulario, Campo, CampoSelecao, GradeDeCampos } from "@/components/ui/campo";
 import {
   Dialogo,
+  DialogoAviso,
   DialogoCabecalho,
   DialogoConteudo,
   DialogoCorpo,
@@ -17,6 +16,7 @@ import {
   DialogoGatilho,
   DialogoRodape,
   DialogoTitulo,
+  useAcaoEmDialogo,
 } from "@/components/ui/dialogo";
 
 import { criarNo, vincularPessoa, type EstadoDaEstrutura } from "./actions";
@@ -26,24 +26,6 @@ const inicial: EstadoDaEstrutura = {};
 type Area = { id: string; nome: string };
 type Pessoa = { id: string; nome: string };
 type Tipo = "area" | "atividade";
-
-type Acao = (anterior: EstadoDaEstrutura, dados: FormData) => Promise<EstadoDaEstrutura>;
-
-/**
- * Envolve a server action: ao concluir, o aviso sai como toast e o diálogo
- * fecha. O erro continua no estado, para aparecer inline no formulário.
- */
-function useAcaoDoDialogo(acao: Acao, fechar: () => void, limpar: () => void) {
-  return useActionState(async (anterior: EstadoDaEstrutura, dados: FormData) => {
-    const resultado = await acao(anterior, dados);
-    if (resultado.sucesso) {
-      toast.success(resultado.sucesso);
-      fechar();
-      limpar();
-    }
-    return resultado;
-  }, inicial);
-}
 
 export function NovoNoDialogo({
   areas,
@@ -60,12 +42,12 @@ export function NovoNoDialogo({
   const [tipo, setTipo] = React.useState<Tipo>(tipoInicial);
   const formRef = React.useRef<HTMLFormElement>(null);
 
-  const fechar = React.useCallback(() => setAberto(false), []);
-  const limpar = React.useCallback(() => {
+  const concluir = React.useCallback(() => {
+    setAberto(false);
     formRef.current?.reset();
     setTipo(tipoInicial);
   }, [tipoInicial]);
-  const [estado, acao, enviando] = useAcaoDoDialogo(criarNo, fechar, limpar);
+  const { estado, enviar, enviando } = useAcaoEmDialogo(criarNo, inicial, concluir);
 
   const semArea = areas.length === 0;
   const podeCriarAtividade = !semArea;
@@ -82,7 +64,7 @@ export function NovoNoDialogo({
       </DialogoGatilho>
 
       <DialogoConteudo>
-        <form ref={formRef} action={acao} className="flex min-h-0 flex-1 flex-col">
+        <form ref={formRef} onSubmit={enviar} className="flex min-h-0 flex-1 flex-col">
           <DialogoCabecalho>
             <DialogoTitulo>{tipo === "area" ? "Nova área" : "Nova atividade"}</DialogoTitulo>
             <DialogoDescricao>
@@ -149,12 +131,15 @@ export function NovoNoDialogo({
               )}
             </GradeDeCampos>
 
-            {estado.erro ? (
-              <AvisoDoFormulario tom="erro" icone={<AlertCircle />} className="mt-4">
+          </DialogoCorpo>
+
+          {estado.erro ? (
+            <DialogoAviso>
+              <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
                 {estado.erro}
               </AvisoDoFormulario>
-            ) : null}
-          </DialogoCorpo>
+            </DialogoAviso>
+          ) : null}
 
           <DialogoRodape>
             <DialogoFechar asChild>
@@ -186,9 +171,11 @@ export function VincularDialogo({
   const [aberto, setAberto] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
 
-  const fechar = React.useCallback(() => setAberto(false), []);
-  const limpar = React.useCallback(() => formRef.current?.reset(), []);
-  const [estado, acao, enviando] = useAcaoDoDialogo(vincularPessoa, fechar, limpar);
+  const concluir = React.useCallback(() => {
+    setAberto(false);
+    formRef.current?.reset();
+  }, []);
+  const { estado, enviar, enviando } = useAcaoEmDialogo(vincularPessoa, inicial, concluir);
 
   const semPessoas = pessoas.length === 0;
 
@@ -204,7 +191,7 @@ export function VincularDialogo({
       </DialogoGatilho>
 
       <DialogoConteudo largura="sm">
-        <form ref={formRef} action={acao} className="flex min-h-0 flex-1 flex-col">
+        <form ref={formRef} onSubmit={enviar} className="flex min-h-0 flex-1 flex-col">
           <input type="hidden" name="area_id" value={areaId} />
 
           <DialogoCabecalho>
@@ -241,12 +228,15 @@ export function VincularDialogo({
               />
             </GradeDeCampos>
 
-            {estado.erro ? (
-              <AvisoDoFormulario tom="erro" icone={<AlertCircle />} className="mt-4">
+          </DialogoCorpo>
+
+          {estado.erro ? (
+            <DialogoAviso>
+              <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
                 {estado.erro}
               </AvisoDoFormulario>
-            ) : null}
-          </DialogoCorpo>
+            </DialogoAviso>
+          ) : null}
 
           <DialogoRodape>
             <DialogoFechar asChild>

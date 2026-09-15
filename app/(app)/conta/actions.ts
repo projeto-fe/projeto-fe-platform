@@ -12,7 +12,7 @@ const nomeValido = z
   .min(2, "Informe pelo menos duas letras.")
   .max(80, "Use no máximo 80 caracteres.");
 
-export type EstadoDaConta = { erro?: string; sucesso?: boolean };
+export type EstadoDaConta = { erro?: string; sucesso?: string };
 
 export async function salvarNome(
   _anterior: EstadoDaConta,
@@ -43,7 +43,7 @@ export async function salvarNome(
   }
 
   revalidatePath("/", "layout");
-  return { sucesso: true };
+  return { sucesso: "Nome atualizado." };
 }
 
 export async function sair() {

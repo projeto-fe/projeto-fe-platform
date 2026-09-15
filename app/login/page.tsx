@@ -4,7 +4,10 @@ import { CabecalhoDeEntrada, MolduraDeEntrada } from "@/components/shell/moldura
 
 import { FormularioDeLogin } from "./formulario";
 
-export const metadata: Metadata = { title: "Entrar" };
+export const metadata: Metadata = {
+  title: "Entrar",
+  description: "Acesso da equipe do Instituto Projeto Fé.",
+};
 
 const MOTIVOS: Record<string, string> = {
   "sem-acesso":

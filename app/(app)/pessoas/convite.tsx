@@ -2,8 +2,6 @@
 
 import { AlertCircle, UserPlus } from "lucide-react";
 import * as React from "react";
-import { useActionState } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { AvisoDoFormulario, Campo, CampoSelecao, GradeDeCampos } from "@/components/ui/campo";
@@ -11,12 +9,14 @@ import {
   Dialogo,
   DialogoCabecalho,
   DialogoConteudo,
+  DialogoAviso,
   DialogoCorpo,
   DialogoDescricao,
   DialogoFechar,
   DialogoGatilho,
   DialogoRodape,
   DialogoTitulo,
+  useAcaoEmDialogo,
 } from "@/components/ui/dialogo";
 
 import { convidarPessoa, type EstadoDoConvite } from "./actions";
@@ -31,21 +31,8 @@ export function ConvidarDialogo({
   gatilho?: React.ReactNode;
 }) {
   const [aberto, setAberto] = React.useState(false);
-  const formRef = React.useRef<HTMLFormElement>(null);
-
-  // Ao concluir, o aviso sai como toast e o diálogo fecha; o erro fica inline.
-  const [estado, acao, enviando] = useActionState(
-    async (anterior: EstadoDoConvite, dados: FormData) => {
-      const resultado = await convidarPessoa(anterior, dados);
-      if (resultado.sucesso) {
-        toast.success(resultado.sucesso);
-        setAberto(false);
-        formRef.current?.reset();
-      }
-      return resultado;
-    },
-    inicial,
-  );
+  const concluir = React.useCallback(() => setAberto(false), []);
+  const { estado, enviar, enviando } = useAcaoEmDialogo(convidarPessoa, inicial, concluir);
 
   return (
     <Dialogo open={aberto} onOpenChange={setAberto}>
@@ -59,7 +46,7 @@ export function ConvidarDialogo({
       </DialogoGatilho>
 
       <DialogoConteudo>
-        <form ref={formRef} action={acao} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={enviar} className="flex min-h-0 flex-1 flex-col">
           <DialogoCabecalho>
             <DialogoTitulo>Convidar pessoa</DialogoTitulo>
             <DialogoDescricao>O convite vale 7 dias e serve uma vez só.</DialogoDescricao>
@@ -103,12 +90,15 @@ export function ConvidarDialogo({
               />
             </GradeDeCampos>
 
-            {estado.erro ? (
-              <AvisoDoFormulario tom="erro" icone={<AlertCircle />} className="mt-4">
+          </DialogoCorpo>
+
+          {estado.erro ? (
+            <DialogoAviso>
+              <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
                 {estado.erro}
               </AvisoDoFormulario>
-            ) : null}
-          </DialogoCorpo>
+            </DialogoAviso>
+          ) : null}
 
           <DialogoRodape>
             <DialogoFechar asChild>

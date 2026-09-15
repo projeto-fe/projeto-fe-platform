@@ -1,50 +1,87 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
-import { useActionState, useEffect } from "react";
-import { toast } from "sonner";
+import { AlertCircle, Pencil } from "lucide-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import { Ajuda, AvisoDoFormulario, Rotulo, estiloDeControle } from "@/components/ui/campo";
+import { AvisoDoFormulario, Campo, GradeDeCampos } from "@/components/ui/campo";
+import {
+  Dialogo,
+  DialogoAviso,
+  DialogoCabecalho,
+  DialogoConteudo,
+  DialogoCorpo,
+  DialogoDescricao,
+  DialogoFechar,
+  DialogoGatilho,
+  DialogoRodape,
+  DialogoTitulo,
+  useAcaoEmDialogo,
+} from "@/components/ui/dialogo";
 
 import { salvarNome, type EstadoDaConta } from "./actions";
 
 const inicial: EstadoDaConta = {};
 
-export function FormularioDeNome({ nome }: { nome: string }) {
-  const [estado, acao, salvando] = useActionState(salvarNome, inicial);
-
-  useEffect(() => {
-    if (estado.sucesso) toast.success("Nome atualizado.");
-  }, [estado]);
+export function BotaoDeEditarNome({ nome }: { nome: string }) {
+  const [aberto, setAberto] = React.useState(false);
+  const concluir = React.useCallback(() => setAberto(false), []);
+  const { estado, enviar, enviando: salvando } = useAcaoEmDialogo(salvarNome, inicial, concluir);
 
   return (
-    <form action={acao} className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1.5">
-        <Rotulo htmlFor="nome">Nome</Rotulo>
-        <input
-          id="nome"
-          name="nome"
-          defaultValue={nome}
-          required
-          maxLength={80}
-          autoComplete="name"
-          aria-invalid={estado.erro ? true : undefined}
-          aria-describedby={estado.erro ? "erro-nome" : "ajuda-nome"}
-          className={estiloDeControle}
-        />
-        <Ajuda id="ajuda-nome">É assim que a equipe vai ver você no portal.</Ajuda>
-      </div>
+    <Dialogo open={aberto} onOpenChange={setAberto}>
+      <DialogoGatilho asChild>
+        <Button variant="outline" size="sm">
+          <Pencil aria-hidden />
+          Editar nome
+        </Button>
+      </DialogoGatilho>
 
-      {estado.erro ? (
-        <AvisoDoFormulario id="erro-nome" tom="erro" icone={<AlertCircle />}>
-          {estado.erro}
-        </AvisoDoFormulario>
-      ) : null}
+      <DialogoConteudo largura="sm">
+        <form onSubmit={enviar} className="flex min-h-0 flex-1 flex-col">
+          <DialogoCabecalho>
+            <DialogoTitulo>Editar nome</DialogoTitulo>
+            <DialogoDescricao>É assim que a equipe vai ver você no portal.</DialogoDescricao>
+          </DialogoCabecalho>
 
-      <Button type="submit" loading={salvando} className="self-start">
-        Salvar nome
-      </Button>
-    </form>
+          <DialogoCorpo>
+            <GradeDeCampos>
+              <Campo
+                id="nome"
+                name="nome"
+                rotulo="Nome"
+                colunas={12}
+                obrigatorio
+                maxLength={80}
+                autoComplete="name"
+                defaultValue={nome}
+                erro={estado.erro}
+                autoFocus
+              />
+            </GradeDeCampos>
+
+          </DialogoCorpo>
+
+          {estado.erro ? (
+            <DialogoAviso>
+              <AvisoDoFormulario tom="erro" icone={<AlertCircle />}>
+                {estado.erro}
+              </AvisoDoFormulario>
+            </DialogoAviso>
+          ) : null}
+
+          <DialogoRodape>
+            <DialogoFechar asChild>
+              <Button type="button" variant="outline">
+                Cancelar
+              </Button>
+            </DialogoFechar>
+            <Button type="submit" loading={salvando}>
+              Salvar nome
+            </Button>
+          </DialogoRodape>
+        </form>
+      </DialogoConteudo>
+    </Dialogo>
   );
 }

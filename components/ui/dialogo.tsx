@@ -2,14 +2,19 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import * as React from "react";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 
 /**
- * Diálogo para tarefa curta que merece foco: criar uma área, convidar uma
- * pessoa, vincular alguém. No celular sobe do rodapé como uma folha; no
- * desktop centraliza. Tarefa longa (cadastro de criança) tem página própria.
+ * Diálogo: toda tarefa de criar ou editar acontece aqui, aberta a partir de
+ * um botão, e não como formulário parado no meio da tela. No celular sobe do
+ * rodapé como uma folha; no desktop centraliza.
+ *
+ * Tarefa longa (o cadastro de criança) usa `largura="xl"` e continua tendo
+ * rota própria, para o endereço poder ser compartilhado e aberto direto.
  */
 export const Dialogo = DialogPrimitive.Root;
 export const DialogoGatilho = DialogPrimitive.Trigger;
@@ -20,8 +25,16 @@ export function DialogoConteudo({
   children,
   largura = "md",
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & { largura?: "sm" | "md" | "lg" }) {
-  const larguras = { sm: "sm:max-w-sm", md: "sm:max-w-md", lg: "sm:max-w-2xl" };
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  largura?: "sm" | "md" | "lg" | "xl";
+}) {
+  const larguras = {
+    sm: "sm:max-w-sm",
+    md: "sm:max-w-md",
+    lg: "sm:max-w-2xl",
+    // Cadastro longo: duas colunas por seção precisam de espaço para caber.
+    xl: "sm:max-w-4xl",
+  };
 
   return (
     <DialogPrimitive.Portal>
@@ -73,6 +86,92 @@ export function DialogoRodape({ className, ...props }: React.ComponentProps<"div
         "flex flex-col-reverse gap-2 border-t border-line bg-surface px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:flex-row sm:justify-end",
         className,
       )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * Diálogo que é uma rota: existe enquanto a URL existir e fecha voltando no
+ * histórico. É o que sustenta abrir o cadastro de criança por cima da lista
+ * (rota interceptada) sem perder o endereço compartilhável.
+ */
+export function DialogoDeRota({
+  largura,
+  children,
+}: {
+  largura?: "sm" | "md" | "lg" | "xl";
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
+  const [aberto, setAberto] = React.useState(true);
+
+  function aoMudar(valor: boolean) {
+    if (valor) return;
+    // Anima a saída antes de desmontar; sem isto o diálogo some de um quadro
+    // para o outro.
+    setAberto(false);
+    router.back();
+  }
+
+  return (
+    <Dialogo open={aberto} onOpenChange={aoMudar}>
+      <DialogoConteudo largura={largura}>{children}</DialogoConteudo>
+    </Dialogo>
+  );
+}
+
+/** O que toda server action de formulário devolve para a tela. */
+export type EstadoDeFormulario = { erro?: string; sucesso?: string };
+
+/**
+ * Envio de formulário em diálogo: ao concluir, o aviso sai como toast, o
+ * formulário limpa e o diálogo fecha. O erro fica no estado, para aparecer
+ * inline, que é onde precisa ser lido com calma.
+ *
+ * Usa onSubmit em vez de <form action={...}> de propósito. Com `action`, o
+ * React limpa os campos assim que a ação termina, inclusive quando ela
+ * termina em erro: num cadastro de vinte campos isso apaga tudo que a pessoa
+ * digitou e a obriga a recomeçar por causa de um nome curto demais.
+ */
+export function useAcaoEmDialogo(
+  acao: (anterior: EstadoDeFormulario, dados: FormData) => Promise<EstadoDeFormulario>,
+  inicial: EstadoDeFormulario,
+  aoConcluir: () => void,
+) {
+  const [estado, setEstado] = React.useState(inicial);
+  const [enviando, iniciar] = React.useTransition();
+
+  function enviar(evento: React.FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    const formulario = evento.currentTarget;
+    const dados = new FormData(formulario);
+
+    iniciar(async () => {
+      const resultado = await acao(estado, dados);
+      setEstado(resultado);
+      if (!resultado.sucesso) return;
+
+      toast.success(resultado.sucesso);
+      formulario.reset();
+      aoConcluir();
+    });
+  }
+
+  return { estado, enviar, enviando };
+}
+
+/**
+ * Faixa de aviso presa acima do rodapé do diálogo.
+ *
+ * Fica fora do corpo rolável porque um erro no fim de um formulário longo é
+ * um erro que ninguém vê: a pessoa clica em salvar, nada parece acontecer, e
+ * a explicação está trezentos pixels abaixo.
+ */
+export function DialogoAviso({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn("border-t border-line bg-surface-raised px-5 pt-4", className)}
       {...props}
     />
   );

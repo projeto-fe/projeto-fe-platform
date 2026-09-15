@@ -10,13 +10,16 @@ import { Card, CardNota } from "@/components/ui/card";
 import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { Iniciais } from "@/components/ui/iniciais";
 import { Tabela, type Coluna } from "@/components/ui/tabela";
-import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
-import { AvisoDeSalvo } from "./aviso-de-salvo";
+import { AbrirCadastro } from "./abrir-cadastro";
+import { dadosDoCadastro } from "./dados";
 import { Filtros } from "./filtros";
 
-export const metadata: Metadata = { title: "Crianças" };
+export const metadata: Metadata = {
+  title: "Crianças",
+  description: "Quem o Instituto atende, em que atividade cada criança está inscrita e o que a equipe precisa saber durante a atividade.",
+};
 
 type LinhaDeCrianca = {
   id: string;
@@ -39,11 +42,11 @@ function idade(nascimento: string) {
 export default async function Criancas({
   searchParams,
 }: {
-  searchParams: Promise<{ busca?: string; atividade?: string; salvo?: string }>;
+  searchParams: Promise<{ busca?: string; atividade?: string }>;
 }) {
-  await exigirPessoaLogada();
   const { busca, atividade } = await searchParams;
   const supabase = await criarClienteDoServidor();
+  const { atividades: atividadesDoCadastro, podeVerSensiveis } = await dadosDoCadastro();
 
   const [criancasResposta, atividadesResposta, inscricoesResposta] = await Promise.all([
     supabase
@@ -88,13 +91,22 @@ export default async function Criancas({
       chave: "nome",
       cabecalho: "Criança",
       conteudo: (linha) => (
-        <Link href={`/criancas/${linha.id}`} className="flex items-center gap-3 hover:text-brand-ink">
-          <Iniciais nome={linha.nome_completo} />
-          <span className="flex min-w-0 flex-col">
-            <span className="truncate font-semibold">{linha.nome_completo}</span>
-            <span className="text-xs text-ink-muted">{idade(linha.data_nascimento)} anos</span>
-          </span>
-        </Link>
+        <AbrirCadastro
+          criancaId={linha.id}
+          atividades={atividadesDoCadastro}
+          podeVerSensiveis={podeVerSensiveis}
+        >
+          <button
+            type="button"
+            className="flex items-center gap-3 rounded-md text-left transition-colors hover:text-brand-ink"
+          >
+            <Iniciais nome={linha.nome_completo} />
+            <span className="flex min-w-0 flex-col">
+              <span className="truncate font-semibold">{linha.nome_completo}</span>
+              <span className="text-xs text-ink-muted">{idade(linha.data_nascimento)} anos</span>
+            </span>
+          </button>
+        </AbrirCadastro>
       ),
     },
     {
@@ -130,13 +142,19 @@ export default async function Criancas({
       largura: "3rem",
       numerica: true,
       conteudo: (linha) => (
-        <Link
-          href={`/criancas/${linha.id}`}
-          aria-label={`Abrir cadastro de ${linha.nome_completo}`}
-          className="inline-grid size-8 place-items-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunken hover:text-ink"
+        <AbrirCadastro
+          criancaId={linha.id}
+          atividades={atividadesDoCadastro}
+          podeVerSensiveis={podeVerSensiveis}
         >
-          <ChevronRight className="size-4" aria-hidden />
-        </Link>
+          <button
+            type="button"
+            aria-label={`Abrir cadastro de ${linha.nome_completo}`}
+            className="inline-grid size-8 place-items-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunken hover:text-ink"
+          >
+            <ChevronRight className="size-4" aria-hidden />
+          </button>
+        </AbrirCadastro>
       ),
     },
   ];
@@ -151,17 +169,13 @@ export default async function Criancas({
 
   return (
     <>
-      <Suspense fallback={null}>
-        <AvisoDeSalvo />
-      </Suspense>
-
       <CabecalhoDaPagina
         titulo="Crianças"
         descricao={descricao}
         acao={
-          <Button asChild>
-            <Link href="/criancas/nova">Nova criança</Link>
-          </Button>
+          <AbrirCadastro atividades={atividadesDoCadastro} podeVerSensiveis={podeVerSensiveis}>
+            <Button>Nova criança</Button>
+          </AbrirCadastro>
         }
       />
 
@@ -194,9 +208,12 @@ export default async function Criancas({
                   titulo="Nenhuma criança cadastrada"
                   descricao="Aqui vai aparecer a lista das crianças atendidas, com idade, atividades e observação de saúde."
                   acao={
-                    <Button asChild size="sm">
-                      <Link href="/criancas/nova">Cadastrar a primeira criança</Link>
-                    </Button>
+                    <AbrirCadastro
+                      atividades={atividadesDoCadastro}
+                      podeVerSensiveis={podeVerSensiveis}
+                    >
+                      <Button size="sm">Cadastrar a primeira criança</Button>
+                    </AbrirCadastro>
                   }
                 />
               )

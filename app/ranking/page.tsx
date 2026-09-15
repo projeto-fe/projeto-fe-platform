@@ -8,8 +8,9 @@ import { criarClienteAdministrativo } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Ranking IDE JOGAI",
-  description: "Ranking do IDE JOGAI, a gamificação do Instituto Projeto Fé.",
+  // Página pública: não leva o sufixo do portal interno.
+  title: { absolute: "Ranking IDE JOGAI · Instituto Projeto Fé" },
+  description: "Ranking do ano do IDE JOGAI, a gamificação do Instituto Projeto Fé, em Marília/SP.",
   robots: { index: true, follow: true },
 };
 

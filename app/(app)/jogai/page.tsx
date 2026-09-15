@@ -21,9 +21,12 @@ import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 import { estornarLancamento } from "./actions";
-import { Lancador } from "./lancador";
+import { BotaoDeLancarPonto } from "./lancador";
 
-export const metadata: Metadata = { title: "IDE JOGAI" };
+export const metadata: Metadata = {
+  title: "IDE JOGAI",
+  description: "Lançamento de pontos e ranking do ano, com o histórico de quem lançou o quê.",
+};
 
 function quando(iso: string) {
   const data = new Date(iso);
@@ -72,108 +75,107 @@ export default async function Jogai() {
       <CabecalhoDaPagina
         titulo="IDE JOGAI"
         descricao="Lance pontos pelo catálogo de motivos e acompanhe o ranking do ano."
+        acao={
+          <BotaoDeLancarPonto
+            criancas={criancas.data ?? []}
+            motivos={motivos.data ?? []}
+            atividades={atividades.data ?? []}
+          />
+        }
       />
 
       <CorpoDaPagina>
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
-          <div className="flex flex-col gap-5">
-            <Lancador
-              criancas={criancas.data ?? []}
-              motivos={motivos.data ?? []}
-              atividades={atividades.data ?? []}
-            />
+          <Card>
+            <CardHeader>
+              <CardHeading>
+                <CardTitle>Últimos lançamentos</CardTitle>
+                <CardDescription>25 mais recentes</CardDescription>
+              </CardHeading>
+            </CardHeader>
 
-            <Card>
-              <CardHeader>
-                <CardHeading>
-                  <CardTitle>Últimos lançamentos</CardTitle>
-                  <CardDescription>25 mais recentes</CardDescription>
-                </CardHeading>
-              </CardHeader>
+            {listaDeEventos.length === 0 ? (
+              <EstadoVazio
+                compacto
+                icone={History}
+                titulo="Nenhum ponto lançado ainda"
+                descricao="Cada lançamento aparece aqui com criança, motivo, quem lançou e quando."
+              />
+            ) : (
+              <Lista>
+                {listaDeEventos.map((evento) => {
+                  const ehEstorno = Boolean(evento.estorna_evento_id);
+                  const foiEstornado = estornados.has(evento.id);
+                  const positivo = evento.valor_aplicado > 0;
+                  const nome = nomeDaCrianca.get(evento.crianca_id) ?? "Criança removida";
 
-              {listaDeEventos.length === 0 ? (
-                <EstadoVazio
-                  compacto
-                  icone={History}
-                  titulo="Nenhum ponto lançado ainda"
-                  descricao="Cada lançamento aparece aqui com criança, motivo, quem lançou e quando."
-                />
-              ) : (
-                <Lista>
-                  {listaDeEventos.map((evento) => {
-                    const ehEstorno = Boolean(evento.estorna_evento_id);
-                    const foiEstornado = estornados.has(evento.id);
-                    const positivo = evento.valor_aplicado > 0;
-                    const nome = nomeDaCrianca.get(evento.crianca_id) ?? "Criança removida";
+                  return (
+                    <Linha key={evento.id}>
+                      <span
+                        className={cn(
+                          "min-w-11 rounded-md px-2 py-1 text-center text-md font-semibold",
+                          positivo
+                            ? "bg-positive-soft text-positive-strong"
+                            : "bg-negative-soft text-negative-strong",
+                          foiEstornado && "opacity-50",
+                        )}
+                      >
+                        {positivo ? "+" : ""}
+                        {evento.valor_aplicado}
+                      </span>
 
-                    return (
-                      <Linha key={evento.id}>
-                        <span
-                          className={cn(
-                            "min-w-11 rounded-md px-2 py-1 text-center text-md font-semibold",
-                            positivo
-                              ? "bg-positive-soft text-positive-strong"
-                              : "bg-negative-soft text-negative-strong",
-                            foiEstornado && "opacity-50",
-                          )}
+                      <LinhaTexto
+                        principal={nome}
+                        riscado={foiEstornado}
+                        secundario={[
+                          ehEstorno
+                            ? "Estorno"
+                            : (rotuloDoMotivo.get(evento.motivo_id ?? "") ?? "Motivo removido"),
+                          nomeDaPessoa.get(evento.lancado_por) ?? "Pessoa removida",
+                          quando(evento.lancado_em),
+                        ].join(" · ")}
+                      />
+
+                      {foiEstornado ? (
+                        <Badge variant="negative">estornado</Badge>
+                      ) : podeEstornar && !ehEstorno ? (
+                        <Confirmacao
+                          titulo="Estornar este lançamento?"
+                          descricao={
+                            <>
+                              O ponto de <span className="font-semibold text-ink">{nome}</span> não é
+                              apagado: um lançamento contrário é criado e os dois ficam visíveis no
+                              histórico.
+                            </>
+                          }
+                          rotuloConfirmar="Estornar"
+                          perigoso
+                          acao={estornarLancamento}
+                          campos={{ evento_id: evento.id, crianca_id: evento.crianca_id }}
+                          mensagemDeSucesso="Lançamento estornado."
                         >
-                          {positivo ? "+" : ""}
-                          {evento.valor_aplicado}
-                        </span>
-
-                        <LinhaTexto
-                          principal={nome}
-                          riscado={foiEstornado}
-                          secundario={[
-                            ehEstorno
-                              ? "Estorno"
-                              : (rotuloDoMotivo.get(evento.motivo_id ?? "") ?? "Motivo removido"),
-                            nomeDaPessoa.get(evento.lancado_por) ?? "Pessoa removida",
-                            quando(evento.lancado_em),
-                          ].join(" · ")}
-                        />
-
-                        {foiEstornado ? (
-                          <Badge variant="negative">estornado</Badge>
-                        ) : podeEstornar && !ehEstorno ? (
-                          <Confirmacao
-                            titulo="Estornar este lançamento?"
-                            descricao={
-                              <>
-                                O ponto de <span className="font-semibold text-ink">{nome}</span> não é
-                                apagado: um lançamento contrário é criado e os dois ficam visíveis no
-                                histórico.
-                              </>
-                            }
-                            rotuloConfirmar="Estornar"
-                            perigoso
-                            acao={estornarLancamento}
-                            campos={{ evento_id: evento.id, crianca_id: evento.crianca_id }}
-                            mensagemDeSucesso="Lançamento estornado."
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Estornar este lançamento"
+                            className="hover:bg-negative-soft hover:text-negative-strong"
                           >
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label="Estornar este lançamento"
-                              className="hover:bg-negative-soft hover:text-negative-strong"
-                            >
-                              <Undo2 aria-hidden />
-                            </Button>
-                          </Confirmacao>
-                        ) : null}
-                      </Linha>
-                    );
-                  })}
-                </Lista>
-              )}
+                            <Undo2 aria-hidden />
+                          </Button>
+                        </Confirmacao>
+                      ) : null}
+                    </Linha>
+                  );
+                })}
+              </Lista>
+            )}
 
-              <CardNota>
-                Cada ponto é um registro, não um número que muda. Estornar cria um lançamento
-                contrário e mantém os dois visíveis, para que sempre dê para explicar à criança por
-                que a pontuação dela é essa.
-              </CardNota>
-            </Card>
-          </div>
+            <CardNota>
+              Cada ponto é um registro, não um número que muda. Estornar cria um lançamento
+              contrário e mantém os dois visíveis, para que sempre dê para explicar à criança por
+              que a pontuação dela é essa.
+            </CardNota>
+          </Card>
 
           <Card>
             <CardHeader>

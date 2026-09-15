@@ -5,6 +5,7 @@ import { ChevronsUpDown, LogOut, UserCog } from "lucide-react";
 import Link from "next/link";
 
 import { sair } from "@/app/(app)/conta/actions";
+import { SeletorDeTema } from "@/components/shell/tema";
 import { Iniciais } from "@/components/ui/iniciais";
 
 export function MenuDaConta({ nome, papel }: { nome: string; papel: string }) {
@@ -35,6 +36,13 @@ export function MenuDaConta({ nome, papel }: { nome: string; papel: string }) {
               Minha conta
             </Link>
           </DropdownMenu.Item>
+
+          <DropdownMenu.Separator className="my-1 h-px bg-line" />
+
+          <DropdownMenu.Label className="px-2.5 pt-1.5 pb-1 text-xs font-semibold text-ink-muted">
+            Tema
+          </DropdownMenu.Label>
+          <SeletorDeTema />
 
           <DropdownMenu.Separator className="my-1 h-px bg-line" />
 
