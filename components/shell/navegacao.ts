@@ -4,7 +4,7 @@ import {
   Users,
   Network,
   ShieldCheck,
-  UserCog,
+  CalendarDays,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,10 +27,12 @@ export const NAVEGACAO: ItemDeNavegacao[] = [
   { href: "/", rotulo: "Início", rotuloCurto: "Início", icone: Home, grupo: "operacao", noCelular: true },
   { href: "/criancas", rotulo: "Crianças", rotuloCurto: "Crianças", icone: Users, grupo: "operacao", noCelular: true },
   { href: "/jogai", rotulo: "IDE JOGAI", rotuloCurto: "JOGAI", icone: Star, grupo: "operacao", noCelular: true },
+  { href: "/calendario", rotulo: "Calendário", rotuloCurto: "Calendário", icone: CalendarDays, grupo: "operacao", noCelular: true },
   { href: "/estrutura", rotulo: "Estrutura", rotuloCurto: "Estrutura", icone: Network, grupo: "administracao", noCelular: true },
   { href: "/pessoas", rotulo: "Pessoas e acessos", rotuloCurto: "Pessoas", icone: ShieldCheck, grupo: "administracao", somenteAdmin: true },
-  // No desktop, conta e saída ficam no menu do rodapé da barra lateral.
-  { href: "/conta", rotulo: "Minha conta", rotuloCurto: "Conta", icone: UserCog, grupo: "administracao", noCelular: true, somenteCelular: true },
+  // Conta saiu da barra do celular para abrir vaga ao calendário. No
+  // celular, conta e saída agora vivem no avatar do topo (ver AppShell);
+  // no desktop continuam no menu do rodapé da barra lateral.
 ];
 
 export const ROTULO_DO_GRUPO: Record<ItemDeNavegacao["grupo"], string> = {

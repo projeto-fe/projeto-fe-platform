@@ -15,7 +15,15 @@ import { chavePublicaDoSupabase, urlDoSupabase } from "@/lib/ambiente";
  * e por isso não serve como porta.
  */
 
-const ROTAS_PUBLICAS = ["/login", "/convite", "/ranking", "/auth"];
+const ROTAS_PUBLICAS = [
+  "/login",
+  "/convite",
+  "/esqueci-senha",
+  "/redefinir-senha",
+  "/ranking",
+  "/agenda",
+  "/auth",
+];
 
 export async function proxy(request: NextRequest) {
   let resposta = NextResponse.next({ request });
