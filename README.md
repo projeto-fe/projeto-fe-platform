@@ -36,6 +36,8 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0009](docs/adr/0009-backup-por-export-agendado.md) | Backup por exportação agendada |
 | [0010](docs/adr/0010-libs-de-interface.md) | Bibliotecas de interface |
 | [0011](docs/adr/0011-padroes-de-interacao.md) | Padrões de interação: confirmação, aviso, diálogo e formulário |
+| [0012](docs/adr/0012-desativar-em-vez-de-apagar.md) | Desativar em vez de apagar |
+| [0013](docs/adr/0013-casca-publica-compartilhada.md) | Rotas públicas compartilham uma casca própria |
 
 ## Especificações
 
@@ -45,6 +47,7 @@ Next.js (App Router), Supabase (Postgres, Auth, Storage) e Vercel. Detalhes e mo
 | [0002](docs/specs/0002-ide-jogai.md) | IDE JOGAI: pontuação, extrato e ranking |
 | [0003](docs/specs/0003-estrutura-e-acessos.md) | Estrutura, pessoas e acessos |
 | [0004](docs/specs/0004-redesenho-da-interface.md) | Redesenho da interface |
+| [0005](docs/specs/0005-calendario-e-presenca.md) | Calendário de atividades e presença |
 
 ## Rodar localmente
 
