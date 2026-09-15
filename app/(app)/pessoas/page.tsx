@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Mail, ScrollText, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CabecalhoDaPagina, CorpoDaPagina } from "@/components/shell/cabecalho-da-pagina";
@@ -18,6 +19,7 @@ import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { Iniciais } from "@/components/ui/iniciais";
 import { Linha, LinhaTexto, Lista } from "@/components/ui/lista";
 import { Tabela, type Coluna } from "@/components/ui/tabela";
+import { caminhoFotoDoUsuario, urlDaFoto } from "@/lib/fotos";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
@@ -112,13 +114,16 @@ export default async function Pessoas() {
       chave: "pessoa",
       cabecalho: "Pessoa",
       conteudo: (p) => (
-        <span className="flex items-center gap-3">
-          <Iniciais nome={p.nome} tom={p.is_admin ? "marca" : "neutro"} />
+        <Link
+          href={`/pessoas/${p.id}`}
+          className="flex items-center gap-3 rounded-md outline-none transition-colors hover:text-brand-ink focus-visible:ring-2 focus-visible:ring-brand"
+        >
+          <Iniciais nome={p.nome} foto={urlDaFoto(caminhoFotoDoUsuario(p.id))} tom={p.is_admin ? "marca" : "neutro"} />
           <span className="flex min-w-0 flex-col">
             <span className="truncate font-semibold">{p.nome}</span>
             <span className="truncate text-xs text-ink-muted">{p.email}</span>
           </span>
-        </span>
+        </Link>
       ),
     },
     {

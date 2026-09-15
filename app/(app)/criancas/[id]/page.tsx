@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { CabecalhoDaPagina, CorpoDaPagina } from "@/components/shell/cabecalho-da-pagina";
+import { PainelDeFrequencia } from "@/components/calendario/painel-de-frequencia";
+import { carregarFrequenciaDaCrianca } from "@/lib/calendario-dados";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
 import { dadosDaCrianca } from "../dados";
@@ -31,18 +33,21 @@ export async function generateMetadata({
 
 export default async function EditarCrianca({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { valores, atividades, podeVerSensiveis } = await dadosDaCrianca(id);
+  const [{ valores, atividades, podeVerSensiveis }, frequencia] = await Promise.all([
+    dadosDaCrianca(id),
+    carregarFrequenciaDaCrianca(id),
+  ]);
 
   return (
     <>
       <CabecalhoDaPagina
         titulo={valores.nome_completo ?? "Cadastro da criança"}
         voltar={{ href: "/criancas", rotulo: "Crianças" }}
-        descricao={
+        descricao={`${valores.matricula ? `Matrícula ${valores.matricula} · ` : ""}${
           podeVerSensiveis
             ? "Todos os dados ficam restritos à equipe."
             : "Cadastro básico; endereço e contato ficam com a coordenação."
-        }
+        }`}
       />
       <CorpoDaPagina>
         <FormularioDaCrianca
@@ -50,6 +55,7 @@ export default async function EditarCrianca({ params }: { params: Promise<{ id: 
           atividades={atividades}
           podeVerSensiveis={podeVerSensiveis}
         />
+        <PainelDeFrequencia frequencia={frequencia} />
       </CorpoDaPagina>
     </>
   );
