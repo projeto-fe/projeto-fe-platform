@@ -1,7 +1,6 @@
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 
-import { Logo } from "@/components/marca/logo";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -22,10 +21,6 @@ export function CabecalhoDaPagina({ titulo, descricao, acao, voltar }: Props) {
   return (
     <header className="border-b border-line bg-surface-raised md:bg-transparent md:border-b-0">
       <div className="mx-auto flex w-full max-w-(--content-w) flex-col gap-3 px-4 pt-4 pb-4 md:px-8 md:pt-8 md:pb-2">
-        <div className="md:hidden">
-          <Logo compacto />
-        </div>
-
         {voltar ? (
           <Link
             href={voltar.href}

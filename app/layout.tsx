@@ -42,10 +42,21 @@ export const metadata: Metadata = {
     description: DESCRICAO,
     locale: "pt_BR",
   },
+  // Sem isto, "Adicionar à Tela de Início" no iPhone abre num modo que não
+  // sabe da área segura do aparelho: a barra inferior do celular (que já
+  // reserva espaço pra essa área) fica sem o respiro, cortada pelo indicador
+  // de início. `viewportFit: "cover"` no viewport, ao lado disto, é o que
+  // ativa `env(safe-area-inset-bottom)` de verdade no modo instalado.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Projeto Fé",
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: marca.azul,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
