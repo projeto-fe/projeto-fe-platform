@@ -9,7 +9,7 @@ import { NAVEGACAO, ROTULO_DO_GRUPO } from "@/components/shell/navegacao";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  usuario: { nome: string; papel: string; isAdmin: boolean };
+  usuario: { id: string; nome: string; papel: string; isAdmin: boolean };
   children: React.ReactNode;
 };
 
@@ -78,11 +78,20 @@ export function AppShell({ usuario, children }: Props) {
         </nav>
 
         <div className="p-3">
-          <MenuDaConta nome={usuario.nome} papel={usuario.papel} />
+          <MenuDaConta usuarioId={usuario.id} nome={usuario.nome} papel={usuario.papel} />
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-col">
+        {/* Barra do topo: só no celular. Logo e conta na mesma linha, uma
+            vez só — cada page.tsx não repete mais o logo aqui dentro. */}
+        <div className="flex items-center justify-between border-b border-line bg-surface-nav px-4 py-2 md:hidden">
+          <Link href="/" className="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-brand">
+            <Logo compacto />
+          </Link>
+          <MenuDaConta usuarioId={usuario.id} nome={usuario.nome} papel={usuario.papel} compacto />
+        </div>
+
         <div className="flex flex-1 flex-col pb-20 md:pb-0">{children}</div>
 
         {/* Barra inferior: só no celular. Cinco itens alcançáveis com o polegar. */}

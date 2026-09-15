@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { registrarAuditoria } from "@/lib/auditoria";
+import { caminhoFotoDaCrianca } from "@/lib/fotos";
+import { enviarFoto, removerFoto } from "@/lib/fotos-dados";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
@@ -240,4 +242,38 @@ export async function excluirCrianca(dados: FormData) {
 
   revalidatePath("/criancas");
   revalidatePath("/");
+}
+
+export type EstadoDaFoto = { erro?: string };
+
+/**
+ * Foto de criança, visível a toda a equipe (mesmo acesso do cadastro
+ * básico), decidida ao lado da Spec 0001, que originalmente excluía isso.
+ */
+export async function enviarFotoDaCrianca(
+  _anterior: EstadoDaFoto,
+  dados: FormData,
+): Promise<EstadoDaFoto> {
+  await exigirPessoaLogada();
+
+  const criancaId = String(dados.get("crianca_id"));
+  const arquivo = dados.get("foto");
+  if (!(arquivo instanceof File)) return { erro: "Escolha um arquivo de imagem." };
+
+  const resultado = await enviarFoto(caminhoFotoDaCrianca(criancaId), arquivo);
+  if (resultado.erro) return resultado;
+
+  revalidatePath("/criancas");
+  revalidatePath(`/criancas/${criancaId}`);
+  return {};
+}
+
+export async function removerFotoDaCrianca(dados: FormData) {
+  await exigirPessoaLogada();
+
+  const criancaId = String(dados.get("crianca_id"));
+  await removerFoto(caminhoFotoDaCrianca(criancaId));
+
+  revalidatePath("/criancas");
+  revalidatePath(`/criancas/${criancaId}`);
 }
