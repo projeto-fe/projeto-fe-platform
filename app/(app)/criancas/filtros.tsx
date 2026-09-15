@@ -33,6 +33,8 @@ export function Filtros({
       const novos = new URLSearchParams(parametros.toString());
       if (termo) novos.set("busca", termo);
       else novos.delete("busca");
+      // Filtro novo pode ter menos páginas que a atual: volta pra primeira.
+      novos.delete("pagina");
       router.replace(`/criancas?${novos.toString()}`);
     }, 350);
 
@@ -43,6 +45,7 @@ export function Filtros({
     const novos = new URLSearchParams(parametros.toString());
     if (valor) novos.set(chave, valor);
     else novos.delete(chave);
+    novos.delete("pagina");
     router.replace(`/criancas?${novos.toString()}`);
   }
 

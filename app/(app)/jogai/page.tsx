@@ -16,12 +16,15 @@ import {
 import { Confirmacao } from "@/components/ui/confirmacao";
 import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { Barra, Linha, LinhaTexto, Lista, Numero, Posicao } from "@/components/ui/lista";
+import { Paginacao } from "@/components/ui/paginacao";
+import { carregarRanking } from "@/lib/ranking";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 import { estornarLancamento } from "./actions";
 import { BotaoDeLancarPonto } from "./lancador";
+import { MotivosDialogo } from "./motivos-dialogo";
 
 export const metadata: Metadata = {
   title: "IDE JOGAI",
@@ -37,32 +40,59 @@ function quando(iso: string) {
   return `${data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}, ${hora}`;
 }
 
-export default async function Jogai() {
+const POR_PAGINA = 20;
+
+export default async function Jogai({
+  searchParams,
+}: {
+  searchParams: Promise<{ paginaExtrato?: string; paginaRanking?: string }>;
+}) {
   const pessoa = await exigirPessoaLogada();
   const supabase = await criarClienteDoServidor();
+  const { paginaExtrato, paginaRanking } = await searchParams;
 
-  const [criancas, motivos, atividades, ranking, eventos, equipe] = await Promise.all([
-    supabase.from("criancas").select("id, nome_completo").eq("ativo", true).order("nome_completo"),
-    supabase.from("motivos_pontuacao").select("id, rotulo, valor").eq("ativo", true).order("ordem"),
-    supabase.from("areas").select("id, nome").eq("tipo", "atividade").eq("ativo", true).order("nome"),
-    supabase
-      .from("ranking_interno")
-      .select("crianca_id, nome_completo, nome_publico, pontos")
-      .order("pontos", { ascending: false }),
-    supabase
-      .from("pontuacao_eventos")
-      .select("id, crianca_id, motivo_id, valor_aplicado, lancado_por, lancado_em, estorna_evento_id")
-      .order("lancado_em", { ascending: false })
-      .limit(25),
-    supabase.from("perfis").select("id, nome"),
-  ]);
+  const paginaDoExtrato = Math.max(1, Number(paginaExtrato) || 1);
+  const inicioDoExtrato = (paginaDoExtrato - 1) * POR_PAGINA;
+  const paginaDoRanking = Math.max(1, Number(paginaRanking) || 1);
+  const inicioDoRanking = (paginaDoRanking - 1) * POR_PAGINA;
+
+  const [criancas, motivos, atividades, rankingCompleto, eventos, equipe, motivosUsados] =
+    await Promise.all([
+      supabase.from("criancas").select("id, nome_completo").eq("ativo", true).order("nome_completo"),
+      supabase.from("motivos_pontuacao").select("id, rotulo, valor, ativo").order("ordem"),
+      supabase.from("areas").select("id, nome").eq("tipo", "atividade").eq("ativo", true).order("nome"),
+      carregarRanking(),
+      supabase
+        .from("pontuacao_eventos")
+        .select("id, crianca_id, motivo_id, valor_aplicado, lancado_por, lancado_em, estorna_evento_id", {
+          count: "exact",
+        })
+        .order("lancado_em", { ascending: false })
+        .range(inicioDoExtrato, inicioDoExtrato + POR_PAGINA - 1),
+      supabase.from("perfis").select("id, nome"),
+      supabase.from("pontuacao_eventos").select("motivo_id").not("motivo_id", "is", null),
+    ]);
+
+  const linhasDoRanking = rankingCompleto.slice(inicioDoRanking, inicioDoRanking + POR_PAGINA);
+  const totalDoRanking = rankingCompleto.length;
+  const totalPaginasDoRanking = Math.max(1, Math.ceil(totalDoRanking / POR_PAGINA));
+  const totalDoExtrato = eventos.count ?? 0;
+  const totalPaginasDoExtrato = Math.max(1, Math.ceil(totalDoExtrato / POR_PAGINA));
+
+  // Barra de proporção do ranking compara sempre com o maior de todos, não
+  // só o maior da página em tela, senão a barra muda de escala a cada página.
+  const maiorDoRanking = rankingCompleto[0]?.pontos ?? 0;
+
+  const idsDeMotivosUsados = new Set((motivosUsados.data ?? []).map((e) => e.motivo_id));
+  const todosOsMotivos = (motivos.data ?? []).map((m) => ({
+    ...m,
+    temHistorico: idsDeMotivosUsados.has(m.id),
+  }));
+  const motivosAtivos = todosOsMotivos.filter((m) => m.ativo);
 
   const nomeDaPessoa = new Map((equipe.data ?? []).map((p) => [p.id, p.nome]));
   const nomeDaCrianca = new Map((criancas.data ?? []).map((c) => [c.id, c.nome_completo]));
-  const rotuloDoMotivo = new Map((motivos.data ?? []).map((m) => [m.id, m.rotulo]));
-
-  const linhasDoRanking = ranking.data ?? [];
-  const maior = linhasDoRanking[0]?.pontos ?? 0;
+  const rotuloDoMotivo = new Map(todosOsMotivos.map((m) => [m.id, m.rotulo]));
   const listaDeEventos = eventos.data ?? [];
   const estornados = new Set(
     listaDeEventos.map((e) => e.estorna_evento_id).filter(Boolean) as string[],
@@ -70,17 +100,36 @@ export default async function Jogai() {
 
   const podeEstornar = pessoa.isAdmin || pessoa.coordenaAlgumaArea;
 
+  function hrefDoExtrato(pagina: number) {
+    const parametros = new URLSearchParams();
+    if (pagina > 1) parametros.set("paginaExtrato", String(pagina));
+    if (paginaDoRanking > 1) parametros.set("paginaRanking", String(paginaDoRanking));
+    const query = parametros.toString();
+    return query ? `/jogai?${query}` : "/jogai";
+  }
+
+  function hrefDoRanking(pagina: number) {
+    const parametros = new URLSearchParams();
+    if (paginaDoExtrato > 1) parametros.set("paginaExtrato", String(paginaDoExtrato));
+    if (pagina > 1) parametros.set("paginaRanking", String(pagina));
+    const query = parametros.toString();
+    return query ? `/jogai?${query}` : "/jogai";
+  }
+
   return (
     <>
       <CabecalhoDaPagina
         titulo="IDE JOGAI"
         descricao="Lance pontos pelo catálogo de motivos e acompanhe o ranking do ano."
         acao={
-          <BotaoDeLancarPonto
-            criancas={criancas.data ?? []}
-            motivos={motivos.data ?? []}
-            atividades={atividades.data ?? []}
-          />
+          <div className="flex items-center gap-2">
+            {pessoa.isAdmin ? <MotivosDialogo motivos={todosOsMotivos} /> : null}
+            <BotaoDeLancarPonto
+              criancas={criancas.data ?? []}
+              motivos={motivosAtivos}
+              atividades={atividades.data ?? []}
+            />
+          </div>
         }
       />
 
@@ -90,7 +139,7 @@ export default async function Jogai() {
             <CardHeader>
               <CardHeading>
                 <CardTitle>Últimos lançamentos</CardTitle>
-                <CardDescription>25 mais recentes</CardDescription>
+                <CardDescription>{totalDoExtrato} no total</CardDescription>
               </CardHeading>
             </CardHeader>
 
@@ -170,6 +219,11 @@ export default async function Jogai() {
               </Lista>
             )}
 
+            <Paginacao
+              paginaAtual={paginaDoExtrato}
+              totalDePaginas={totalPaginasDoExtrato}
+              criarHref={hrefDoExtrato}
+            />
             <CardNota>
               Cada ponto é um registro, não um número que muda. Estornar cria um lançamento
               contrário e mantém os dois visíveis, para que sempre dê para explicar à criança por
@@ -183,7 +237,7 @@ export default async function Jogai() {
                 <CardTitle>Ranking do ano</CardTitle>
               </CardHeading>
               <Badge>
-                {linhasDoRanking.length} {linhasDoRanking.length === 1 ? "criança" : "crianças"}
+                {totalDoRanking} {totalDoRanking === 1 ? "criança" : "crianças"}
               </Badge>
             </CardHeader>
 
@@ -198,15 +252,23 @@ export default async function Jogai() {
               <Lista ordenada>
                 {linhasDoRanking.map((linha, indice) => (
                   <Linha key={linha.crianca_id}>
-                    <Posicao numero={indice + 1} />
+                    <Posicao numero={inicioDoRanking + indice + 1} />
                     <LinhaTexto principal={linha.nome_completo} secundario={linha.nome_publico} />
-                    <Barra proporcao={maior > 0 ? linha.pontos / maior : 0} className="hidden sm:block" />
+                    <Barra
+                      proporcao={maiorDoRanking > 0 ? linha.pontos / maiorDoRanking : 0}
+                      className="hidden sm:block"
+                    />
                     <Numero>{linha.pontos}</Numero>
                   </Linha>
                 ))}
               </Lista>
             )}
 
+            <Paginacao
+              paginaAtual={paginaDoRanking}
+              totalDePaginas={totalPaginasDoRanking}
+              criarHref={hrefDoRanking}
+            />
             <CardNota>
               Aqui a equipe vê o nome real. Na página pública em{" "}
               <Link
