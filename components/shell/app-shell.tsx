@@ -84,8 +84,12 @@ export function AppShell({ usuario, children }: Props) {
 
       <div className="flex min-w-0 flex-col">
         {/* Barra do topo: só no celular. Logo e conta na mesma linha, uma
-            vez só — cada page.tsx não repete mais o logo aqui dentro. */}
-        <div className="flex items-center justify-between border-b border-line bg-surface-nav px-4 py-2 md:hidden">
+            vez só — cada page.tsx não repete mais o logo aqui dentro.
+            `black-translucent` (app/layout.tsx) põe o conteúdo por trás da
+            barra de status/Dynamic Island de propósito, então esta barra
+            precisa reservar esse espaço, senão a logo fica espremida ao
+            lado do relógio do aparelho. */}
+        <div className="flex items-center justify-between border-b border-line bg-surface-nav px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2 md:hidden">
           <Link href="/" className="inline-flex rounded-md outline-none focus-visible:ring-2 focus-visible:ring-brand">
             <Logo compacto />
           </Link>
@@ -108,7 +112,11 @@ export function AppShell({ usuario, children }: Props) {
                 href={item.href}
                 aria-current={ativo ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-1 px-1 pt-2 pb-2.5 text-2xs font-semibold",
+                  // O respiro pro indicador de início do iPhone já vem do
+                  // `pb-[env(safe-area-inset-bottom)]` do <nav> pai. Um
+                  // `pb` maior aqui somaria aos dois, e o rótulo acaba
+                  // parecendo flutuar longe demais da borda.
+                  "flex flex-col items-center gap-1 px-1 pt-2 pb-1.5 text-2xs font-semibold",
                   ativo ? "text-ink" : "text-ink-muted",
                 )}
               >
