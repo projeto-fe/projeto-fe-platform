@@ -36,6 +36,8 @@ export function OpcaoMarcavel({
   titulo,
   descricao,
   defaultChecked,
+  checked,
+  onCheckedChange,
   className,
 }: {
   id: string;
@@ -44,6 +46,8 @@ export function OpcaoMarcavel({
   titulo: string;
   descricao?: string;
   defaultChecked?: boolean;
+  checked?: boolean;
+  onCheckedChange?: (marcado: boolean) => void;
   className?: string;
 }) {
   return (
@@ -54,7 +58,14 @@ export function OpcaoMarcavel({
         className,
       )}
     >
-      <Checkbox id={id} name={name} value={value} defaultChecked={defaultChecked} />
+      <Checkbox
+        id={id}
+        name={name}
+        value={value}
+        defaultChecked={defaultChecked}
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+      />
       <span className="min-w-0">
         <span className="block text-sm font-semibold">{titulo}</span>
         {descricao ? <span className="block text-xs text-ink-muted">{descricao}</span> : null}
