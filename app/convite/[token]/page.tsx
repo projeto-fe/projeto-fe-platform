@@ -11,7 +11,7 @@ import { FormularioDeAceite } from "./formulario";
 
 export const metadata: Metadata = { title: "Aceitar convite", robots: { index: false } };
 
-type Situacao = "valido" | "inexistente" | "expirado" | "usado";
+type Situacao = "valido" | "inexistente" | "expirado" | "usado" | "falha";
 
 export default async function AceitarConvite({
   params,
@@ -27,14 +27,20 @@ export default async function AceitarConvite({
   // Consulta com o papel de serviço porque quem abre este link ainda não tem
   // conta, e portanto nenhuma permissão no banco.
   const supabase = criarClienteAdministrativo();
-  const { data: convite } = await supabase
+  const { data: convite, error } = await supabase
     .from("convites")
     .select("id, email, papel, area_id, expira_em, aceito_em")
     .eq("token_hash", tokenHash)
     .maybeSingle();
 
+  // Falha de consulta não é convite inexistente. Tratar as duas como a mesma
+  // coisa manda a pessoa conferir um link que está correto, e esconde o
+  // defeito de quem deveria corrigi-lo.
+  if (error) console.error("[convite] consulta falhou:", error.message);
+
   let situacao: Situacao = "valido";
-  if (!convite) situacao = "inexistente";
+  if (error) situacao = "falha";
+  else if (!convite) situacao = "inexistente";
   else if (convite.aceito_em) situacao = "usado";
   else if (new Date(convite.expira_em) < new Date()) situacao = "expirado";
 
@@ -50,6 +56,11 @@ export default async function AceitarConvite({
     usado: {
       titulo: "Convite já usado",
       texto: "Este link já criou uma conta. Se a conta é sua, entre normalmente.",
+    },
+    falha: {
+      titulo: "Não deu para abrir seu convite",
+      texto:
+        "O problema é do nosso lado, não do seu link. Avise a coordenação e tente de novo em alguns minutos.",
     },
   };
 

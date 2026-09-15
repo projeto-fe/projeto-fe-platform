@@ -322,5 +322,57 @@ select espera(
   'a view de ranking expõe o nome derivado'
 );
 
+
+-- ============================================================== teste 14
+-- Fluxo de convite: quem abre o link ainda não tem conta, então a leitura
+-- acontece pelo papel de serviço. Sem estes privilégios a tela dizia
+-- "convite não existe" para um link perfeitamente válido.
+reset role;
+set role service_role;
+
+select espera(
+  (select count(*) from convites) >= 0,
+  'service_role lê convites (a tela de aceite depende disso)'
+);
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform 1 from convites limit 1;
+    update convites set aceito_em = now() where false;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(not deu_erro, 'service_role marca convite como aceito');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into area_membros (usuario_id, area_id, papel)
+    values ('33333333-3333-3333-3333-333333333333',
+            'aaaaaaaa-0000-0000-0000-000000000001', 'voluntario')
+    on conflict do nothing;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(not deu_erro, 'service_role aplica o vínculo de área do convite');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from criancas_dados_sensiveis;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'service_role continua sem alcançar dado sensível de criança');
+end;
+$$;
+
+reset role;
+
 \echo ''
 \echo 'Todos os testes passaram.'
