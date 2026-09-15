@@ -62,6 +62,8 @@ const ERROS_SILENCIOSOS = new Set(["no-speech", "aborted"]);
 type Props = {
   /** Chamado a cada trecho reconhecido, final ou não, com o texto acumulado até agora. */
   aoTranscrever: (texto: string) => void;
+  /** Chamado uma vez, quando a pessoa para de ouvir (ou um erro interrompe), com o texto final. */
+  aoParar?: (texto: string) => void;
   className?: string;
 };
 
@@ -71,7 +73,7 @@ type Props = {
  * Some sozinho em navegador sem suporte, porque a escolha manual do motivo
  * continua sendo o caminho principal.
  */
-export function BotaoDeDitado({ aoTranscrever, className }: Props) {
+export function BotaoDeDitado({ aoTranscrever, aoParar, className }: Props) {
   const [ouvindo, setOuvindo] = React.useState(false);
   const [erro, setErro] = React.useState<string>();
   const reconhecimentoRef = React.useRef<InstanciaDeReconhecimento | null>(null);
@@ -82,6 +84,7 @@ export function BotaoDeDitado({ aoTranscrever, className }: Props) {
   // foi dito antes do reinício.
   const textoBaseRef = React.useRef("");
   const textoFinalDaSessaoRef = React.useRef("");
+  const textoAtualRef = React.useRef("");
   const suportado = React.useMemo(() => Boolean(obterConstrutor()), []);
 
   React.useEffect(() => {
@@ -108,13 +111,15 @@ export function BotaoDeDitado({ aoTranscrever, className }: Props) {
         else interino += resultado.item(0).transcript;
       }
       textoFinalDaSessaoRef.current = final;
-      aoTranscrever([textoBaseRef.current, final, interino].filter(Boolean).join(" "));
+      textoAtualRef.current = [textoBaseRef.current, final, interino].filter(Boolean).join(" ");
+      aoTranscrever(textoAtualRef.current);
     };
 
     reconhecimento.onerror = (evento) => {
       if (ERROS_SILENCIOSOS.has(evento.error)) return;
       deveOuvirRef.current = false;
       setErro(MENSAGENS_DE_ERRO[evento.error] ?? "Não foi possível ouvir. Tente de novo.");
+      aoParar?.(textoAtualRef.current);
     };
 
     reconhecimento.onend = () => {
@@ -151,12 +156,14 @@ export function BotaoDeDitado({ aoTranscrever, className }: Props) {
       window.setTimeout(() => {
         if (reconhecimentoRef.current === instancia) instancia?.abort();
       }, 500);
+      aoParar?.(textoAtualRef.current);
       return;
     }
 
     setErro(undefined);
     textoBaseRef.current = "";
     textoFinalDaSessaoRef.current = "";
+    textoAtualRef.current = "";
     deveOuvirRef.current = true;
     const reconhecimento = criarReconhecimento();
     reconhecimentoRef.current = reconhecimento;

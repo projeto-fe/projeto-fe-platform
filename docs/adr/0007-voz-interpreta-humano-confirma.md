@@ -1,6 +1,6 @@
 # ADR 0007: Ditado escolhe o motivo, pessoa confirma, código grava
 
-- Status: aceito
+- Status: substituído pelo [ADR 0015](0015-ditado-identifica-crianca-atividade-motivo.md)
 - Data: 2026-09-14
 
 ## Contexto
