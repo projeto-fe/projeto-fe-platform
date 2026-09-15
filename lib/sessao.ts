@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
@@ -17,8 +18,11 @@ export type PessoaLogada = {
  *
  * O papel nunca vem do token nem de metadado do usuário, porque esses são
  * editáveis pelo cliente em alguns fluxos. Vem sempre da tabela.
+ *
+ * Memoizado com `cache()` do React: chamado várias vezes na mesma requisição
+ * (layout + página), mas só bate no banco uma vez.
  */
-export async function exigirPessoaLogada(): Promise<PessoaLogada> {
+export const exigirPessoaLogada = cache(async function exigirPessoaLogada(): Promise<PessoaLogada> {
   const supabase = await criarClienteDoServidor();
 
   const {
@@ -55,4 +59,4 @@ export async function exigirPessoaLogada(): Promise<PessoaLogada> {
     coordenaAlgumaArea: coordena,
     papel: perfil.is_admin ? "Administrador" : coordena ? "Coordenador" : "Voluntário",
   };
-}
+});
