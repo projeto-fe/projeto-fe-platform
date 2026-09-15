@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 
 import { exigirPessoaLogada } from "@/lib/sessao";
@@ -47,6 +47,8 @@ export async function lancarPonto(
 
   revalidatePath("/jogai");
   revalidatePath("/");
+  revalidatePath("/ranking");
+  updateTag("ranking");
   return { sucesso: "Ponto lançado." };
 }
 
@@ -70,4 +72,116 @@ export async function estornarLancamento(dados: FormData) {
 
   revalidatePath("/jogai");
   revalidatePath("/");
+  revalidatePath("/ranking");
+  updateTag("ranking");
+}
+
+export type EstadoDoMotivo = { erro?: string; sucesso?: string };
+
+const novoMotivo = z.object({
+  rotulo: z.string().trim().min(2, "Informe um texto com pelo menos duas letras.").max(80),
+  valor: z.coerce.number().int().refine((v) => v !== 0, "O valor não pode ser zero."),
+});
+
+/** Catálogo de motivos: só administrador mexe, e o valor nunca é zero (ADR 0003). */
+export async function criarMotivo(
+  _anterior: EstadoDoMotivo,
+  dados: FormData,
+): Promise<EstadoDoMotivo> {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin) return { erro: "Apenas administradores mexem no catálogo de motivos." };
+
+  const analise = novoMotivo.safeParse({
+    rotulo: dados.get("rotulo"),
+    valor: dados.get("valor"),
+  });
+
+  if (!analise.success) {
+    return { erro: analise.error.issues[0]?.message ?? "Confira os campos." };
+  }
+
+  const supabase = await criarClienteDoServidor();
+  const { count } = await supabase
+    .from("motivos_pontuacao")
+    .select("id", { count: "exact", head: true });
+
+  const { error } = await supabase.from("motivos_pontuacao").insert({
+    rotulo: analise.data.rotulo,
+    valor: analise.data.valor,
+    ordem: count ?? 0,
+  });
+
+  if (error) {
+    if (error.message.includes("duplicate") || error.message.includes("unique")) {
+      return { erro: "Já existe um motivo com este texto." };
+    }
+    return { erro: "Não foi possível criar. Tente de novo." };
+  }
+
+  revalidatePath("/jogai");
+  return { sucesso: "Motivo criado." };
+}
+
+const edicaoDoMotivo = z.object({
+  id: z.string().uuid(),
+  rotulo: z.string().trim().min(2, "Informe um texto com pelo menos duas letras.").max(80),
+  valor: z.coerce.number().int().refine((v) => v !== 0, "O valor não pode ser zero."),
+});
+
+export async function editarMotivo(
+  _anterior: EstadoDoMotivo,
+  dados: FormData,
+): Promise<EstadoDoMotivo> {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin) return { erro: "Apenas administradores mexem no catálogo de motivos." };
+
+  const analise = edicaoDoMotivo.safeParse({
+    id: dados.get("id"),
+    rotulo: dados.get("rotulo"),
+    valor: dados.get("valor"),
+  });
+
+  if (!analise.success) {
+    return { erro: analise.error.issues[0]?.message ?? "Confira os campos." };
+  }
+
+  const supabase = await criarClienteDoServidor();
+  const { error } = await supabase
+    .from("motivos_pontuacao")
+    .update({ rotulo: analise.data.rotulo, valor: analise.data.valor })
+    .eq("id", analise.data.id);
+
+  if (error) {
+    if (error.message.includes("duplicate") || error.message.includes("unique")) {
+      return { erro: "Já existe um motivo com este texto." };
+    }
+    return { erro: "Não foi possível salvar. Tente de novo." };
+  }
+
+  revalidatePath("/jogai");
+  return { sucesso: "Motivo atualizado. Pontos já lançados continuam com o valor de antes." };
+}
+
+/**
+ * Apaga de vez. Só administrador, e só enquanto nenhum ponto já lançado usou
+ * este motivo — o banco recusaria de qualquer forma (`on delete restrict`),
+ * aqui é só a mensagem amigável.
+ */
+export async function excluirMotivo(dados: FormData) {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin) return;
+
+  const id = String(dados.get("id"));
+  const supabase = await criarClienteDoServidor();
+
+  const { count } = await supabase
+    .from("pontuacao_eventos")
+    .select("id", { count: "exact", head: true })
+    .eq("motivo_id", id);
+
+  if ((count ?? 0) > 0) return;
+
+  await supabase.from("motivos_pontuacao").delete().eq("id", id);
+
+  revalidatePath("/jogai");
 }
