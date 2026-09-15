@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { History, Trophy, Undo2 } from "lucide-react";
+import { History, Trash2, Trophy, Undo2 } from "lucide-react";
 import Link from "next/link";
 
 import { CabecalhoDaPagina, CorpoDaPagina } from "@/components/shell/cabecalho-da-pagina";
@@ -22,7 +22,7 @@ import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
-import { estornarLancamento } from "./actions";
+import { estornarLancamento, excluirLancamento } from "./actions";
 import { BotaoDeLancarPonto } from "./lancador";
 import { MotivosDialogo } from "./motivos-dialogo";
 
@@ -210,6 +210,37 @@ export default async function Jogai({
                             className="hover:bg-negative-soft hover:text-negative-strong"
                           >
                             <Undo2 aria-hidden />
+                          </Button>
+                        </Confirmacao>
+                      ) : null}
+
+                      {pessoa.isAdmin ? (
+                        <Confirmacao
+                          titulo="Excluir este lançamento?"
+                          descricao={
+                            <>
+                              Remove o registro de <span className="font-semibold text-ink">{nome}</span>{" "}
+                              para sempre, sem deixar rastro no extrato.
+                              {ehEstorno
+                                ? " O lançamento original volta a valer, como se nunca tivesse sido estornado."
+                                : foiEstornado
+                                  ? " O estorno dele também é excluído junto."
+                                  : " Normalmente o estorno já resolve um lançamento errado sem apagar o histórico."}
+                            </>
+                          }
+                          rotuloConfirmar="Excluir"
+                          perigoso
+                          acao={excluirLancamento}
+                          campos={{ evento_id: evento.id }}
+                          mensagemDeSucesso="Lançamento excluído."
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Excluir este lançamento"
+                            className="hover:bg-negative-soft hover:text-negative-strong"
+                          >
+                            <Trash2 aria-hidden />
                           </Button>
                         </Confirmacao>
                       ) : null}

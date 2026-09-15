@@ -109,7 +109,7 @@ select espera(
 );
 
 -- =============================================================== teste 4
--- Ninguém atualiza nem apaga evento de pontuação. Nem admin.
+-- Ninguém atualiza evento de pontuação, nem admin. Só admin exclui (ADR 0016).
 set "request.jwt.claim.sub" = '11111111-1111-1111-1111-111111111111';
 
 do $$
@@ -124,15 +124,44 @@ end;
 $$;
 
 do $$
-declare deu_erro boolean := false;
+declare
+  novo_id uuid;
+  deu_erro boolean := false;
 begin
+  insert into pontuacao_eventos (crianca_id, motivo_id, valor_aplicado, lancado_por)
+  values ('cccccccc-0000-0000-0000-000000000001',
+          (select id from motivos_pontuacao where rotulo = 'Ajudou um colega'),
+          0,
+          '11111111-1111-1111-1111-111111111111')
+  returning id into novo_id;
+
   begin
-    delete from pontuacao_eventos;
+    delete from pontuacao_eventos where id = novo_id;
   exception when others then deu_erro := true;
   end;
-  perform espera(deu_erro, 'admin NÃO consegue apagar evento de pontuação');
+
+  perform espera(not deu_erro, 'admin consegue excluir evento de pontuação');
+  perform espera(
+    not exists (select 1 from pontuacao_eventos where id = novo_id),
+    'evento excluído por admin realmente sumiu do banco'
+  );
 end;
 $$;
+
+-- RLS bloqueia sem lançar erro (a permissão de DELETE agora existe pra
+-- authenticated; quem barra voluntário é a policy, não a ausência de grant).
+set "request.jwt.claim.sub" = '33333333-3333-3333-3333-333333333333';
+
+delete from pontuacao_eventos
+  where crianca_id = 'cccccccc-0000-0000-0000-000000000001'
+    and estorna_evento_id is null;
+
+select espera(
+  exists (select 1 from pontuacao_eventos
+    where crianca_id = 'cccccccc-0000-0000-0000-000000000001'
+      and estorna_evento_id is null),
+  'voluntário NÃO consegue excluir evento de pontuação'
+);
 
 -- =============================================================== teste 5
 -- Lançar em nome de outra pessoa é recusado.
