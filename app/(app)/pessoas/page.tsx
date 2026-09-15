@@ -21,7 +21,9 @@ import { Tabela, type Coluna } from "@/components/ui/tabela";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
-import { alternarAcesso, cancelarConvite } from "./actions";
+import { cancelarConvite } from "./actions";
+import { AcoesDaPessoa } from "./acoes-da-pessoa";
+import type { Vinculo } from "./acesso";
 import { ConvidarDialogo } from "./convite";
 
 export const metadata: Metadata = {
@@ -35,7 +37,10 @@ type Pessoa = {
   email: string;
   is_admin: boolean;
   ativo: boolean;
-  vinculos: string[];
+  /** Para a coluna "Papel", já legível. */
+  resumoDosVinculos: string[];
+  /** Para o diálogo de acesso, que precisa editar. */
+  vinculos: Vinculo[];
 };
 
 function quando(iso: string) {
@@ -79,16 +84,22 @@ export default async function Pessoas() {
   const nomeDaArea = new Map(listaDeAreas.map((a) => [a.id, a.nome]));
   const nomeDaPessoa = new Map((perfis.data ?? []).map((p) => [p.id, p.nome]));
 
-  const vinculosPorPessoa = new Map<string, string[]>();
+  const resumoPorPessoa = new Map<string, string[]>();
+  const vinculosPorPessoa = new Map<string, Vinculo[]>();
   for (const v of vinculos.data ?? []) {
-    const lista = vinculosPorPessoa.get(v.usuario_id) ?? [];
+    const resumo = resumoPorPessoa.get(v.usuario_id) ?? [];
     const papel = v.papel === "coordenador" ? "coordena" : "voluntária em";
-    lista.push(`${papel} ${nomeDaArea.get(v.area_id) ?? "área removida"}`);
+    resumo.push(`${papel} ${nomeDaArea.get(v.area_id) ?? "área removida"}`);
+    resumoPorPessoa.set(v.usuario_id, resumo);
+
+    const lista = vinculosPorPessoa.get(v.usuario_id) ?? [];
+    lista.push({ area_id: v.area_id, papel: v.papel });
     vinculosPorPessoa.set(v.usuario_id, lista);
   }
 
   const pessoas: Pessoa[] = (perfis.data ?? []).map((p) => ({
     ...p,
+    resumoDosVinculos: resumoPorPessoa.get(p.id) ?? [],
     vinculos: vinculosPorPessoa.get(p.id) ?? [],
   }));
   const comAcesso = pessoas.filter((p) => p.ativo).length;
@@ -116,10 +127,10 @@ export default async function Pessoas() {
       conteudo: (p) =>
         p.is_admin ? (
           <Badge variant="brand">Administrador</Badge>
-        ) : p.vinculos.length === 0 ? (
+        ) : p.resumoDosVinculos.length === 0 ? (
           <span className="text-ink-muted">Sem área</span>
         ) : (
-          <span className="text-xs text-ink-muted">{p.vinculos.join(", ")}</span>
+          <span className="text-xs text-ink-muted">{p.resumoDosVinculos.join(", ")}</span>
         ),
     },
     {
@@ -141,38 +152,21 @@ export default async function Pessoas() {
       chave: "acao",
       cabecalho: "",
       numerica: true,
-      largura: "8rem",
-      conteudo: (p) =>
-        p.id === eu.id ? (
-          <span className="text-xs text-ink-muted">Você</span>
-        ) : p.ativo ? (
-          <Confirmacao
-            titulo={`Desativar acesso de ${p.nome}?`}
-            descricao="A pessoa perde o acesso na próxima requisição. Você pode reativar depois."
-            rotuloConfirmar="Desativar acesso"
-            perigoso
-            acao={alternarAcesso}
-            campos={{ usuario_id: p.id, ativar: "nao" }}
-            mensagemDeSucesso="Acesso desativado."
-          >
-            <Button variant="ghost" size="sm">
-              Desativar
-            </Button>
-          </Confirmacao>
-        ) : (
-          <Confirmacao
-            titulo={`Reativar acesso de ${p.nome}?`}
-            descricao="A pessoa volta a entrar no portal com a mesma conta e os mesmos vínculos de área."
-            rotuloConfirmar="Reativar acesso"
-            acao={alternarAcesso}
-            campos={{ usuario_id: p.id, ativar: "sim" }}
-            mensagemDeSucesso="Acesso reativado."
-          >
-            <Button variant="ghost" size="sm">
-              Reativar
-            </Button>
-          </Confirmacao>
-        ),
+      largura: "3rem",
+      conteudo: (p) => (
+        <AcoesDaPessoa
+          pessoa={{
+            id: p.id,
+            nome: p.nome,
+            email: p.email,
+            isAdmin: p.is_admin,
+            ativo: p.ativo,
+            vinculos: p.vinculos,
+          }}
+          areas={listaDeAreas}
+          souEu={p.id === eu.id}
+        />
+      ),
     },
   ];
 

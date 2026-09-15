@@ -38,6 +38,10 @@ funcionando. O ADR 0010 escolheu as bibliotecas; faltava decidir o comportamento
   acima do controle; ajuda ou erro abaixo, nunca os dois.
 - **Formulário longo em seções de duas colunas.** Título e explicação à esquerda, campos à
   direita (`SecaoDoFormulario`). No celular empilha.
+- **Ação que concede acesso pede mais que confirmação.** `Confirmacao` basta para o que se
+  desfaz (desativar, estornar, remover vínculo). Conceder privilégio de administrador não se
+  desfaz de verdade, então tem diálogo próprio, com o que aquele acesso permite escrito, o nome
+  da pessoa digitado e a senha de quem promove. Ver ADR 0012.
 - **Estado vazio ensina.** `EstadoVazio` sempre com título, uma frase sobre o que vai aparecer
   ali e a primeira ação quando ela existe.
 - **Marca é acento.** A cor laranja aparece em foco, item ativo, posição 1 do ranking e no botão

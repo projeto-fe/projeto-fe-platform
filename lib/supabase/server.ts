@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 import {
@@ -44,4 +45,21 @@ export function criarClienteAdministrativo() {
   return createServerClient(urlDoSupabase(), chaveDeServicoDoSupabase(), {
     cookies: { getAll: () => [], setAll: () => {} },
   });
+}
+
+/**
+ * Confere uma senha sem tocar na sessão de quem está logado.
+ *
+ * Serve para etapa extra de confirmação em ação de alto impacto, como conceder
+ * privilégio de administrador: prova que quem clicou é a pessoa, e não alguém
+ * que encontrou o computador destravado. O cliente é efêmero e não persiste
+ * nada, senão o login de verificação sobrescreveria o cookie de sessão.
+ */
+export async function conferirSenha(email: string, senha: string) {
+  const efemero = createClient(urlDoSupabase(), chavePublicaDoSupabase(), {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+
+  const { error } = await efemero.auth.signInWithPassword({ email, password: senha });
+  return !error;
 }

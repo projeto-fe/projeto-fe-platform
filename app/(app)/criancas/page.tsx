@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ChevronRight, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -10,9 +10,11 @@ import { Card, CardNota } from "@/components/ui/card";
 import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { Iniciais } from "@/components/ui/iniciais";
 import { Tabela, type Coluna } from "@/components/ui/tabela";
+import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
 import { AbrirCadastro } from "./abrir-cadastro";
+import { AcoesDaCrianca } from "./acoes-da-crianca";
 import { dadosDoCadastro } from "./dados";
 import { Filtros } from "./filtros";
 
@@ -27,7 +29,9 @@ type LinhaDeCrianca = {
   data_nascimento: string;
   tem_problema_saude: boolean;
   observacao_saude: string | null;
+  ativo: boolean;
   atividades: string[];
+  temPontuacao: boolean;
 };
 
 function idade(nascimento: string) {
@@ -42,20 +46,23 @@ function idade(nascimento: string) {
 export default async function Criancas({
   searchParams,
 }: {
-  searchParams: Promise<{ busca?: string; atividade?: string }>;
+  searchParams: Promise<{ busca?: string; atividade?: string; situacao?: string }>;
 }) {
-  const { busca, atividade } = await searchParams;
+  const pessoa = await exigirPessoaLogada();
+  const { busca, atividade, situacao } = await searchParams;
   const supabase = await criarClienteDoServidor();
   const { atividades: atividadesDoCadastro, podeVerSensiveis } = await dadosDoCadastro();
 
-  const [criancasResposta, atividadesResposta, inscricoesResposta] = await Promise.all([
+  const [criancasResposta, atividadesResposta, inscricoesResposta, pontuadas] = await Promise.all([
     supabase
       .from("criancas")
-      .select("id, nome_completo, data_nascimento, tem_problema_saude, observacao_saude")
-      .eq("ativo", true)
+      .select("id, nome_completo, data_nascimento, tem_problema_saude, observacao_saude, ativo")
       .order("nome_completo"),
     supabase.from("areas").select("id, nome").eq("tipo", "atividade").eq("ativo", true).order("nome"),
     supabase.from("crianca_atividades").select("crianca_id, atividade_id"),
+    // Quem já pontuou não pode ser excluída sem levar o ranking junto, então a
+    // lista precisa saber disso antes de oferecer a ação.
+    supabase.from("pontuacao_eventos").select("crianca_id"),
   ]);
 
   const nomeDaAtividade = new Map((atividadesResposta.data ?? []).map((a) => [a.id, a.nome]));
@@ -74,17 +81,29 @@ export default async function Criancas({
     idsPorAtividade.set(inscricao.atividade_id, conjunto);
   }
 
+  const comPontuacao = new Set((pontuadas.data ?? []).map((e) => e.crianca_id));
+
   const todas = criancasResposta.data ?? [];
+  const ativas = todas.filter((c) => c.ativo);
   const termo = busca?.trim().toLowerCase();
-  const filtrando = Boolean(termo || atividade);
+  const verSituacao = situacao === "inativas" || situacao === "todas" ? situacao : "ativas";
+  const filtrando = Boolean(termo || atividade || verSituacao !== "ativas");
 
   const linhas: LinhaDeCrianca[] = todas
-    .map((c) => ({ ...c, atividades: atividadesPorCrianca.get(c.id) ?? [] }))
+    .map((c) => ({
+      ...c,
+      atividades: atividadesPorCrianca.get(c.id) ?? [],
+      temPontuacao: comPontuacao.has(c.id),
+    }))
     .filter((c) => {
+      if (verSituacao === "ativas" && !c.ativo) return false;
+      if (verSituacao === "inativas" && c.ativo) return false;
       if (termo && !c.nome_completo.toLowerCase().includes(termo)) return false;
       if (atividade && !idsPorAtividade.get(atividade)?.has(c.id)) return false;
       return true;
     });
+
+  const podeDesativar = pessoa.isAdmin || pessoa.coordenaAlgumaArea;
 
   const colunas: Coluna<LinhaDeCrianca>[] = [
     {
@@ -137,34 +156,49 @@ export default async function Criancas({
         ),
     },
     {
-      chave: "abrir",
+      chave: "acoes",
       cabecalho: "",
       largura: "3rem",
       numerica: true,
       conteudo: (linha) => (
-        <AbrirCadastro
-          criancaId={linha.id}
+        <AcoesDaCrianca
+          crianca={{
+            id: linha.id,
+            nome: linha.nome_completo,
+            ativa: linha.ativo,
+            temPontuacao: linha.temPontuacao,
+          }}
           atividades={atividadesDoCadastro}
           podeVerSensiveis={podeVerSensiveis}
-        >
-          <button
-            type="button"
-            aria-label={`Abrir cadastro de ${linha.nome_completo}`}
-            className="inline-grid size-8 place-items-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunken hover:text-ink"
-          >
-            <ChevronRight className="size-4" aria-hidden />
-          </button>
-        </AbrirCadastro>
+          podeDesativar={podeDesativar}
+          podeExcluir={pessoa.isAdmin}
+        />
       ),
     },
   ];
 
-  const total = todas.length;
+  if (verSituacao !== "ativas") {
+    colunas.splice(3, 0, {
+      chave: "situacao",
+      cabecalho: "Situação",
+      largura: "8rem",
+      conteudo: (linha) =>
+        linha.ativo ? (
+          <Badge variant="positive" ponto>
+            Ativa
+          </Badge>
+        ) : (
+          <Badge variant="neutral">Inativa</Badge>
+        ),
+    });
+  }
+
+  const total = ativas.length;
   const descricao =
-    total === 0
+    todas.length === 0
       ? "Nenhuma criança cadastrada ainda."
       : filtrando
-        ? `${linhas.length} de ${total} ${total === 1 ? "criança ativa" : "crianças ativas"}`
+        ? `${linhas.length} ${linhas.length === 1 ? "criança" : "crianças"} neste filtro, de ${total} ${total === 1 ? "ativa" : "ativas"}`
         : `${total} ${total === 1 ? "criança ativa" : "crianças ativas"}`;
 
   return (
@@ -181,12 +215,17 @@ export default async function Criancas({
 
       <CorpoDaPagina>
         <Suspense fallback={null}>
-          <Filtros atividades={atividadesResposta.data ?? []} busca={busca} atividade={atividade} />
+          <Filtros
+            atividades={atividadesResposta.data ?? []}
+            busca={busca}
+            atividade={atividade}
+            situacao={verSituacao}
+          />
         </Suspense>
 
         <Card>
           <Tabela
-            legenda="Crianças ativas"
+            legenda="Crianças"
             colunas={colunas}
             linhas={linhas}
             chaveDaLinha={(linha) => linha.id}

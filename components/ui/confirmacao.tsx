@@ -8,8 +8,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  /** O gatilho: um botão ou ícone. Recebe o clique via Slot. */
-  children: React.ReactNode;
+  /** O gatilho: um botão ou ícone. Ausente quando a abertura é controlada. */
+  children?: React.ReactNode;
+  /** Abertura controlada, para quando quem pede a confirmação é um item de
+   *  menu: o menu desmonta ao fechar e levaria o gatilho junto. */
+  aberto?: boolean;
+  aoMudarAberto?: (aberto: boolean) => void;
   titulo: string;
   descricao: React.ReactNode;
   rotuloConfirmar: string;
@@ -21,6 +25,9 @@ type Props = {
   campos?: Record<string, string>;
   /** Mensagem do aviso depois que a ação conclui. */
   mensagemDeSucesso?: string;
+  /** Explica por que não dá, sem esconder a opção: quem clicou precisa ler o
+   *  motivo, não descobrir que o item sumiu do menu. */
+  desabilitado?: boolean;
 };
 
 /**
@@ -30,6 +37,8 @@ type Props = {
  */
 export function Confirmacao({
   children,
+  aberto: abertoControlado,
+  aoMudarAberto,
   titulo,
   descricao,
   rotuloConfirmar,
@@ -37,8 +46,11 @@ export function Confirmacao({
   acao,
   campos = {},
   mensagemDeSucesso,
+  desabilitado = false,
 }: Props) {
-  const [aberto, setAberto] = React.useState(false);
+  const [abertoInterno, setAbertoInterno] = React.useState(false);
+  const aberto = abertoControlado ?? abertoInterno;
+  const setAberto = aoMudarAberto ?? setAbertoInterno;
   const [enviando, iniciar] = React.useTransition();
 
   function confirmar() {
@@ -58,7 +70,7 @@ export function Confirmacao({
 
   return (
     <AlertDialog.Root open={aberto} onOpenChange={setAberto}>
-      <AlertDialog.Trigger asChild>{children}</AlertDialog.Trigger>
+      {children ? <AlertDialog.Trigger asChild>{children}</AlertDialog.Trigger> : null}
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-50 bg-scrim backdrop-blur-[2px] animate-esmaecer" />
         <AlertDialog.Content
@@ -76,12 +88,13 @@ export function Confirmacao({
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <AlertDialog.Cancel asChild>
               <Button variant="outline" disabled={enviando}>
-                Voltar
+                {desabilitado ? "Entendi" : "Voltar"}
               </Button>
             </AlertDialog.Cancel>
             <Button
               variant={perigoso ? "destructive" : "primary"}
               loading={enviando}
+              disabled={desabilitado}
               onClick={confirmar}
             >
               {rotuloConfirmar}

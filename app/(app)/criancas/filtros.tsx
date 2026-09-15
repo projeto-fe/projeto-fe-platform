@@ -12,10 +12,12 @@ export function Filtros({
   atividades,
   busca,
   atividade,
+  situacao,
 }: {
   atividades: { id: string; nome: string }[];
   busca?: string;
   atividade?: string;
+  situacao?: string;
 }) {
   const router = useRouter();
   const parametros = useSearchParams();
@@ -37,10 +39,10 @@ export function Filtros({
     return () => clearTimeout(tempo);
   }, [termo, parametros, router]);
 
-  function trocarAtividade(valor: string) {
+  function trocarParametro(chave: string, valor: string) {
     const novos = new URLSearchParams(parametros.toString());
-    if (valor) novos.set("atividade", valor);
-    else novos.delete("atividade");
+    if (valor) novos.set(chave, valor);
+    else novos.delete(chave);
     router.replace(`/criancas?${novos.toString()}`);
   }
 
@@ -73,16 +75,31 @@ export function Filtros({
         ) : null}
       </div>
 
-      <div className="sm:w-64">
-        <Select
-          aria-label="Filtrar por atividade"
-          value={atividade ?? ""}
-          onValueChange={trocarAtividade}
-          opcoes={[
-            { value: "", label: "Todas as atividades" },
-            ...atividades.map((a) => ({ value: a.id, label: a.nome })),
-          ]}
-        />
+      <div className="flex gap-2">
+        <div className="min-w-0 flex-1 sm:w-56 sm:flex-none">
+          <Select
+            aria-label="Filtrar por atividade"
+            value={atividade ?? ""}
+            onValueChange={(valor) => trocarParametro("atividade", valor)}
+            opcoes={[
+              { value: "", label: "Todas as atividades" },
+              ...atividades.map((a) => ({ value: a.id, label: a.nome })),
+            ]}
+          />
+        </div>
+
+        <div className="min-w-0 flex-1 sm:w-40 sm:flex-none">
+          <Select
+            aria-label="Filtrar por situação"
+            value={situacao ?? "ativas"}
+            onValueChange={(valor) => trocarParametro("situacao", valor === "ativas" ? "" : valor)}
+            opcoes={[
+              { value: "ativas", label: "Ativas" },
+              { value: "inativas", label: "Inativas" },
+              { value: "todas", label: "Todas" },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { registrarAuditoria } from "@/lib/auditoria";
 import { exigirPessoaLogada } from "@/lib/sessao";
 import { criarClienteDoServidor } from "@/lib/supabase/server";
 
@@ -169,4 +170,74 @@ export async function carregarCadastroDaCrianca(
   if (!crianca.data) return { erro: "Este cadastro não existe mais." };
 
   return { valores: montarValores(crianca.data, sensiveis.data, inscricoes.data ?? []) };
+}
+
+/**
+ * Tira a criança da operação sem apagar nada.
+ *
+ * É o caminho normal para quem saiu do projeto: o cadastro some das listas e
+ * dos lançamentos, mas a pontuação do ano continua existindo e explicável.
+ * Coordenação decide isso; voluntário não.
+ */
+export async function alternarAtivoDaCrianca(dados: FormData) {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin && !pessoa.coordenaAlgumaArea) return;
+
+  const id = String(dados.get("crianca_id"));
+  const ativar = dados.get("ativar") === "sim";
+
+  const supabase = await criarClienteDoServidor();
+  const { error } = await supabase.from("criancas").update({ ativo: ativar }).eq("id", id);
+  if (error) return;
+
+  await registrarAuditoria({
+    atorId: pessoa.id,
+    acao: ativar ? "reativou criança" : "desativou criança",
+    entidade: "criancas",
+    entidadeId: id,
+    detalhe: { nome: String(dados.get("nome") ?? "") },
+    sensivel: true,
+  });
+
+  revalidatePath("/criancas");
+  revalidatePath("/");
+}
+
+/**
+ * Apaga o cadastro de vez. Só administrador, e só enquanto não houver
+ * pontuação lançada.
+ *
+ * A chave estrangeira de `pontuacao_eventos` é `on delete cascade`: apagar uma
+ * criança com histórico levaria junto os lançamentos que sustentam o ranking
+ * do ano, e ninguém conseguiria mais explicar à turma por que as posições
+ * mudaram. Quem já pontuou se desativa, não se apaga.
+ */
+export async function excluirCrianca(dados: FormData) {
+  const pessoa = await exigirPessoaLogada();
+  if (!pessoa.isAdmin) return;
+
+  const id = String(dados.get("crianca_id"));
+  const supabase = await criarClienteDoServidor();
+
+  const { count } = await supabase
+    .from("pontuacao_eventos")
+    .select("id", { count: "exact", head: true })
+    .eq("crianca_id", id);
+
+  if ((count ?? 0) > 0) return;
+
+  const { error } = await supabase.from("criancas").delete().eq("id", id);
+  if (error) return;
+
+  await registrarAuditoria({
+    atorId: pessoa.id,
+    acao: "excluiu cadastro de criança",
+    entidade: "criancas",
+    entidadeId: id,
+    detalhe: { nome: String(dados.get("nome") ?? "") },
+    sensivel: true,
+  });
+
+  revalidatePath("/criancas");
+  revalidatePath("/");
 }

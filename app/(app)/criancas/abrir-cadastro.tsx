@@ -23,8 +23,12 @@ type Props = {
   criancaId?: string;
   atividades: Atividade[];
   podeVerSensiveis: boolean;
-  /** O botão ou a linha da tabela que abre o diálogo. */
-  children: React.ReactNode;
+  /** O botão que abre o diálogo. Ausente quando quem abre é um item de menu. */
+  children?: React.ReactNode;
+  /** Abertura controlada: item de menu não serve de gatilho, porque o menu
+   *  desmonta ao fechar e levaria o diálogo junto. */
+  aberto?: boolean;
+  aoMudarAberto?: (aberto: boolean) => void;
 };
 
 /**
@@ -35,8 +39,17 @@ type Props = {
  * alguém clicar. As páginas `/criancas/nova` e `/criancas/[id]` continuam
  * existindo para quem chega pelo endereço direto.
  */
-export function AbrirCadastro({ criancaId, atividades, podeVerSensiveis, children }: Props) {
-  const [aberto, setAberto] = React.useState(false);
+export function AbrirCadastro({
+  criancaId,
+  atividades,
+  podeVerSensiveis,
+  children,
+  aberto: abertoControlado,
+  aoMudarAberto,
+}: Props) {
+  const [abertoInterno, setAbertoInterno] = React.useState(false);
+  const aberto = abertoControlado ?? abertoInterno;
+  const setAberto = aoMudarAberto ?? setAbertoInterno;
   const [valores, setValores] = React.useState<ValoresDaCrianca>();
   const [erro, setErro] = React.useState<string>();
   const [carregando, iniciarCarga] = React.useTransition();
@@ -57,7 +70,7 @@ export function AbrirCadastro({ criancaId, atividades, podeVerSensiveis, childre
 
   return (
     <Dialogo open={aberto} onOpenChange={aoMudar}>
-      <DialogoGatilho asChild>{children}</DialogoGatilho>
+      {children ? <DialogoGatilho asChild>{children}</DialogoGatilho> : null}
 
       <DialogoConteudo largura="xl">
         {pronto ? (
