@@ -61,6 +61,11 @@ select espera(
   'catálogo de motivos veio populado pela migration'
 );
 
+select espera(
+  (select matricula from criancas where id = 'cccccccc-0000-0000-0000-000000000001') is not null,
+  'matrícula é gerada sozinha, sem ninguém preencher'
+);
+
 -- =============================================================== teste 1
 -- Voluntário não lê dado sensível. Testado no banco, não na interface.
 set role authenticated;
@@ -369,6 +374,272 @@ begin
   exception when others then deu_erro := true;
   end;
   perform espera(deu_erro, 'service_role continua sem alcançar dado sensível de criança');
+end;
+$$;
+
+reset role;
+
+-- ============================================================== teste 15
+-- Calendário e presença. "Inglês" (aaaaaaaa...0002) é atividade dentro de
+-- "Educacional" (aaaaaaaa...0001); volu está vinculado à atividade, coord à
+-- área-mãe. Uma segunda atividade sem ninguém vinculado serve de negativo.
+insert into areas (id, nome, tipo) values
+  ('aaaaaaaa-0000-0000-0000-000000000003', 'Esportivo', 'area');
+insert into areas (id, nome, parent_id, tipo) values
+  ('aaaaaaaa-0000-0000-0000-000000000004', 'Futebol',
+   'aaaaaaaa-0000-0000-0000-000000000003', 'atividade');
+
+set role authenticated;
+set "request.jwt.claim.sub" = '11111111-1111-1111-1111-111111111111';
+
+insert into atividade_horarios (atividade_id, dia_semana, hora_inicio, hora_fim, local)
+values ('aaaaaaaa-0000-0000-0000-000000000002', 2, '14:00', '15:30', 'Sala 3');
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into atividade_horarios (atividade_id, dia_semana, hora_inicio, hora_fim)
+    values ('aaaaaaaa-0000-0000-0000-000000000001', 1, '10:00', '11:00');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'horário recorrente recusa área que não é atividade');
+end;
+$$;
+
+insert into atividade_horarios (atividade_id, frequencia, dia_do_mes, hora_inicio, hora_fim)
+values ('aaaaaaaa-0000-0000-0000-000000000002', 'mensal_dia_fixo', 15, '19:00', '20:00');
+
+insert into atividade_horarios (atividade_id, frequencia, dia_semana, semana_do_mes, hora_inicio, hora_fim)
+values ('aaaaaaaa-0000-0000-0000-000000000002', 'mensal_ordinal', 2, -1, '19:00', '20:00');
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into atividade_horarios (atividade_id, frequencia, dia_semana, dia_do_mes, hora_inicio, hora_fim)
+    values ('aaaaaaaa-0000-0000-0000-000000000002', 'mensal_dia_fixo', 2, 15, '19:00', '20:00');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'horário mensal por dia fixo recusa vir com dia da semana também preenchido');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into atividade_horarios (atividade_id, frequencia, hora_inicio, hora_fim)
+    values ('aaaaaaaa-0000-0000-0000-000000000002', 'semanal', '19:00', '20:00');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'horário semanal exige dia da semana');
+end;
+$$;
+
+set "request.jwt.claim.sub" = '33333333-3333-3333-3333-333333333333';
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into atividade_horarios (atividade_id, dia_semana, hora_inicio, hora_fim)
+    values ('aaaaaaaa-0000-0000-0000-000000000002', 3, '09:00', '10:00');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'voluntário não cria horário recorrente, só administrador');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into atividade_eventos (atividade_id, data, tipo)
+    values ('aaaaaaaa-0000-0000-0000-000000000002', '2026-10-07', 'cancelado');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'voluntário simples não registra exceção, só coordenador ou administrador');
+end;
+$$;
+
+set "request.jwt.claim.sub" = '22222222-2222-2222-2222-222222222222';
+
+insert into atividade_eventos (atividade_id, data, tipo)
+values ('aaaaaaaa-0000-0000-0000-000000000002', '2026-10-13', 'cancelado');
+
+select espera(
+  (select count(*) from atividade_eventos where atividade_id = 'aaaaaaaa-0000-0000-0000-000000000002' and tipo = 'cancelado') = 1,
+  'coordenador da área-mãe registra exceção na atividade filha'
+);
+
+-- Chamada e presença: volu abre a chamada de Inglês e lança presença.
+set "request.jwt.claim.sub" = '33333333-3333-3333-3333-333333333333';
+
+insert into chamadas (id, atividade_id, data, aberta_por) values
+  ('dddddddd-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000002',
+   '2026-09-15', '33333333-3333-3333-3333-333333333333');
+
+insert into presencas (chamada_id, crianca_id, status, registrado_por) values
+  ('dddddddd-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000001',
+   'presente', '33333333-3333-3333-3333-333333333333');
+
+select espera(
+  (select atividade_id from presencas where chamada_id = 'dddddddd-0000-0000-0000-000000000001') =
+    'aaaaaaaa-0000-0000-0000-000000000002',
+  'presença copia o atividade_id da chamada, não do que o cliente mandaria'
+);
+
+update presencas set status = 'falta', atualizado_em = now()
+  where chamada_id = 'dddddddd-0000-0000-0000-000000000001'
+    and crianca_id = 'cccccccc-0000-0000-0000-000000000001';
+
+select espera(
+  (select status from presencas where chamada_id = 'dddddddd-0000-0000-0000-000000000001') = 'falta',
+  'presença se corrige com UPDATE direto, sem estorno'
+);
+
+select espera(
+  (select count(*) from presencas where chamada_id = 'dddddddd-0000-0000-0000-000000000001') = 1,
+  'a correção atualizou a linha existente, não duplicou'
+);
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into chamadas (atividade_id, data, aberta_por) values
+      ('aaaaaaaa-0000-0000-0000-000000000004', '2026-09-15', '33333333-3333-3333-3333-333333333333');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'sem vínculo com a área, sem abrir chamada naquela atividade');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into presencas (chamada_id, usuario_id, status, registrado_por) values
+      ('dddddddd-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111',
+       'presente', '33333333-3333-3333-3333-333333333333'),
+      ('dddddddd-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111',
+       'falta', '33333333-3333-3333-3333-333333333333');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'não dá para lançar duas presenças da mesma pessoa na mesma chamada');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    insert into presencas (chamada_id, status, registrado_por) values
+      ('dddddddd-0000-0000-0000-000000000001', 'presente', '33333333-3333-3333-3333-333333333333');
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'presença exige uma pessoa: nem criança nem voluntário é recusado');
+end;
+$$;
+
+reset role;
+set role anon;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from chamadas;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'anon não lê chamadas');
+end;
+$$;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from presencas;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'anon não lê presenças');
+end;
+$$;
+
+reset role;
+set role service_role;
+
+select espera(
+  (select count(*) from agenda_horarios) >= 1,
+  'service_role lê a agenda pública de horários'
+);
+
+select espera(
+  (select count(*) from agenda_eventos) >= 1,
+  'service_role lê a agenda pública de eventos'
+);
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from presencas;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'service_role NÃO alcança presença: a agenda pública nunca precisa disso');
+end;
+$$;
+
+reset role;
+
+-- ============================================================== teste 16
+-- Redefinição de senha: só o service_role mexe, ninguém logado alcança.
+set role service_role;
+
+insert into redefinicoes_senha (usuario_id, token_hash, expira_em)
+values ('33333333-3333-3333-3333-333333333333', 'hash-de-teste', now() + interval '1 hour');
+
+select espera(
+  (select count(*) from redefinicoes_senha where usuario_id = '33333333-3333-3333-3333-333333333333') = 1,
+  'service_role cria e lê pedido de redefinição de senha'
+);
+
+update redefinicoes_senha set usado_em = now()
+  where usuario_id = '33333333-3333-3333-3333-333333333333';
+
+select espera(
+  (select usado_em from redefinicoes_senha where usuario_id = '33333333-3333-3333-3333-333333333333') is not null,
+  'service_role marca a redefinição como usada'
+);
+
+reset role;
+set role authenticated;
+set "request.jwt.claim.sub" = '11111111-1111-1111-1111-111111111111';
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from redefinicoes_senha;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'admin logado não alcança a tabela de redefinição de senha');
+end;
+$$;
+
+reset role;
+set role anon;
+
+do $$
+declare deu_erro boolean := false;
+begin
+  begin
+    perform count(*) from redefinicoes_senha;
+  exception when others then deu_erro := true;
+  end;
+  perform espera(deu_erro, 'anon não alcança a tabela de redefinição de senha');
 end;
 $$;
 
